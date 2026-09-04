@@ -2,3 +2,9 @@
 name = "yalc-app"
 version.workspace = true
 edition.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+yalc-errors = { path = "../yalc-errors" }

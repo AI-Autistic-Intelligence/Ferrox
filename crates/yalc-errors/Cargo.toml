@@ -2,3 +2,11 @@
 name = "yalc-errors"
 version.workspace = true
 edition.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+anyhow.workspace = true
+axum.workspace = true
+serde.workspace = true
+serde_json = "1.0"
+http = "1.0"
