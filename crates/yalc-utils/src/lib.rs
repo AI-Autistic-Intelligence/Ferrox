@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-/// Generates a secure, random UUID v4 string
+/// Generates a secure, time-ordered UUID v7 string.
+/// UUIDv7 is superior for database primary keys as it prevents index fragmentation.
 pub fn generate_uuid() -> String {
-    Uuid::new_v4().to_string()
+    Uuid::now_v7().to_string()
 }
 
 /// Extension trait to add domain-specific utility methods to Strings
