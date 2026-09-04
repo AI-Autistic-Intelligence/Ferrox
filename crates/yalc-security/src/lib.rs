@@ -11,6 +11,8 @@ use serde::{Deserialize, Serialize};
 use time::{Duration, OffsetDateTime};
 use yalc_errors::AppError;
 
+pub mod auth_middleware;
+
 /// Hashes a password securely using Argon2.
 /// The input is wrapped in `Secret<String>` to guarantee it doesn't leak in logs.
 pub fn hash_password(password: Secret<String>) -> Result<String, AppError> {
@@ -40,7 +42,7 @@ pub struct PasetoAuth {
     key: SymmetricKey<V4>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AuthPayload {
     pub user_id: String,
     pub role: String,
