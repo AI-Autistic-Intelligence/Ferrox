@@ -1,0 +1,3 @@
+[submodule "docs/autistic-theme"]
+	path = docs/autistic-theme
+	url = https://github.com/AI-Autistic-Intelligence/Docusaurus_Autistic_Theme.git
