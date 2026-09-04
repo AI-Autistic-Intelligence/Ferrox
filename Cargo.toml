@@ -19,7 +19,14 @@ members = [
     "crates/ag-grid/yalc-ag-grid-mongo",
     "crates/integrations/yalc-notifications-slack",
     "crates/integrations/yalc-payments-stripe",
-    "crates/integrations/yalc-payments-google"
+    "crates/integrations/yalc-payments-google",
+    "crates/integrations/yalc-storage",
+    "crates/integrations/yalc-mailer",
+    "crates/integrations/yalc-feature-flags",
+    "crates/integrations/yalc-reports",
+    "crates/integrations/yalc-cloud-helpers",
+    "crates/yalc-jobs",
+    "crates/yalc-rate-limiter"
 ]
 
 [workspace.package]
