@@ -2,3 +2,14 @@
 name = "yalc-crud-gen"
 version.workspace = true
 edition.workspace = true
+
+[dependencies]
+axum.workspace = true
+serde.workspace = true
+serde_json = "1.0"
+yalc-database-core = { path = "../database/yalc-database-core" }
+yalc-errors = { path = "../yalc-errors" }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }
+async-trait = "0.1"
