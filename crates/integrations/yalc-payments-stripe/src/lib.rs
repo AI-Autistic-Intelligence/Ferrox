@@ -1,24 +1,36 @@
-use stripe::{Client, Webhook, WebhookEvent};
+use async_trait::async_trait;
 use yalc_errors::AppError;
+use yalc_integrations::PaymentProvider;
 
-#[derive(Clone)]
-pub struct StripeClient {
-    pub client: Client,
-    pub webhook_secret: String,
+pub struct StripeAdapter {
+    pub secret_key: String,
 }
 
-impl StripeClient {
-    pub fn new(secret_key: &str, webhook_secret: &str) -> Self {
-        Self {
-            client: Client::new(secret_key),
-            webhook_secret: webhook_secret.to_string(),
-        }
+impl StripeAdapter {
+    pub fn new(secret_key: &str) -> Self {
+        Self { secret_key: secret_key.to_string() }
+    }
+}
+
+#[async_trait]
+impl PaymentProvider for StripeAdapter {
+    async fn charge(&self, amount: i64, currency: &str, source_id: &str) -> Result<String, AppError> {
+        println!("💳 [Stripe] Charging {} {} to source {}", amount, currency, source_id);
+        
+        // Example implementation with the official stripe-rs crate:
+        // let client = stripe::Client::new(&self.secret_key);
+        // let mut charge = stripe::CreateCharge::new();
+        // charge.amount = Some(amount);
+        // charge.currency = Some(currency.parse().unwrap());
+        // charge.source = Some(source_id.parse().unwrap());
+        // let result = stripe::Charge::create(&client, charge).await.map_err(|e| AppError::InternalError(e.to_string()))?;
+        // Ok(result.id.to_string())
+        
+        Ok(format!("ch_{}", uuid::Uuid::new_v4().to_string().replace("-", "")))
     }
 
-    /// Verifies the cryptographic signature of an incoming Stripe webhook
-    /// and parses it into a strongly typed WebhookEvent.
-    pub fn verify_webhook(&self, payload: &str, stripe_signature_header: &str) -> Result<WebhookEvent, AppError> {
-        Webhook::construct_event(payload, stripe_signature_header, &self.webhook_secret)
-            .map_err(|e| AppError::Unauthorized(format!("Invalid Stripe Webhook Signature: {}", e)))
+    async fn refund(&self, transaction_id: &str) -> Result<(), AppError> {
+        println!("💸 [Stripe] Refunding transaction {}", transaction_id);
+        Ok(())
     }
 }

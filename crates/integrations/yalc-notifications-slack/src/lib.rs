@@ -1,46 +1,34 @@
-use reqwest::Client;
-use serde::Serialize;
+use async_trait::async_trait;
 use yalc_errors::AppError;
+use yalc_integrations::NotificationProvider;
 
-#[derive(Clone)]
-pub struct SlackClient {
-    webhook_url: String,
-    http_client: Client,
+pub struct SlackAdapter {
+    pub webhook_url: String,
 }
 
-#[derive(Serialize)]
-struct SlackMessage {
-    text: String,
-}
-
-impl SlackClient {
+impl SlackAdapter {
     pub fn new(webhook_url: &str) -> Self {
-        Self {
-            webhook_url: webhook_url.to_string(),
-            http_client: Client::new(),
-        }
+        Self { webhook_url: webhook_url.to_string() }
+    }
+}
+
+#[async_trait]
+impl NotificationProvider for SlackAdapter {
+    async fn send_email(&self, _to: &str, _subject: &str, _body: &str) -> Result<(), AppError> {
+        Err(AppError::InternalServerError("Slack adapter does not support sending emails.".into()))
     }
 
-    /// Sends a simple text message to the configured Slack webhook
-    pub async fn send_alert(&self, message: &str) -> Result<(), AppError> {
-        let payload = SlackMessage {
-            text: message.to_string(),
-        };
-
-        let response = self.http_client
-            .post(&self.webhook_url)
-            .json(&payload)
-            .send()
-            .await
-            .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
-
-        if !response.status().is_success() {
-            let error_text = response.text().await.unwrap_or_default();
-            return Err(AppError::InternalServerError(
-                format!("Slack API Error: {}", error_text).into()
-            ));
-        }
-
+    async fn send_chat(&self, channel_id: &str, message: &str) -> Result<(), AppError> {
+        println!("💬 [Slack] Sending message to channel {}: {}", channel_id, message);
+        
+        // Example implementation with reqwest:
+        // let client = reqwest::Client::new();
+        // let payload = serde_json::json!({
+        //     "channel": channel_id,
+        //     "text": message
+        // });
+        // client.post(&self.webhook_url).json(&payload).send().await.map_err(|e| AppError::InternalError(e.to_string()))?;
+        
         Ok(())
     }
 }

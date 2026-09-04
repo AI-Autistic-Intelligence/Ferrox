@@ -18,6 +18,7 @@ members = [
     "crates/yalc-validation",
     "crates/yalc-saga",
     "crates/yalc-search",
+    "crates/yalc-integrations",
     "crates/integrations/yalc-notifications-slack",
     "crates/integrations/yalc-payments-stripe",
     "crates/integrations/yalc-payments-google",
