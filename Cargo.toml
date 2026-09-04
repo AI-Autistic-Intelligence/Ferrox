@@ -1,0 +1,10 @@
+[package]
+name = "rust-yalc"
+version = "0.1.0"
+edition = "2021"
+description = "A shared rust library collection"
+
+[dependencies]
+# Add core shared dependencies here (e.g., serde, tracing)
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
