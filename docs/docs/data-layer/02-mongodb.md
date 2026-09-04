@@ -4,11 +4,11 @@ sidebar_position: 2
 
 # MongoDB
 
-Per i carichi di lavoro NoSQL (come log di audit intensivi, configurazioni flessibili o analytics), Rust-YALC include `yalc-database-mongo`.
+For NoSQL workloads (such as intensive audit logging, flexible configurations, or analytics), Rust-YALC includes `yalc-database-mongo`.
 
-## Configurazione
+## Configuration
 
-Il crate espone un manager che si connette e verifica l'istanza con un ping automatico per assicurare la raggiungibilità.
+The crate exposes a manager that connects and verifies the instance with an automatic ping to ensure reachability (Fail-Fast).
 
 ```rust
 use yalc_database_mongo::MongoManager;
@@ -17,5 +17,5 @@ let mongo = MongoManager::new().await;
 let collection = mongo.get_collection::<Document>("my_collection");
 ```
 
-## Pattern di Utilizzo
-Ti consigliamo di utilizzare SeaORM per le relazioni transazionali primarie e MongoDB per collezioni event-driven.
+## Usage Patterns
+We recommend using SeaORM for primary transactional relationships and MongoDB for event-driven or unstructured collections.

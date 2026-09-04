@@ -20,8 +20,8 @@ const config: Config = {
     locales: ['en'],
   },
 
-  // EREDITARIETÀ DEL TEMA (STATIC ASSETS)
-  // Qui includiamo la cartella static del submodule aziendale.
+  // THEME INHERITANCE (STATIC ASSETS)
+  // We include the static folder of the enterprise submodule here.
   staticDirectories: ['static', 'autistic-theme/static'],
 
   presets: [
@@ -33,8 +33,8 @@ const config: Config = {
         },
         blog: false,
         theme: {
-          // EREDITARIETÀ DEL TEMA (CSS)
-          // Puntiamo al CSS custom del submodule aziendale!
+          // THEME INHERITANCE (CSS)
+          // We point to the custom CSS of the enterprise submodule!
           customCss: './autistic-theme/src/css/custom.css',
         },
       } satisfies Preset.Options,
@@ -47,7 +47,7 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      // Usiamo il titolo del framework e il logo ereditato dal tema
+      // We use the framework title and the logo inherited from the theme
       title: 'Rust-YALC',
       logo: {
         alt: 'Rust-YALC Logo',
