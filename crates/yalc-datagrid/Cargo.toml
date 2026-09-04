@@ -10,6 +10,7 @@ mongo = ["dep:mongodb", "dep:bson"]
 aggrid = []
 mui = []
 tanstack = []
+graphql = ["dep:async-graphql"]
 
 [dependencies]
 yalc-errors = { path = "../yalc-errors" }
@@ -20,3 +21,4 @@ serde_json = "1.0"
 sea-orm = { workspace = true, optional = true }
 mongodb = { workspace = true, optional = true }
 bson = { workspace = true, optional = true }
+async-graphql = { workspace = true, optional = true }
