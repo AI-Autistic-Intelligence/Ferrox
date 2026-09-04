@@ -10,14 +10,18 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://ferrox.io',
+  url: 'https://ferrox.dev',
   baseUrl: '/',
-
-  onBrokenLinks: 'throw',
 
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'it', 'es', 'fr', 'de', 'zh', 'ja', 'ko', 'pt-BR'],
+    localeConfigs: {
+      en: { label: 'English', direction: 'ltr' },
+      it: { label: 'Italiano', direction: 'ltr' },
+      es: { label: 'Español', direction: 'ltr' },
+      zh: { label: '中文 (Simplified)', direction: 'ltr' },
+    },
   },
 
   // THEME INHERITANCE (STATIC ASSETS)

@@ -1,5 +1,6 @@
 use crate::{PasetoAuth, AuthPayload};
 use ferrox_errors::AppError;
+use secrecy::Secret;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -13,9 +14,9 @@ pub struct DualTokenManager {
 }
 
 impl DualTokenManager {
-    pub fn new(secret_key: &str) -> Self {
+    pub fn new(secret_key: Secret<String>) -> Self {
         Self {
-            paseto: PasetoAuth::new(secret_key),
+            paseto: PasetoAuth::new(secret_key).unwrap(),
         }
     }
 
