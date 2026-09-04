@@ -60,3 +60,53 @@ pub mod string {
 pub fn generate_uuid() -> String {
     Uuid::now_v7().to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::date::*;
+    use super::string::*;
+
+    #[test]
+    fn test_generate_uuid() {
+        let id1 = generate_uuid();
+        let id2 = generate_uuid();
+        
+        assert_eq!(id1.len(), 36);
+        assert_ne!(id1, id2);
+    }
+
+    #[test]
+    fn test_date_utilities() {
+        let utc = now_utc();
+        let gmt_str = to_gmt_string(utc);
+        assert!(gmt_str.ends_with("GMT"));
+    }
+
+    #[test]
+    fn test_string_casing() {
+        let original = String::from("hello world test");
+        assert_eq!(original.to_camel_case(), "helloWorldTest");
+        assert_eq!(original.to_snake_case(), "hello_world_test");
+        assert_eq!(original.to_kebab_case(), "hello-world-test");
+    }
+
+    #[test]
+    fn test_string_masking() {
+        let email = String::from("admin@antigravity.com");
+        let masked = email.mask(3, 4); // "adm**************.com"
+        
+        assert!(masked.starts_with("adm"));
+        assert!(masked.ends_with(".com"));
+        assert!(masked.contains("*"));
+        assert_eq!(masked.len(), email.len());
+        
+        // Edge case: string too short
+        let short = String::from("a");
+        assert_eq!(short.mask(3, 4), "a");
+        
+        // Exact length
+        let exact = String::from("abcdefg");
+        assert_eq!(exact.mask(3, 4), "abcdefg");
+    }
+}

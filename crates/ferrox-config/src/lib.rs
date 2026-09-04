@@ -16,9 +16,35 @@ pub fn load_config<'a, T: Deserialize<'a>>(env_prefix: &str) -> Result<T, AppErr
         .merge(Toml::file(format!("config/{}.toml", environment)))
         .merge(Env::prefixed(env_prefix))
         .extract()
-        .map_err(|e| AppError::InternalError(format!("Configuration Validation Failed: {}", e)))?;
+        .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
 
     info!("Loaded strongly-typed configuration for environment: {}", environment);
 
     Ok(config)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::Deserialize;
+
+    #[derive(Deserialize, Debug, PartialEq)]
+    struct TestConfig {
+        host: String,
+        port: u16,
+    }
+
+    #[test]
+    fn test_load_config_env_override() {
+        // Set an env var that should be picked up by Figment
+        std::env::set_var("APP_HOST", "127.0.0.1");
+        std::env::set_var("APP_PORT", "8080");
+
+        let config: Result<TestConfig, _> = load_config("APP_");
+        assert!(config.is_ok());
+        
+        let config = config.unwrap();
+        assert_eq!(config.host, "127.0.0.1");
+        assert_eq!(config.port, 8080);
+    }
 }

@@ -67,3 +67,30 @@ impl IntoResponse for AppError {
 pub fn setup() {
     println!("ferrox-errors initialized: Provides global AppError and IntoResponse for Axum.");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::response::IntoResponse;
+    use axum::http::StatusCode;
+
+    #[test]
+    fn test_error_formatting() {
+        let err = AppError::NotFound("User".into());
+        assert_eq!(err.to_string(), "Not Found: User");
+
+        let err = AppError::ValidationError("Invalid email".into());
+        assert_eq!(err.to_string(), "Validation Error: Invalid email");
+    }
+
+    #[test]
+    fn test_into_response() {
+        let err = AppError::Unauthorized("Invalid token".into());
+        let response = err.into_response();
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+        let err = AppError::DatabaseError("Connection lost".into());
+        let response = err.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
+}
