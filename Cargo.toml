@@ -3,13 +3,18 @@ members = [
     "crates/yalc-app",
     "crates/yalc-errors",
     "crates/yalc-logger",
-    "crates/yalc-database",
-    "crates/yalc-ag-grid",
     "crates/yalc-crud-gen",
     "crates/yalc-graphql",
     "crates/yalc-events",
     "crates/yalc-utils",
-    "crates/yalc-types"
+    "crates/yalc-types",
+    "crates/database/yalc-database-core",
+    "crates/database/yalc-database-seaorm",
+    "crates/database/yalc-database-mongo",
+    "crates/database/yalc-database-redis",
+    "crates/ag-grid/yalc-ag-grid-core",
+    "crates/ag-grid/yalc-ag-grid-seaorm",
+    "crates/ag-grid/yalc-ag-grid-mongo"
 ]
 
 [workspace.package]

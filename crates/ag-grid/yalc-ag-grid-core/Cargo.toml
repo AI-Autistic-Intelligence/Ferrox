@@ -1,4 +1,4 @@
 [package]
-name = "yalc-database"
+name = "yalc-ag-grid-core"
 version.workspace = true
 edition.workspace = true

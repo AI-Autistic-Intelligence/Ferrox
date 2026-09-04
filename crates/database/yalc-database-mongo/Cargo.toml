@@ -1,0 +1,4 @@
+[package]
+name = "yalc-database-mongo"
+version.workspace = true
+edition.workspace = true

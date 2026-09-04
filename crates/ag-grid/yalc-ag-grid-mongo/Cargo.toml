@@ -1,0 +1,4 @@
+[package]
+name = "yalc-ag-grid-mongo"
+version.workspace = true
+edition.workspace = true

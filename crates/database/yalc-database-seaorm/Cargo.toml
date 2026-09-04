@@ -1,0 +1,4 @@
+[package]
+name = "yalc-database-seaorm"
+version.workspace = true
+edition.workspace = true
