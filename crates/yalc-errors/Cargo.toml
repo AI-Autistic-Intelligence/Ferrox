@@ -1,0 +1,4 @@
+[package]
+name = "yalc-errors"
+version.workspace = true
+edition.workspace = true

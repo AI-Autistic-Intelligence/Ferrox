@@ -1,0 +1,4 @@
+[package]
+name = "yalc-utils"
+version.workspace = true
+edition.workspace = true

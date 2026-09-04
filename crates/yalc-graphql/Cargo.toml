@@ -1,0 +1,4 @@
+[package]
+name = "yalc-graphql"
+version.workspace = true
+edition.workspace = true

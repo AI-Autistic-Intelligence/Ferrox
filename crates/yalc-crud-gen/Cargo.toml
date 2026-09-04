@@ -1,0 +1,4 @@
+[package]
+name = "yalc-crud-gen"
+version.workspace = true
+edition.workspace = true

@@ -1,10 +1,28 @@
-[package]
-name = "rust-yalc"
+[workspace]
+members = [
+    "crates/yalc-app",
+    "crates/yalc-errors",
+    "crates/yalc-logger",
+    "crates/yalc-database",
+    "crates/yalc-ag-grid",
+    "crates/yalc-crud-gen",
+    "crates/yalc-graphql",
+    "crates/yalc-events",
+    "crates/yalc-utils",
+    "crates/yalc-types"
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
-description = "A shared rust library collection"
+authors = ["Antigravity"]
 
-[dependencies]
-# Add core shared dependencies here (e.g., serde, tracing)
+[workspace.dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 tracing = "0.1"
+thiserror = "1.0"
+sea-orm = { version = "1.0" }
+async-graphql = "7.0"
+chrono = "0.4"
