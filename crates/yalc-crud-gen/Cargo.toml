@@ -13,3 +13,4 @@ yalc-errors = { path = "../yalc-errors" }
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }
 async-trait = "0.1"
+uuid = { version = "1.0", features = ["v7"] }

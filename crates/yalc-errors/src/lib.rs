@@ -19,7 +19,7 @@ pub enum AppError {
     Unauthorized(String),
 
     #[error("Internal Server Error")]
-    InternalServerError(#[from] anyhow::Error), // Requires anyhow, or we can just use generic String/Box<dyn Error>
+    InternalServerError(#[source] Box<dyn std::error::Error + Send + Sync>),
 
     #[error("Database Error: {0}")]
     DatabaseError(String),

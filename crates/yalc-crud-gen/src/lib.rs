@@ -66,7 +66,7 @@ mod tests {
     // 1. Define a dummy entity
     #[derive(Clone, Serialize, Deserialize)]
     struct User {
-        id: u32,
+        id: uuid::Uuid,
         name: String,
     }
 
@@ -74,18 +74,18 @@ mod tests {
     struct MockUserRepository;
 
     #[async_trait]
-    impl Repository<User, u32> for MockUserRepository {
-        async fn find_by_id(&self, _id: u32) -> Result<Option<User>, AppError> { Ok(None) }
+    impl Repository<User, uuid::Uuid> for MockUserRepository {
+        async fn find_by_id(&self, _id: uuid::Uuid) -> Result<Option<User>, AppError> { Ok(None) }
         async fn find_all(&self) -> Result<Vec<User>, AppError> { Ok(vec![]) }
         async fn insert(&self, entity: User) -> Result<User, AppError> { Ok(entity) }
-        async fn update(&self, _id: u32, entity: User) -> Result<User, AppError> { Ok(entity) }
-        async fn delete(&self, _id: u32) -> Result<(), AppError> { Ok(()) }
+        async fn update(&self, _id: uuid::Uuid, entity: User) -> Result<User, AppError> { Ok(entity) }
+        async fn delete(&self, _id: uuid::Uuid) -> Result<(), AppError> { Ok(()) }
     }
 
     // 3. Test that the macro compiles and returns a valid Axum Router bound to the Repo state
     #[test]
     fn test_crud_router_generation() {
-        let _router: Router<Arc<MockUserRepository>> = crud_router!(User, u32, MockUserRepository);
+        let _router: Router<Arc<MockUserRepository>> = crud_router!(User, uuid::Uuid, MockUserRepository);
         assert!(true, "Router generated successfully!");
     }
 }
