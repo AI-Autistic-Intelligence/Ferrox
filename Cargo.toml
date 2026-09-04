@@ -34,3 +34,7 @@ anyhow = "1.0"
 sea-orm = { version = "1.0" }
 async-graphql = "7.0"
 time = { version = "0.3", features = ["serde", "formatting", "macros"] }
+
+[workspace.lints.clippy]
+pedantic = "warn"
+unwrap_used = "deny"

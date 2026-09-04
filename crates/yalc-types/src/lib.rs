@@ -31,6 +31,21 @@ impl Pagination {
     }
 }
 
+use validator::Validate;
+
+/// Example of a Validatable DTO using the `validator` crate (like class-validator in TS)
+#[derive(Debug, Clone, Serialize, Deserialize, Validate)]
+pub struct CreateUserDto {
+    #[validate(email)]
+    pub email: String,
+    
+    #[validate(length(min = 8, message = "Password must be at least 8 characters"))]
+    pub password: String,
+    
+    #[validate(range(min = 18, max = 130))]
+    pub age: u8,
+}
+
 pub fn setup() {
     println!("yalc-types initialized: Provides domain primitives and marker traits.");
 }
@@ -62,5 +77,24 @@ mod tests {
         let pagination = Pagination::new(50, 20).unwrap();
         assert_eq!(pagination.limit(), 50);
         assert_eq!(pagination.offset(), 20);
+    }
+
+    #[test]
+    fn test_dto_validation() {
+        let bad_dto = CreateUserDto {
+            email: "invalid_email".into(),
+            password: "short".into(),
+            age: 15, // too young
+        };
+
+        let result = bad_dto.validate();
+        assert!(result.is_err());
+        let errs = result.unwrap_err();
+        
+        // Assert all 3 validations failed
+        let err_map = errs.field_errors();
+        assert!(err_map.contains_key("email"));
+        assert!(err_map.contains_key("password"));
+        assert!(err_map.contains_key("age"));
     }
 }

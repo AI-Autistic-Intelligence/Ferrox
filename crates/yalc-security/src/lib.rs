@@ -64,9 +64,14 @@ impl PasetoAuth {
         claims.expiration(&exp_iso).map_err(|e| AppError::InternalServerError(Box::new(e)))?;
 
         // Add custom payload
-        claims.add_additional("user_id", serde_json::to_value(&payload.user_id).unwrap())
+        let user_id_val = serde_json::to_value(&payload.user_id)
             .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
-        claims.add_additional("role", serde_json::to_value(&payload.role).unwrap())
+        claims.add_additional("user_id", user_id_val)
+            .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
+            
+        let role_val = serde_json::to_value(&payload.role)
+            .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
+        claims.add_additional("role", role_val)
             .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
 
         // Encrypt and sign

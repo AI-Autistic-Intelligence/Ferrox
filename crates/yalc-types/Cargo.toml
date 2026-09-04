@@ -5,4 +5,5 @@ edition.workspace = true
 
 [dependencies]
 serde.workspace = true
+validator = { version = "0.18", features = ["derive"] }
 yalc-errors = { path = "../yalc-errors" }

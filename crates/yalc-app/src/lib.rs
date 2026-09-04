@@ -22,7 +22,34 @@ impl YalcApp {
         self
     }
 
-    pub async fn start(self) -> Result<(), AppError> {
+    pub async fn start(mut self) -> Result<(), AppError> {
+        // Add security middlewares (Helmet equivalent)
+        use tower_http::{
+            catch_panic::CatchPanicLayer,
+            cors::CorsLayer,
+            set_header::SetResponseHeaderLayer,
+            timeout::TimeoutLayer,
+        };
+        use axum::http::HeaderValue;
+        use std::time::Duration;
+
+        self.router = self.router
+            .layer(TimeoutLayer::new(Duration::from_secs(15)))
+            .layer(CatchPanicLayer::new())
+            .layer(CorsLayer::permissive()) // In a real app, configure this tightly
+            .layer(SetResponseHeaderLayer::overriding(
+                axum::http::header::STRICT_TRANSPORT_SECURITY,
+                HeaderValue::from_static("max-age=31536000; includeSubDomains"),
+            ))
+            .layer(SetResponseHeaderLayer::overriding(
+                axum::http::header::X_FRAME_OPTIONS,
+                HeaderValue::from_static("DENY"),
+            ))
+            .layer(SetResponseHeaderLayer::overriding(
+                axum::http::header::X_CONTENT_TYPE_OPTIONS,
+                HeaderValue::from_static("nosniff"),
+            ));
+
         let addr = SocketAddr::from(([0, 0, 0, 0], self.port));
         
         info!("Starting YalcApp on {}", addr);
