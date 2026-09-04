@@ -44,7 +44,8 @@ members = [
     "crates/integrations/ferrox-cloud-helpers",
     "crates/integrations/ferrox-webhooks",
     "crates/ferrox-jobs",
-    "crates/ferrox-rate-limiter"
+    "crates/ferrox-rate-limiter",
+    "apps/ferrox-showcase"
 ]
 
 [workspace.package]

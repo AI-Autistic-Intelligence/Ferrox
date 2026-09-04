@@ -1,0 +1,17 @@
+[package]
+name = "ferrox-showcase"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json = "1.0"
+tracing.workspace = true
+tracing-subscriber = "0.3"
+
+ferrox-config = { path = "../../crates/ferrox-config" }
+ferrox-security = { path = "../../crates/ferrox-security" }
+ferrox-errors = { path = "../../crates/ferrox-errors" }
+ferrox-utils = { path = "../../crates/ferrox-utils" }
