@@ -2,9 +2,9 @@
 sidebar_position: 5
 ---
 
-# Universal DataGrid (yalc-datagrid)
+# Universal DataGrid (ferrox-datagrid)
 
-The `yalc-datagrid` crate allows Rust-YALC to parse complex sorting, filtering, and pagination states from the most popular frontend DataGrid libraries and translate them natively into backend queries.
+The `ferrox-datagrid` crate allows Rust-FERROX to parse complex sorting, filtering, and pagination states from the most popular frontend DataGrid libraries and translate them natively into backend queries.
 
 ## Supported Frontend Grids
 Our Universal Parser supports:
@@ -21,8 +21,8 @@ Once parsed into our universal `DataGridRequest` struct, it can be translated in
 
 ```rust
 use serde_json::Value;
-use yalc_datagrid::parsers::mui;
-use yalc_datagrid::translators::seaorm::translate_filters;
+use ferrox_datagrid::parsers::mui;
+use ferrox_datagrid::translators::seaorm::translate_filters;
 use my_app::entities::users;
 
 // 1. You receive a JSON payload from your frontend MUI DataGrid

@@ -1,4 +1,4 @@
-name: Rust-YALC CI
+name: Rust-FERROX CI
 
 on:
   push:

@@ -1,0 +1,13 @@
+[package]
+name = "ferrox-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Command Line Interface for scaffolding Rust-FERROX Enterprise Apps"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+inquire = "0.6"
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.4", features = ["v4"] }

@@ -1,8 +1,0 @@
-[package]
-name = "yalc-mailer"
-version.workspace = true
-edition.workspace = true
-
-[dependencies]
-lettre = { version = "0.11", features = ["tokio1", "tokio1-native-tls", "builder"] }
-yalc-errors = { path = "../../yalc-errors" }

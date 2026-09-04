@@ -1,0 +1,10 @@
+[package]
+name = "ferrox-cloud-helpers"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+aws-config = "1.1"
+aws-sdk-secretsmanager = "1.21"
+tokio = { workspace = true, features = ["full"] }
+ferrox-errors = { path = "../../ferrox-errors" }

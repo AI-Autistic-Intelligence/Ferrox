@@ -1,0 +1,10 @@
+[package]
+name = "ferrox-database-seaorm"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+sea-orm = { workspace = true, features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+log = "0.4"
+ferrox-database-core = { path = "../ferrox-database-core" }
+ferrox-errors = { path = "../../ferrox-errors" }

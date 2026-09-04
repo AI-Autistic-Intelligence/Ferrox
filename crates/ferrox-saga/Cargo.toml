@@ -1,0 +1,12 @@
+[package]
+name = "ferrox-saga"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+ferrox-errors = { path = "../ferrox-errors" }
+tracing = "0.1"
+
+[dev-dependencies]
+tokio = { version = "1.35", features = ["full"] }

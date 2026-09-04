@@ -1,0 +1,32 @@
+use async_trait::async_trait;
+use ferrox_errors::AppError;
+
+#[async_trait]
+pub trait Transport: Send + Sync {
+    /// Starts the transport. This is usually a blocking async operation
+    /// (e.g. running an axum server or a tonic grpc server).
+    async fn start(&self) -> Result<(), AppError>;
+    
+    /// Returns the name of the transport for logging purposes.
+    fn name(&self) -> &'static str;
+}
+
+#[cfg(feature = "http")]
+pub mod http;
+#[cfg(feature = "http")]
+pub use http::HttpTransport;
+
+#[cfg(feature = "http")]
+pub mod ws;
+#[cfg(feature = "http")]
+pub use ws::WsTransport;
+
+#[cfg(feature = "grpc")]
+pub mod grpc;
+
+#[cfg(feature = "ftp")]
+pub mod ftp;
+
+pub fn setup() {
+    println!("ferrox-transports initialized: Multi-Transport system ready.");
+}

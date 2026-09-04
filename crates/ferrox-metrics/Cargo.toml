@@ -1,0 +1,10 @@
+[package]
+name = "ferrox-metrics"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+metrics = "0.22"
+metrics-exporter-prometheus = "0.13"
+tokio = { workspace = true, features = ["full"] }
+ferrox-errors = { path = "../ferrox-errors" }

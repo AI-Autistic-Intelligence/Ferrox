@@ -1,0 +1,13 @@
+[package]
+name = "ferrox-graphql"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+async-graphql = { workspace = true, features = ["tokio"] }
+tokio = { workspace = true, features = ["full"] }
+ferrox-database-core = { path = "../database/ferrox-database-core" }
+ferrox-errors = { path = "../ferrox-errors" }
+
+[dev-dependencies]
+serde_json = "1.0"

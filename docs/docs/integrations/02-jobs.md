@@ -9,7 +9,7 @@ For example, generating a PDF or sending 100 emails can take seconds.
 
 ## Enter Apalis & Redis
 
-Rust-YALC uses **Apalis** backed by **Redis** via the `yalc-jobs` module.
+Rust-FERROX uses **Apalis** backed by **Redis** via the `ferrox-jobs` module.
 
 ### How it works
 
@@ -19,7 +19,7 @@ Rust-YALC uses **Apalis** backed by **Redis** via the `yalc-jobs` module.
 
 ```rust
 // Spawning the worker inside main.rs
-use yalc_jobs::start_worker;
+use ferrox_jobs::start_worker;
 
 start_worker("redis://127.0.0.1:6379").await.unwrap();
 ```

@@ -1,0 +1,12 @@
+[package]
+name = "ferrox-payments-stripe"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+ferrox-errors = { path = "../../ferrox-errors" }
+ferrox-integrations = { path = "../../ferrox-integrations" }
+
+# In a real app we'd use the `stripe` crate
+# stripe = "0.26"

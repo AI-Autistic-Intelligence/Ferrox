@@ -1,12 +1,12 @@
-db = db.getSiblingDB('yalc_db');
+db = db.getSiblingDB('ferrox_db');
 
 db.createUser({
-  user: 'yalc_app',
+  user: 'ferrox_app',
   pwd: 'secure_app_password',
   roles: [
     {
       role: 'readWrite',
-      db: 'yalc_db'
+      db: 'ferrox_db'
     }
   ]
 });

@@ -13,7 +13,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 # Build application
 COPY . .
-RUN cargo build --release --bin yalc-app
+RUN cargo build --release --bin ferrox-app
 
 # --- Stage 3: Runtime ---
 # We use a distroless-like minimal debian base
@@ -26,11 +26,11 @@ RUN apt-get update -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/target/release/yalc-app yalc-app
+COPY --from=builder /app/target/release/ferrox-app ferrox-app
 
 # Run as non-root user for Zero Trust Security
-RUN useradd -m -s /bin/bash yalc
-USER yalc
+RUN useradd -m -s /bin/bash ferrox
+USER ferrox
 
 EXPOSE 3000
-CMD ["./yalc-app"]
+CMD ["./ferrox-app"]

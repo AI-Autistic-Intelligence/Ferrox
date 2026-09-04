@@ -1,0 +1,10 @@
+[package]
+name = "ferrox-jobs"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+apalis = { version = "0.5", features = ["redis"] }
+serde = { workspace = true, features = ["derive"] }
+tokio = { workspace = true, features = ["full"] }
+ferrox-errors = { path = "../ferrox-errors" }

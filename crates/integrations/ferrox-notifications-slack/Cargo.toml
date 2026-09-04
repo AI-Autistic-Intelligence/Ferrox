@@ -1,0 +1,12 @@
+[package]
+name = "ferrox-notifications-slack"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+ferrox-errors = { path = "../../ferrox-errors" }
+ferrox-integrations = { path = "../../ferrox-integrations" }
+
+# In a real app we'd use reqwest to call Slack Webhooks
+# reqwest = { version = "0.11", features = ["json"] }

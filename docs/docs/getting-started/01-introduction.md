@@ -2,11 +2,11 @@
 sidebar_position: 1
 ---
 
-# Introduction to Rust-YALC
+# Introduction to Rust-VELOX
 
-**Rust-YALC** is a full-featured, Cloud-Native, enterprise-grade Rust workspace designed to bring the ergonomics of NestJS into the blazing-fast and type-safe world of Rust.
+**Rust-VELOX** is a full-featured, Cloud-Native, enterprise-grade Rust workspace designed to bring the ergonomics of NestJS into the blazing-fast and type-safe world of Rust.
 
-## What is Rust-YALC?
+## What is Rust-VELOX?
 
 It is a collection of over 20 modular, highly-optimized crates that provide everything a modern web application needs out of the box:
 - Telemetry & Logging (OpenTelemetry, JSON logs, Sentry)

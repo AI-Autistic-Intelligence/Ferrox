@@ -1,0 +1,10 @@
+[package]
+name = "ferrox-rate-limiter"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+redis = { version = "0.25", features = ["tokio-comp"] }
+tower = "0.4"
+tokio = { workspace = true, features = ["full"] }
+ferrox-errors = { path = "../ferrox-errors" }

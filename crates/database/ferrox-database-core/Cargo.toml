@@ -1,0 +1,8 @@
+[package]
+name = "ferrox-database-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+async-trait = "0.1"
+ferrox-errors = { path = "../../ferrox-errors" }

@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Docker
 
-Rust-YALC uses optimized, multi-stage Docker builds to achieve minimal image sizes and maximize security.
+Rust-FERROX uses optimized, multi-stage Docker builds to achieve minimal image sizes and maximize security.
 
 ## Multi-Stage Build
 
@@ -16,5 +16,5 @@ The `Dockerfile` in the root of the workspace builds the entire monorepo, extrac
 ## Building
 
 ```bash
-docker build -t rust-yalc:latest .
+docker build -t rust-ferrox:latest .
 ```

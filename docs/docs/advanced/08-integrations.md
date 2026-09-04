@@ -2,15 +2,15 @@
 sidebar_position: 8
 ---
 
-# Third-Party Integrations (yalc-integrations)
+# Third-Party Integrations (ferrox-integrations)
 
 In an Enterprise environment, hardcoding external APIs (like Stripe, SendGrid, or Slack) directly into your business logic creates extreme technical debt. It locks your software to a specific vendor and makes unit testing a nightmare.
 
-`Rust-YALC` solves this via the **Dependency Inversion Principle**, providing unified integration abstractions.
+`Rust-FERROX` solves this via the **Dependency Inversion Principle**, providing unified integration abstractions.
 
 ## Core Abstractions
 
-The `yalc-integrations` crate exposes generic Traits for common business needs:
+The `ferrox-integrations` crate exposes generic Traits for common business needs:
 
 ### Payment Providers
 ```rust
@@ -32,10 +32,10 @@ pub trait NotificationProvider: Send + Sync {
 
 ## Supported Official Adapters
 
-Instead of building your own HTTP calls, `Rust-YALC` ships with official adapters that implement these traits. They are located in `crates/integrations/`:
+Instead of building your own HTTP calls, `Rust-FERROX` ships with official adapters that implement these traits. They are located in `crates/integrations/`:
 
-1. **`yalc-payments-stripe`**: Implements `PaymentProvider` using the Stripe API.
-2. **`yalc-notifications-slack`**: Implements `NotificationProvider` using Slack Webhooks.
+1. **`ferrox-payments-stripe`**: Implements `PaymentProvider` using the Stripe API.
+2. **`ferrox-notifications-slack`**: Implements `NotificationProvider` using Slack Webhooks.
 *(More to come, such as AWS SES, Twilio, Google Pay, etc.)*
 
 ## Usage (Dependency Injection)
@@ -44,8 +44,8 @@ To use these in your application, inject the generic `Arc<dyn PaymentProvider>` 
 
 ```rust
 use std::sync::Arc;
-use yalc_integrations::PaymentProvider;
-use yalc_payments_stripe::StripeAdapter;
+use ferrox_integrations::PaymentProvider;
+use ferrox_payments_stripe::StripeAdapter;
 
 struct AppState {
     pub payment_gateway: Arc<dyn PaymentProvider>,

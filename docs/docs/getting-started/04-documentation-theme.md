@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Documentation Theme (Submodule)
 
-The documentation portal for `rust-yalc` does not use standard colors and layouts. Instead, it natively inherits its theme, CSS, and static assets from a shared enterprise template repository.
+The documentation portal for `rust-ferrox` does not use standard colors and layouts. Instead, it natively inherits its theme, CSS, and static assets from a shared enterprise template repository.
 
 ## The Git Submodule
 

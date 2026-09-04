@@ -4,9 +4,9 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: yalc
+      POSTGRES_USER: ferrox
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: yalc_db
+      POSTGRES_DB: ferrox_db
     ports:
       - "5432:5432"
     volumes:
@@ -18,7 +18,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root_password
-      MONGO_INITDB_DATABASE: yalc_db
+      MONGO_INITDB_DATABASE: ferrox_db
     ports:
       - "27017:27017"
     volumes:

@@ -1,0 +1,10 @@
+[package]
+name = "ferrox-database-mongo"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+mongodb = { version = "3.0", features = ["tokio-runtime"] }
+tokio = { workspace = true, features = ["full"] }
+ferrox-database-core = { path = "../ferrox-database-core" }
+ferrox-errors = { path = "../../ferrox-errors" }

@@ -4,11 +4,11 @@ sidebar_position: 2
 
 # Kubernetes
 
-Rust-YALC is designed to run in highly available environments like Kubernetes. 
+Rust-VELOX is designed to run in highly available environments like Kubernetes. 
 
 ## Probes
 
-Since Rust-YALC is built with a "Fail-Fast" design, it correctly implements Liveness and Readiness probes.
+Since Rust-VELOX is built with a "Fail-Fast" design, it correctly implements Liveness and Readiness probes.
 
 ```yaml
 livenessProbe:

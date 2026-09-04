@@ -1,0 +1,9 @@
+[package]
+name = "ferrox-types"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+validator = { version = "0.18", features = ["derive"] }
+ferrox-errors = { path = "../ferrox-errors" }

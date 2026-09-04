@@ -5,12 +5,12 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'Rust-YALC',
+  title: 'Rust-FERROX',
   tagline: 'The Ultimate Rust Arsenal',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://yalc.io',
+  url: 'https://ferrox.io',
   baseUrl: '/',
 
   onBrokenLinks: 'throw',
@@ -48,9 +48,9 @@ const config: Config = {
     },
     navbar: {
       // We use the framework title and the logo inherited from the theme
-      title: 'Rust-YALC',
+      title: 'Rust-FERROX',
       logo: {
-        alt: 'Rust-YALC Logo',
+        alt: 'Rust-FERROX Logo',
         src: 'img/logo.jpg', 
       },
       items: [

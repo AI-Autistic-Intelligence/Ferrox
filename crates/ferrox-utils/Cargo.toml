@@ -1,0 +1,9 @@
+[package]
+name = "ferrox-utils"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+time = { workspace = true }
+uuid = { version = "1.0", features = ["v7", "serde"] }
+ferrox-errors = { path = "../ferrox-errors" }

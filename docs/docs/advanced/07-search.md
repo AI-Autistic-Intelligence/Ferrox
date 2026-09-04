@@ -2,11 +2,11 @@
 sidebar_position: 7
 ---
 
-# Universal Search & AI Vectors (yalc-search)
+# Universal Search & AI Vectors (ferrox-search)
 
 Search is no longer just about matching keywords. In modern enterprise applications, users expect typo-tolerance, and AI integrations expect mathematical representations of meaning (Embeddings).
 
-`Rust-YALC` solves this by providing the `yalc-search` module: a universal `SearchEngine` abstraction that supports both classic Lexical Search and next-generation Semantic Vector Search.
+`Rust-FERROX` solves this by providing the `ferrox-search` module: a universal `SearchEngine` abstraction that supports both classic Lexical Search and next-generation Semantic Vector Search.
 
 ## Supported Adapters
 
@@ -22,7 +22,7 @@ Qdrant is an ultra-fast Vector Database written in Rust. Using this adapter make
 ## How to use
 
 ```rust
-use yalc_search::{SearchEngine, qdrant::QdrantAdapter, meili::MeilisearchAdapter};
+use ferrox_search::{SearchEngine, qdrant::QdrantAdapter, meili::MeilisearchAdapter};
 
 // 1. Setup a Meilisearch engine for standard product search
 let meili = MeilisearchAdapter::new("http://localhost:7700", "masterKey");

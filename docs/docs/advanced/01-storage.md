@@ -4,12 +4,12 @@ sidebar_position: 1
 
 # S3 Storage
 
-The `yalc-storage` crate provides a unified interface for Amazon S3 and compatible services (like MinIO).
+The `ferrox-storage` crate provides a unified interface for Amazon S3 and compatible services (like MinIO).
 
 ## Initialization
 
 ```rust
-use yalc_storage::StorageService;
+use ferrox_storage::StorageService;
 
 let storage = StorageService::new().await;
 ```
