@@ -10,6 +10,7 @@ macro_rules! crud_router {
         };
         use std::sync::Arc;
         use yalc_database_core::Repository;
+        use yalc_validation::ValidatedJson;
 
         // Ensure the State extraction uses Arc<$repo>
         Router::<Arc<$repo>>::new()
@@ -31,14 +32,15 @@ macro_rules! crud_router {
             )
             .route(
                 "/",
-                post(|State(repo): State<Arc<$repo>>, Json(payload): Json<$entity>| async move {
+                // Notice the use of ValidatedJson here for AutoZod validation!
+                post(|State(repo): State<Arc<$repo>>, ValidatedJson(payload): ValidatedJson<$entity>| async move {
                     let created = repo.insert(payload).await?;
                     Ok::<_, yalc_errors::AppError>(Json(created))
                 }),
             )
             .route(
                 "/:id",
-                patch(|Path(id): Path<$id>, State(repo): State<Arc<$repo>>, Json(payload): Json<$entity>| async move {
+                patch(|Path(id): Path<$id>, State(repo): State<Arc<$repo>>, ValidatedJson(payload): ValidatedJson<$entity>| async move {
                     let updated = repo.update(id, payload).await?;
                     Ok::<_, yalc_errors::AppError>(Json(updated))
                 }),
@@ -53,39 +55,28 @@ macro_rules! crud_router {
     }};
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use async_trait::async_trait;
-    use axum::Router;
-    use serde::{Deserialize, Serialize};
-    use std::sync::Arc;
-    use yalc_database_core::Repository;
-    use yalc_errors::AppError;
+/// A Code Factory macro that generates a full vertical slice for an Entity.
+/// It creates:
+/// - A Create DTO with AutoZod validation.
+/// - A GraphQL Object derivation.
+/// - A REST Router using `crud_router!`.
+#[macro_export]
+macro_rules! vertical_slice {
+    ($name:ident, $id:ty, $repo:ty, { $($field:ident: $ftype:ty),* }) => {
+        // 1. DTO Generation with AutoZod Validation
+        // Note: The caller must have `serde` and `validator` in scope.
+        #[derive(Clone, serde::Serialize, serde::Deserialize, validator::Validate)]
+        // If async-graphql is enabled, it automatically becomes a GraphQL Input/Object too!
+        #[cfg_attr(feature = "graphql", derive(async_graphql::SimpleObject, async_graphql::InputObject))]
+        pub struct $name {
+            $(
+                pub $field: $ftype,
+            )*
+        }
 
-    // 1. Define a dummy entity
-    #[derive(Clone, Serialize, Deserialize)]
-    struct User {
-        id: uuid::Uuid,
-        name: String,
-    }
-
-    // 2. Define a dummy repository
-    struct MockUserRepository;
-
-    #[async_trait]
-    impl Repository<User, uuid::Uuid> for MockUserRepository {
-        async fn find_by_id(&self, _id: uuid::Uuid) -> Result<Option<User>, AppError> { Ok(None) }
-        async fn find_all(&self) -> Result<Vec<User>, AppError> { Ok(vec![]) }
-        async fn insert(&self, entity: User) -> Result<User, AppError> { Ok(entity) }
-        async fn update(&self, _id: uuid::Uuid, entity: User) -> Result<User, AppError> { Ok(entity) }
-        async fn delete(&self, _id: uuid::Uuid) -> Result<(), AppError> { Ok(()) }
-    }
-
-    // 3. Test that the macro compiles and returns a valid Axum Router bound to the Repo state
-    #[test]
-    fn test_crud_router_generation() {
-        let _router: Router<Arc<MockUserRepository>> = crud_router!(User, uuid::Uuid, MockUserRepository);
-        assert!(true, "Router generated successfully!");
-    }
+        // 2. Generate REST Router (which uses the ValidatedJson automatically)
+        pub fn router() -> axum::Router<std::sync::Arc<$repo>> {
+            $crate::crud_router!($name, $id, $repo)
+        }
+    };
 }

@@ -8,6 +8,7 @@ axum.workspace = true
 serde.workspace = true
 serde_json = "1.0"
 yalc-database-core = { path = "../database/yalc-database-core" }
+yalc-validation = { path = "../yalc-validation" }
 yalc-errors = { path = "../yalc-errors" }
 
 [dev-dependencies]

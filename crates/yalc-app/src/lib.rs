@@ -1,69 +1,69 @@
-use axum::Router;
-use std::net::SocketAddr;
+use std::sync::Arc;
 use tokio::signal;
+use tokio::task::JoinHandle;
 use tracing::{info, error};
 use yalc_errors::AppError;
+use yalc_transports::Transport;
 
 pub struct YalcApp {
-    router: Router,
-    port: u16,
+    transports: Vec<Arc<dyn Transport>>,
+}
+
+impl Default for YalcApp {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl YalcApp {
-    pub fn new(router: Router) -> Self {
+    pub fn new() -> Self {
         Self {
-            router,
-            port: 3000,
+            transports: Vec::new(),
         }
     }
 
-    pub fn with_port(mut self, port: u16) -> Self {
-        self.port = port;
+    /// Add a transport layer to the app (e.g. HttpTransport, GrpcTransport, FtpTransport)
+    pub fn add_transport<T: Transport + 'static>(mut self, transport: T) -> Self {
+        self.transports.push(Arc::new(transport));
         self
     }
 
-    pub async fn start(mut self) -> Result<(), AppError> {
-        // Add security middlewares (Helmet equivalent)
-        use tower_http::{
-            catch_panic::CatchPanicLayer,
-            cors::CorsLayer,
-            set_header::SetResponseHeaderLayer,
-            timeout::TimeoutLayer,
-        };
-        use axum::http::HeaderValue;
-        use std::time::Duration;
+    /// Starts all configured transports concurrently and waits for shutdown signal
+    pub async fn start(self) -> Result<(), AppError> {
+        info!("Starting YalcApp multi-transport system...");
 
-        self.router = self.router
-            .layer(sentry_tower::NewSentryLayer::new_from_top())
-            .layer(sentry_tower::SentryHttpLayer::with_transaction())
-            .layer(TimeoutLayer::new(Duration::from_secs(15)))
-            .layer(CatchPanicLayer::new())
-            .layer(CorsLayer::permissive()) // In a real app, configure this tightly
-            .layer(SetResponseHeaderLayer::overriding(
-                axum::http::header::STRICT_TRANSPORT_SECURITY,
-                HeaderValue::from_static("max-age=31536000; includeSubDomains"),
-            ))
-            .layer(SetResponseHeaderLayer::overriding(
-                axum::http::header::X_FRAME_OPTIONS,
-                HeaderValue::from_static("DENY"),
-            ))
-            .layer(SetResponseHeaderLayer::overriding(
-                axum::http::header::X_CONTENT_TYPE_OPTIONS,
-                HeaderValue::from_static("nosniff"),
+        if self.transports.is_empty() {
+            return Err(AppError::InternalServerError(
+                "Cannot start YalcApp: no transports configured!".into(),
             ));
+        }
 
-        let addr = SocketAddr::from(([0, 0, 0, 0], self.port));
+        let mut join_handles: Vec<JoinHandle<Result<(), AppError>>> = Vec::new();
+
+        for transport in self.transports {
+            let t = Arc::clone(&transport);
+            
+            let handle = tokio::spawn(async move {
+                info!("Booting transport: {}", t.name());
+                if let Err(e) = t.start().await {
+                    error!("Transport {} crashed: {:?}", t.name(), e);
+                    return Err(e);
+                }
+                Ok(())
+            });
+            
+            join_handles.push(handle);
+        }
+
+        // Wait for shutdown signal
+        shutdown_signal().await;
+
+        info!("Graceful shutdown initiated...");
         
-        info!("Starting YalcApp on {}", addr);
-
-        let listener = tokio::net::TcpListener::bind(&addr)
-            .await
-            .map_err(|e| AppError::InternalServerError(e.into()))?;
-
-        axum::serve(listener, self.router.into_make_service())
-            .with_graceful_shutdown(shutdown_signal())
-            .await
-            .map_err(|e| AppError::InternalServerError(e.into()))?;
+        // In a real implementation we would send a cancellation token to all join handles
+        for handle in join_handles {
+            handle.abort();
+        }
 
         info!("YalcApp stopped gracefully.");
         Ok(())
@@ -97,5 +97,5 @@ async fn shutdown_signal() {
 }
 
 pub fn setup() {
-    println!("yalc-app initialized: Provides YalcApp bootstrap server.");
+    println!("yalc-app initialized: Multi-Transport YalcApp bootstrap ready.");
 }
