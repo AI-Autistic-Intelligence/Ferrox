@@ -1,0 +1,19 @@
+[package]
+name = "yalc-search"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["elastic", "meili", "qdrant"]
+elastic = ["dep:reqwest"]
+meili = ["dep:reqwest"]
+qdrant = ["dep:reqwest"] # or tonic/qdrant-client in real world
+
+[dependencies]
+async-trait = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+yalc-errors = { path = "../yalc-errors" }
+
+# Shared HTTP client for APIs
+reqwest = { version = "0.11", features = ["json"], optional = true }
