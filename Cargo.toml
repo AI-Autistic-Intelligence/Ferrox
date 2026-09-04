@@ -16,6 +16,7 @@ members = [
     "crates/database/yalc-database-redis",
     "crates/yalc-datagrid",
     "crates/yalc-validation",
+    "crates/yalc-saga",
     "crates/integrations/yalc-notifications-slack",
     "crates/integrations/yalc-payments-stripe",
     "crates/integrations/yalc-payments-google",
