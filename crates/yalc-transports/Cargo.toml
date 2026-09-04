@@ -15,7 +15,7 @@ yalc-errors = { path = "../yalc-errors" }
 tower-http = { version = "0.5", features = ["cors"] }
 
 # Optional Dependencies
-axum = { version = "0.7", optional = true }
+axum = { version = "0.7", features = ["ws"], optional = true }
 tokio = { version = "1.35", features = ["full"], optional = true }
 tonic = { version = "0.10", optional = true }
 prost = { version = "0.12", optional = true }

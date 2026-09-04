@@ -13,6 +13,13 @@ pub trait Transport: Send + Sync {
 
 #[cfg(feature = "http")]
 pub mod http;
+#[cfg(feature = "http")]
+pub use http::HttpTransport;
+
+#[cfg(feature = "http")]
+pub mod ws;
+#[cfg(feature = "http")]
+pub use ws::WsTransport;
 
 #[cfg(feature = "grpc")]
 pub mod grpc;

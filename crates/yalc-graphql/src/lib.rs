@@ -27,6 +27,19 @@ pub fn build_schema_with_context<T: Send + Sync + 'static>(
         .finish()
 }
 
+/// Helper to export the GraphQL Schema (SDL) to a file for Frontend Code Generation
+pub fn export_sdl<Q, M, S>(schema: &Schema<Q, M, S>, path: &str) -> Result<(), std::io::Error> 
+where
+    Q: async_graphql::ObjectType + 'static,
+    M: async_graphql::ObjectType + 'static,
+    S: async_graphql::SubscriptionType + 'static,
+{
+    let sdl = schema.sdl();
+    std::fs::write(path, sdl)?;
+    println!("✅ GraphQL Schema successfully exported to {}", path);
+    Ok(())
+}
+
 pub fn setup() {
     println!("yalc-graphql initialized: Provides async-graphql Schema builders.");
 }
