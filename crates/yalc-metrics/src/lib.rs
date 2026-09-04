@@ -6,6 +6,7 @@ use yalc_errors::AppError;
 /// Call this once during application bootstrap.
 pub fn setup_metrics() -> Result<(), AppError> {
     PrometheusBuilder::new()
+        .with_http_listener(([0, 0, 0, 0], 9000))
         .install()
         .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
 

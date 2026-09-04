@@ -1,0 +1,9 @@
+[package]
+name = "yalc-payments-stripe"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+async-stripe = { version = "0.38", features = ["runtime-tokio-hyper", "webhook-events"] }
+serde = { workspace = true, features = ["derive"] }
+yalc-errors = { path = "../../yalc-errors" }

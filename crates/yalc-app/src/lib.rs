@@ -34,6 +34,8 @@ impl YalcApp {
         use std::time::Duration;
 
         self.router = self.router
+            .layer(sentry_tower::NewSentryLayer::new_from_top())
+            .layer(sentry_tower::SentryHttpLayer::with_transaction())
             .layer(TimeoutLayer::new(Duration::from_secs(15)))
             .layer(CatchPanicLayer::new())
             .layer(CorsLayer::permissive()) // In a real app, configure this tightly

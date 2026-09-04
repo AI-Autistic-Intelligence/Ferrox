@@ -16,7 +16,10 @@ members = [
     "crates/database/yalc-database-redis",
     "crates/ag-grid/yalc-ag-grid-core",
     "crates/ag-grid/yalc-ag-grid-seaorm",
-    "crates/ag-grid/yalc-ag-grid-mongo"
+    "crates/ag-grid/yalc-ag-grid-mongo",
+    "crates/integrations/yalc-notifications-slack",
+    "crates/integrations/yalc-payments-stripe",
+    "crates/integrations/yalc-payments-google"
 ]
 
 [workspace.package]

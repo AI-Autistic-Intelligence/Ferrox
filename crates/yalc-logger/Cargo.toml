@@ -10,4 +10,6 @@ opentelemetry = { version = "0.21" }
 opentelemetry_sdk = { version = "0.21", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.14", features = ["tonic"] }
 tracing-opentelemetry = "0.22"
+sentry = { version = "0.34" }
+sentry-tracing = { version = "0.34" }
 yalc-errors = { path = "../yalc-errors" }
