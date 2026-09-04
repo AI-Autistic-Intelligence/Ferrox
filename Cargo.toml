@@ -8,6 +8,8 @@ members = [
     "crates/yalc-events",
     "crates/yalc-utils",
     "crates/yalc-types",
+    "crates/yalc-security",
+    "crates/yalc-metrics",
     "crates/database/yalc-database-core",
     "crates/database/yalc-database-seaorm",
     "crates/database/yalc-database-mongo",
