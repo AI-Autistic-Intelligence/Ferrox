@@ -2,3 +2,7 @@
 name = "yalc-types"
 version.workspace = true
 edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+yalc-errors = { path = "../yalc-errors" }
