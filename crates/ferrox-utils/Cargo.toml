@@ -4,6 +4,8 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-time = { workspace = true }
-uuid = { version = "1.0", features = ["v7", "serde"] }
+time = { version = "0.3" }
+uuid = { version = "1.0", features = ["v7", "fast-rng"] }
+chrono = { version = "0.4", features = ["serde"] }
+convert_case = "0.6"
 ferrox-errors = { path = "../ferrox-errors" }
