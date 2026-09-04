@@ -2,3 +2,12 @@
 name = "yalc-graphql"
 version.workspace = true
 edition.workspace = true
+
+[dependencies]
+async-graphql = { workspace = true, features = ["tokio"] }
+tokio = { workspace = true, features = ["full"] }
+yalc-database-core = { path = "../database/yalc-database-core" }
+yalc-errors = { path = "../yalc-errors" }
+
+[dev-dependencies]
+serde_json = "1.0"
