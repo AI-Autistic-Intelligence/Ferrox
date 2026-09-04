@@ -22,6 +22,7 @@ members = [
     "crates/ferrox-interceptors",
     "crates/ferrox-schedule",
     "crates/ferrox-sse",
+    "crates/ferrox-singleflight",
     "crates/ferrox-health",
     "crates/ferrox-tracing",
     "crates/ferrox-config",
