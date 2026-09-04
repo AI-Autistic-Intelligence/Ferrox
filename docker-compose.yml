@@ -11,13 +11,19 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/security/init_postgres_least_privilege.sql:/docker-entrypoint-initdb.d/init_postgres_least_privilege.sql
 
   mongo:
     image: mongo:6-jammy
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root_password
+      MONGO_INITDB_DATABASE: yalc_db
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+      - ./scripts/security/init_mongo_least_privilege.js:/docker-entrypoint-initdb.d/init_mongo_least_privilege.js
 
   redis:
     image: redis:7-alpine

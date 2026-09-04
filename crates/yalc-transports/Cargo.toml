@@ -12,6 +12,7 @@ ftp = ["dep:suppaftp", "dep:tokio"]
 [dependencies]
 async-trait = "0.1"
 yalc-errors = { path = "../yalc-errors" }
+tower-http = { version = "0.5", features = ["cors"] }
 
 # Optional Dependencies
 axum = { version = "0.7", optional = true }
