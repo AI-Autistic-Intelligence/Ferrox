@@ -7,6 +7,8 @@ use axum::{
 use std::time::Instant;
 use tracing::info;
 
+pub mod cache;
+
 /// Interceptor Middleware that logs the execution time of a request
 pub async fn logging_interceptor(
     req: Request<Body>,

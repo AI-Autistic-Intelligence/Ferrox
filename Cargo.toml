@@ -29,6 +29,7 @@ members = [
     "crates/integrations/ferrox-feature-flags",
     "crates/integrations/ferrox-reports",
     "crates/integrations/ferrox-cloud-helpers",
+    "crates/integrations/ferrox-webhooks",
     "crates/ferrox-jobs",
     "crates/ferrox-rate-limiter"
 ]
