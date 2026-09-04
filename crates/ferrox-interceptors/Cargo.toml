@@ -9,5 +9,7 @@ axum = "0.7"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 ferrox-database-redis = { path = "../database/ferrox-database-redis" }
+ferrox-database-redis = { path = "../database/ferrox-database-redis" }
 ferrox-singleflight = { path = "../ferrox-singleflight" }
 ferrox-security = { path = "../ferrox-security" }
+secrecy = "0.8"

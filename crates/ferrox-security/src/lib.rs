@@ -12,6 +12,8 @@ use time::{Duration, OffsetDateTime};
 use ferrox_errors::AppError;
 
 pub mod auth_middleware;
+pub mod dual_token;
+pub mod public_id;
 
 /// Hashes a password securely using Argon2.
 /// The input is wrapped in `Secret<String>` to guarantee it doesn't leak in logs.

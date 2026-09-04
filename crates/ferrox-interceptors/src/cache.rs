@@ -10,6 +10,7 @@ use ferrox_singleflight::Singleflight;
 use ferrox_security::paseto::PasetoAuth;
 use std::sync::Arc;
 use tracing::{info, debug, warn};
+use secrecy::Secret;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum CachePolicy {
@@ -54,9 +55,9 @@ pub async fn cache_interceptor(
             }
             
             let token = &auth_header[7..];
-            let auth = PasetoAuth::new(&config.auth_secret);
-            match auth.verify_token(token) {
-                Ok(claims) => format!("cache:private:{}:{}", claims.sub, uri),
+            let auth = PasetoAuth::new(Secret::new(config.auth_secret.clone())).unwrap();
+            match auth.validate_token(token) {
+                Ok(claims) => format!("cache:private:{}:{}", claims.user_id, uri),
                 Err(_) => {
                     warn!("PrivateCache blocked: Invalid token");
                     return Ok(next.run(req).await);
