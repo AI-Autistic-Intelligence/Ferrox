@@ -1,0 +1,21 @@
+---
+sidebar_position: 2
+---
+
+# Slack
+
+The `integrations/yalc-slack` module enables Rust-YALC to communicate with Slack workspaces.
+
+## Features
+- Send alerts and notifications to specific channels
+- Format messages using Slack Block Kit
+- React to Slack Slash commands securely
+
+## Example
+
+```rust
+use yalc_slack::SlackClient;
+
+let slack = SlackClient::new("xoxb-your-token");
+slack.post_message("#alerts", "🚨 High CPU Usage Detected!").await?;
+```
