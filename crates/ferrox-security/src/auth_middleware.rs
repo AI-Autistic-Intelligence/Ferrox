@@ -26,8 +26,19 @@ pub async fn require_auth<B>(
 
     match auth_engine.validate_token(token) {
         Ok(payload) => {
-            // Inject payload into request context
-            req.extensions_mut().insert(payload);
+            // 1. Inject payload into local request context (for Monolith controllers)
+            req.extensions_mut().insert(payload.clone());
+            
+            // 2. Inject claims as HTTP Headers (API Gateway Pattern for Downstream Microservices)
+            // This prevents downstream microservices from having to re-validate the cryptographic signature
+            // or query the database, achieving zero-trust security without performance penalties.
+            if let Ok(user_id_val) = header::HeaderValue::from_str(&payload.user_id) {
+                req.headers_mut().insert("x-ferrox-user-id", user_id_val);
+            }
+            if let Ok(role_val) = header::HeaderValue::from_str(&payload.role) {
+                req.headers_mut().insert("x-ferrox-user-role", role_val);
+            }
+
             Ok(next.run(req).await)
         }
         Err(_) => Err(StatusCode::UNAUTHORIZED),
