@@ -17,7 +17,19 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '🚀 Overview',
-      items: ['overview/introduction'],
+      items: [
+        'overview/introduction',
+        'overview/lifecycle',
+      ],
+    },
+    {
+      type: 'category',
+      label: '🎓 Tutorial: Mini-Project',
+      items: [
+        'tutorial/01-setup',
+        'tutorial/02-building-the-core',
+        'tutorial/03-code-factory',
+      ],
     },
     {
       type: 'category',
