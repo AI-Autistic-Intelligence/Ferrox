@@ -5,6 +5,8 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
 description = "Enterprise module ferrox-mailer for Ferrox Framework."
 [dependencies]
 lettre = { version = "0.11", features = ["tokio1", "tokio1-native-tls", "builder"] }

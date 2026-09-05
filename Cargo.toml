@@ -55,6 +55,8 @@ edition = "2021"
 authors = ["AI-Autistic-Intelligence & Ferrox Contributors <info@ferrox-rust.dev>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/AI-Autistic-Intelligence/Ferrox"
+homepage = "https://ferrox-rust.dev"
+documentation = "https://ferrox-rust.dev"
 
 [workspace.dependencies]
 axum = "0.7"

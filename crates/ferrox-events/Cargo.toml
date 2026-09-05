@@ -5,6 +5,8 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
 description = "Enterprise module ferrox-events for Ferrox Framework."
 [dependencies]
 tokio = { workspace = true, features = ["sync", "rt", "macros"] }

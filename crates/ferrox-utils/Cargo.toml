@@ -5,6 +5,8 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
 description = "Enterprise module ferrox-utils for Ferrox Framework."
 [dependencies]
 time = { version = "0.3" }
