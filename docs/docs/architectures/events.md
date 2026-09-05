@@ -57,7 +57,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 2. Publish Domain Event from Service
     let event = UserCreatedEvent {
         user_id: 101,
-        email: "user@ferrox.dev".into(),
+        email: "user@ferrox-rust.dev".into(),
     };
 
     dispatcher.publish(event).await?;

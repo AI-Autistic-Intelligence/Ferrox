@@ -26,7 +26,7 @@ struct UserExport {
 }
 
 let users = vec![
-    UserExport { id: 1, name: "Alice".into(), email: "alice@ferrox.dev".into() }
+    UserExport { id: 1, name: "Alice".into(), email: "alice@ferrox-rust.dev".into() }
 ];
 
 let csv_bytes = generate_csv(&users)?;

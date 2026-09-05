@@ -1259,6 +1259,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "cargo-ferrox"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "inquire",
+ "serde",
+ "serde_json",
+ "sys-locale",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
 name = "cc"
 version = "1.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2075,19 +2088,6 @@ dependencies = [
  "ferrox-errors",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "ferrox-cli"
-version = "0.1.0"
-dependencies = [
- "clap",
- "inquire",
- "serde",
- "serde_json",
- "sys-locale",
- "tokio",
- "uuid",
 ]
 
 [[package]]

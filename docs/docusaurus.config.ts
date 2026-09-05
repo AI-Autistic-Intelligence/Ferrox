@@ -10,7 +10,7 @@ const config: Config = {
   favicon: 'img/favicon.png',
 
   // Set the production url of your site here
-  url: 'https://ferrox.dev',
+  url: 'https://ferrox-rust.dev',
   baseUrl: '/',
 
   i18n: {
