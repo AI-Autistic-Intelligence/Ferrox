@@ -32,3 +32,9 @@ Ferrox is designed for both Junior developers and Senior Architects.
 Throughout this documentation, you will find:
 - **High-Level Usage**: Simple `#[derive]` macros and plug-and-play code snippets to get work done fast.
 - **Low-Level Internals**: Deep dives into how Ferrox manipulates the Axum request lifecycle, allowing you to build your own custom Interceptors and Guards.
+
+## 💬 Join the Community
+
+Have questions or want to collaborate? Join the official **Ferrox Discord Community Server**:
+👉 [https://discord.gg/Bx3CzGec7d](https://discord.gg/Bx3CzGec7d)
+

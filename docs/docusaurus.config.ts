@@ -65,6 +65,11 @@ const config: Config = {
           label: 'Documentation',
         },
         {
+          href: 'https://discord.gg/Bx3CzGec7d',
+          label: 'Discord',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/AI-Autistic-Intelligence',
           label: 'GitHub',
           position: 'right',
@@ -86,6 +91,10 @@ const config: Config = {
         {
           title: 'Community',
           items: [
+            {
+              label: 'Discord Community Server',
+              href: 'https://discord.gg/Bx3CzGec7d',
+            },
             {
               label: 'Autistic Intelligence GitHub',
               href: 'https://github.com/AI-Autistic-Intelligence',

@@ -14,7 +14,8 @@
   <a href="#-architecture">Architecture</a> •
   <a href="#-crate-workspace-inventory">Crate Inventory</a> •
   <a href="#-quick-start">Quick Start</a> •
-  <a href="#-documentation">Documentation</a>
+  <a href="#-documentation">Documentation</a> •
+  <a href="https://discord.gg/Bx3CzGec7d">Discord</a>
 </p>
 
 ---
@@ -199,6 +200,14 @@ npm run start
 ```
 
 Visit `http://localhost:3000` to browse the interactive documentation.
+
+## 💬 Community & Support
+
+Join the official global **Ferrox Discord Community Server** to discuss framework architecture, ask questions, share showcases, and collaborate with developers worldwide:
+
+[![Discord Server](https://img.shields.io/badge/Discord-Ferrox%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/Bx3CzGec7d)
+
+- **Discord Invite Link:** [https://discord.gg/Bx3CzGec7d](https://discord.gg/Bx3CzGec7d)
 
 ---
 
