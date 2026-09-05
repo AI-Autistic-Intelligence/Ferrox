@@ -22,7 +22,11 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '🏗️ Fundamentals',
-      items: ['fundamentals/controllers'],
+      items: [
+        'fundamentals/controllers',
+        'fundamentals/providers',
+        'fundamentals/middlewares',
+      ],
     },
     {
       type: 'category',
