@@ -1,0 +1,74 @@
+---
+sidebar_position: 4
+---
+
+# 📡 Event-Driven Architecture & Event Bus
+
+Event-driven architecture decouples producers of business events from subscribers that react to them (e.g. sending welcome emails when a `UserCreatedEvent` fires, updating analytics counters, or invalidating caches).
+
+`ferrox-events` provides strongly typed domain events and asynchronous in-memory dispatchers.
+
+---
+
+## 1. Defining a `DomainEvent`
+
+Implement the `DomainEvent` trait on your event structs:
+
+```rust
+use serde::{Deserialize, Serialize};
+use ferrox_events::DomainEvent;
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct UserCreatedEvent {
+    pub user_id: u64,
+    pub email: String,
+}
+
+impl DomainEvent for UserCreatedEvent {
+    fn event_name(&self) -> &'static str {
+        "UserCreated"
+    }
+}
+```
+
+---
+
+## 2. Pub/Sub with `InMemoryDispatcher`
+
+`InMemoryDispatcher` uses Tokio broadcast channels for zero-cost, high-speed in-process event streaming:
+
+```rust
+use ferrox_events::{InMemoryDispatcher, EventDispatcher};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize Event Bus with capacity for 100 queued events
+    let dispatcher = InMemoryDispatcher::<UserCreatedEvent>::new(100);
+
+    // 1. Subscribe Event Listeners
+    let mut rx = dispatcher.subscribe().await?;
+
+    tokio::spawn(async move {
+        while let Ok(event) = rx.recv().await {
+            println!("📧 Welcome Email Listener: Sending email to {}", event.email);
+        }
+    });
+
+    // 2. Publish Domain Event from Service
+    let event = UserCreatedEvent {
+        user_id: 101,
+        email: "user@ferrox.dev".into(),
+    };
+
+    dispatcher.publish(event).await?;
+
+    Ok(())
+}
+```
+
+---
+
+## 3. ✅ Best Practices
+
+- **Make Event Handlers Idempotent**: Design event listeners to safely process duplicate events without unintended side effects.
+- **Offload Heavy Listener Tasks**: Spawn background Tokio tasks for event handlers so publishing domain events never delays HTTP responses.
