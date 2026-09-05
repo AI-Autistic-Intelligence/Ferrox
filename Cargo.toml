@@ -34,6 +34,7 @@ members = [
     "crates/ferrox-guards",
     "crates/ferrox-storage",
     "crates/ferrox-cqrs",
+    "crates/ferrox-transports",
     "crates/ferrox-cli",
     "crates/integrations/ferrox-notifications-slack",
     "crates/integrations/ferrox-payments-stripe",
@@ -51,7 +52,7 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-authors = ["AI-Autistic-Intelligence & Ferrox Contributors"]
+authors = ["AI-Autistic-Intelligence & Ferrox Contributors <info@ferrox-rust.dev>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/AI-Autistic-Intelligence/Ferrox"
 

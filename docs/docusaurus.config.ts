@@ -94,8 +94,12 @@ const config: Config = {
           ],
         },
         {
-          title: 'Community',
+          title: 'Community & Support',
           items: [
+            {
+              label: 'Official Email Support',
+              href: 'mailto:info@ferrox-rust.dev',
+            },
             {
               label: 'Discord Community Server',
               href: 'https://discord.gg/Bx3CzGec7d',

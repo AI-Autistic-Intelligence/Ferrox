@@ -208,7 +208,9 @@ Join the official global **Ferrox Community** to discuss framework architecture,
 
 [![Discord Server](https://img.shields.io/badge/Discord-Ferrox%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/Bx3CzGec7d)
 [![Reddit Subreddit](https://img.shields.io/badge/Reddit-r%2FFerrox-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/Ferrox/)
+[![Email Support](https://img.shields.io/badge/Email-info%40ferrox--rust.dev-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:info@ferrox-rust.dev)
 
+- **Official Support Email:** [info@ferrox-rust.dev](mailto:info@ferrox-rust.dev)
 - **Discord Invite Link:** [https://discord.gg/Bx3CzGec7d](https://discord.gg/Bx3CzGec7d)
 - **Reddit Subreddit:** [r/Ferrox](https://www.reddit.com/r/Ferrox/)
 
