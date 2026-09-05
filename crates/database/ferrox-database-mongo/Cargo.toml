@@ -2,9 +2,12 @@
 name = "ferrox-database-mongo"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-database-mongo for Ferrox Framework."
 [dependencies]
-mongodb = { version = "3.0", features = ["tokio-runtime"] }
+mongodb = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
-ferrox-database-core = { path = "../ferrox-database-core" }
-ferrox-errors = { path = "../../ferrox-errors" }
+ferrox-database-core = { version = "0.1.0", path = "../ferrox-database-core"  }
+ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }

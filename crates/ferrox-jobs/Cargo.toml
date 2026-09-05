@@ -2,9 +2,12 @@
 name = "ferrox-jobs"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-jobs for Ferrox Framework."
 [dependencies]
 apalis = { version = "0.5", features = ["redis"] }
 serde = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"] }
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }

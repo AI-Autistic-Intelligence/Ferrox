@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
     "crates/ferrox-app",
     "crates/ferrox-errors",
@@ -37,7 +38,6 @@ members = [
     "crates/integrations/ferrox-notifications-slack",
     "crates/integrations/ferrox-payments-stripe",
     "crates/integrations/ferrox-payments-google",
-    "crates/integrations/ferrox-storage",
     "crates/integrations/ferrox-mailer",
     "crates/integrations/ferrox-feature-flags",
     "crates/integrations/ferrox-reports",
@@ -63,6 +63,8 @@ tracing = "0.1"
 thiserror = "1.0"
 anyhow = "1.0"
 sea-orm = { version = "1.0" }
+mongodb = "3.0"
+bson = "2.10"
 async-graphql = "7.0"
 time = { version = "0.3", features = ["serde", "formatting", "macros"] }
 ts-rs = "8.1"

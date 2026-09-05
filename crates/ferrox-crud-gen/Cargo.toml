@@ -2,14 +2,17 @@
 name = "ferrox-crud-gen"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-crud-gen for Ferrox Framework."
 [dependencies]
 axum.workspace = true
 serde.workspace = true
 serde_json = "1.0"
-ferrox-database-core = { path = "../database/ferrox-database-core" }
-ferrox-validation = { path = "../ferrox-validation" }
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-database-core = { version = "0.1.0", path = "../database/ferrox-database-core"  }
+ferrox-validation = { version = "0.1.0", path = "../ferrox-validation"  }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }

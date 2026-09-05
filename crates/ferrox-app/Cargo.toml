@@ -2,12 +2,15 @@
 name = "ferrox-app"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-app for Ferrox Framework."
 [dependencies]
 axum = { workspace = true, features = ["tokio"] }
 tokio = { workspace = true, features = ["full", "signal"] }
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "timeout", "catch-panic", "set-header"] }
-ferrox-transports = { path = "../ferrox-transports" }
+ferrox-transports = { version = "0.1.0", path = "../ferrox-transports"  }
 sentry-tower = { version = "0.34", features = ["http"] }
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }

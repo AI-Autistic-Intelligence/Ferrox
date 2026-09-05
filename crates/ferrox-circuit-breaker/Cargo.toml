@@ -1,9 +1,12 @@
 [package]
 name = "ferrox-circuit-breaker"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-circuit-breaker for Ferrox Framework."
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }

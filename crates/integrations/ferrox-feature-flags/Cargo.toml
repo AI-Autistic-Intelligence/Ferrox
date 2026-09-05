@@ -2,10 +2,13 @@
 name = "ferrox-feature-flags"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-feature-flags for Ferrox Framework."
 [dependencies]
 redis = { version = "0.25", features = ["tokio-comp"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = "1.0"
 tokio = { workspace = true, features = ["full"] }
-ferrox-errors = { path = "../../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }

@@ -1,12 +1,15 @@
 [package]
 name = "ferrox-health"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-health for Ferrox Framework."
 [dependencies]
 axum = "0.7"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-ferrox-database-redis = { path = "../database/ferrox-database-redis" }
+ferrox-database-redis = { version = "0.1.0", path = "../database/ferrox-database-redis"  }
 tokio = { version = "1", features = ["full"] }
 chrono = "0.4"

@@ -1,7 +1,11 @@
 [package]
 name = "ferrox-cli"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-cli for Ferrox Framework."
 description = "Command Line Interface for scaffolding Rust-FERROX Enterprise Apps"
 
 [dependencies]

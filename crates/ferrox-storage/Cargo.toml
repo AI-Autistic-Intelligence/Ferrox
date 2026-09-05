@@ -1,12 +1,15 @@
 [package]
 name = "ferrox-storage"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-storage for Ferrox Framework."
 [dependencies]
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }
 tokio-util = { version = "0.7", features = ["io"] }
 aws-sdk-s3 = "1.0"
 async-trait = "0.1"
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }

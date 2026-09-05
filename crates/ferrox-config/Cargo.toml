@@ -1,10 +1,13 @@
 [package]
 name = "ferrox-config"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-config for Ferrox Framework."
 [dependencies]
 figment = { version = "0.10", features = ["toml", "env"] }
 serde = { version = "1.0", features = ["derive"] }
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
 tracing = "0.1"

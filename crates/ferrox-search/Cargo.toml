@@ -1,8 +1,11 @@
 [package]
 name = "ferrox-search"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-search for Ferrox Framework."
 [features]
 default = ["elastic", "meili", "qdrant"]
 elastic = ["dep:reqwest"]
@@ -13,7 +16,7 @@ qdrant = ["dep:reqwest"] # or tonic/qdrant-client in real world
 async-trait = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
 
 # Shared HTTP client for APIs
 reqwest = { version = "0.11", features = ["json"], optional = true }

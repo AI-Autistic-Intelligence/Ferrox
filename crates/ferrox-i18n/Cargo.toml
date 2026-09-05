@@ -1,8 +1,11 @@
 [package]
 name = "ferrox-i18n"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-i18n for Ferrox Framework."
 [dependencies]
 axum = "0.7"
 serde = { version = "1.0", features = ["derive"] }

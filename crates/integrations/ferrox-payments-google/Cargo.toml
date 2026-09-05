@@ -2,9 +2,12 @@
 name = "ferrox-payments-google"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-payments-google for Ferrox Framework."
 [dependencies]
 reqwest = { version = "0.12", features = ["json"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = "1.0"
-ferrox-errors = { path = "../../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }

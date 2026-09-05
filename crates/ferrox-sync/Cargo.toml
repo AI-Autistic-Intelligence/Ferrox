@@ -1,13 +1,16 @@
 [package]
 name = "ferrox-sync"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-sync for Ferrox Framework."
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-ferrox-errors = { path = "../ferrox-errors" }
-ferrox-database-redis = { path = "../database/ferrox-database-redis" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
+ferrox-database-redis = { version = "0.1.0", path = "../database/ferrox-database-redis"  }
 async-trait = "0.1"

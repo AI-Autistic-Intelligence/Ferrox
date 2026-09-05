@@ -2,7 +2,10 @@
 name = "ferrox-logger"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-logger for Ferrox Framework."
 [dependencies]
 tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
@@ -12,4 +15,4 @@ opentelemetry-otlp = { version = "0.14", features = ["tonic"] }
 tracing-opentelemetry = "0.22"
 sentry = { version = "0.34" }
 sentry-tracing = { version = "0.34" }
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }

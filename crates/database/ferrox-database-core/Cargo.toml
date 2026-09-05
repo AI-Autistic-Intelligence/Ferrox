@@ -2,7 +2,10 @@
 name = "ferrox-database-core"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-database-core for Ferrox Framework."
 [dependencies]
 async-trait = "0.1"
-ferrox-errors = { path = "../../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }

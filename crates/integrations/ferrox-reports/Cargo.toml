@@ -2,9 +2,12 @@
 name = "ferrox-reports"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-reports for Ferrox Framework."
 [dependencies]
 csv = "1.3"
 rust_xlsxwriter = "0.74"
 serde = { workspace = true, features = ["derive"] }
-ferrox-errors = { path = "../../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }

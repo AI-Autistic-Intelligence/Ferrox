@@ -2,7 +2,10 @@
 name = "ferrox-errors"
 version.workspace = true
 edition.workspace = true
-
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-errors for Ferrox Framework."
 [dependencies]
 thiserror.workspace = true
 axum.workspace = true

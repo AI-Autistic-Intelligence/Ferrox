@@ -1,15 +1,17 @@
 [package]
 name = "ferrox-interceptors"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-interceptors for Ferrox Framework."
 [dependencies]
 async-trait = "0.1"
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
-ferrox-database-redis = { path = "../database/ferrox-database-redis" }
-ferrox-database-redis = { path = "../database/ferrox-database-redis" }
-ferrox-singleflight = { path = "../ferrox-singleflight" }
-ferrox-security = { path = "../ferrox-security" }
+ferrox-database-redis = { version = "0.1.0", path = "../database/ferrox-database-redis"  }
+ferrox-singleflight = { version = "0.1.0", path = "../ferrox-singleflight"  }
+ferrox-security = { version = "0.1.0", path = "../ferrox-security"  }
 secrecy = "0.8"

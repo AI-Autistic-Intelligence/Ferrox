@@ -1,12 +1,15 @@
 [package]
 name = "ferrox-payments-stripe"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-payments-stripe for Ferrox Framework."
 [dependencies]
 async-trait = "0.1"
-ferrox-errors = { path = "../../ferrox-errors" }
-ferrox-integrations = { path = "../../ferrox-integrations" }
+ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }
+ferrox-integrations = { version = "0.1.0", path = "../../ferrox-integrations"  }
 
 # In a real app we'd use the `stripe` crate
 # stripe = "0.26"

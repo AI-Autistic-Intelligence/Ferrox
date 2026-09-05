@@ -1,10 +1,13 @@
 [package]
 name = "ferrox-cqrs"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Enterprise module ferrox-cqrs for Ferrox Framework."
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"
-ferrox-errors = { path = "../ferrox-errors" }
+ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
 tracing = "0.1"
