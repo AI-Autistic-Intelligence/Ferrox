@@ -2,210 +2,178 @@
 sidebar_position: 1
 ---
 
-# 🕹️ Controllers
+# 🕹️ Controllers: The Masterpiece Guide
 
-Controllers are responsible for handling incoming **HTTP requests** and returning **responses** to the client.
+In a Ferrox application, a **Controller** is the ultimate boundary between the unpredictable outside world (HTTP TCP streams) and the strict, type-safe inner world of your business logic. 
 
-A controller's purpose is to receive specific requests for the application. The **routing** mechanism controls which controller receives which requests. Frequently, each controller has more than one route, and different routes can perform different actions.
+Its sole responsibility is to **receive HTTP requests**, route them to the correct service, and **return HTTP responses**. While this sounds simple, an Enterprise application demands robust handling of streaming, multipart uploads, WebSockets, timeouts, and body size limits.
 
-In Ferrox, we achieve this by combining Rust's powerful type system with **Axum's Extraction** mechanism, allowing you to build declarative, type-safe route handlers.
+This guide explores the full arsenal available to a Ferrox Controller, explaining not just *how* to use it, but *why* and *how not to*.
 
-## Routing
+---
 
-To create a basic controller, we use plain Rust asynchronous functions. Unlike Node.js frameworks where you might decorate a class, in Ferrox you define modular router groups.
+## 1. The Core Concept
+
+In Ferrox (which runs on Axum and Tokio), there is no `@Controller()` class decorator like in NestJS. Instead, controllers are composed of pure, asynchronous functions (`Handlers`) grouped inside a `Router`. 
+
+When the HTTP server receives a TCP byte stream, it attempts to match the URL against a routing tree (Radix Tree). Once matched, it triggers your handler.
 
 ```rust
-use axum::{routing::get, Router};
+use axum::{routing::{get, post}, Router};
 
-// This is our Controller function
-async fn find_all() -> &'static str {
-    "This action returns all cats"
-}
-
-// We map the route to the controller function
-pub fn cats_controller() -> Router {
-    Router::new().route("/cats", get(find_all))
+pub fn users_controller() -> Router<AppState> {
+    // We group routes that share the same prefix
+    Router::new()
+        .route("/", get(get_users).post(create_user))
+        .route("/:id", get(get_user_by_id))
 }
 ```
 
-The `get()` routing method maps an HTTP GET request to our `find_all` handler. When a request matches `GET /cats`, Ferrox will execute the `find_all` asynchronous function.
+---
 
-## Request Object
+## 2. The Arsenal (Toolbox)
 
-Handlers often need access to the client request details. Ferrox uses **Extractors** to parse the request automatically. You simply declare what you need in the function signature, and Ferrox injects it.
+Ferrox provides a massive array of **Extractors** to pull data out of the raw HTTP request. Extractors are strictly typed: if the client sends invalid data, Ferrox intercepts it and returns a `400 Bad Request` *before* your controller is even executed.
 
-Here is a list of the most common extractors:
-
-| Ferrox Extractor | HTTP Request Part | NestJS Equivalent |
+### 2.1 Standard Extractors
+| Extractor | Use Case | NestJS Equivalent |
 | --- | --- | --- |
 | `Path<T>` | Route Parameters (`/users/:id`) | `@Param()` |
 | `Query<T>` | Query String (`?name=ferrox`) | `@Query()` |
 | `Json<T>` | JSON Request Body | `@Body()` |
 | `HeaderMap` | All HTTP Headers | `@Headers()` |
-| `TypedHeader<T>`| Strongly-typed HTTP Header | N/A |
-| `ConnectInfo<T>`| IP Address and Connection Info | `@Ip()` / `@HostParam()` |
 
-### Extracting Data Example
+### 2.2 Advanced Extractors (Multipart, SSE, WebSockets)
 
-```rust
-use axum::{
-    extract::{Path, Query},
-    http::HeaderMap,
-    Json,
-};
-use serde::Deserialize;
+When you need to handle complex payloads, Ferrox provides specialized extractors.
 
-#[derive(Deserialize)]
-pub struct PaginationQuery {
-    limit: usize,
-    offset: usize,
-}
-
-#[derive(Deserialize)]
-pub struct CreateUserDto {
-    name: String,
-}
-
-async fn get_user(
-    Path(user_id): Path<String>,           // Extracts /users/:user_id
-    Query(pagination): Query<PaginationQuery>, // Extracts ?limit=10&offset=0
-    headers: HeaderMap,                    // Extracts all headers
-    Json(payload): Json<CreateUserDto>,    // Parses the JSON body
-) -> String {
-    format!(
-        "User: {}, Limit: {}, Name: {}, User-Agent: {:?}",
-        user_id,
-        pagination.limit,
-        payload.name,
-        headers.get("user-agent")
-    )
-}
-```
-
-> [!TIP]
-> Notice how we don't have to manually parse JSON or cast strings to integers. If the client sends `?limit=abc`, Ferrox will automatically intercept the request and return a `400 Bad Request` before the controller even executes, guaranteeing type safety!
-
-## Status Codes
-
-By default, the response status code is always **200 OK**, except for POST requests which don't automatically default to 201 in raw Axum. 
-
-To easily change the status code dynamically, you return an `impl IntoResponse`. Ferrox provides a highly declarative tuple syntax for responses: `(StatusCode, Payload)`.
+#### Multipart Forms (File Uploads)
+Handling massive file uploads efficiently requires streaming the bytes, rather than loading a 5GB video into RAM.
 
 ```rust
-use axum::{http::StatusCode, response::IntoResponse, Json};
-use serde_json::json;
+use axum::extract::Multipart;
 
-async fn create_cat() -> impl IntoResponse {
-    // We return a tuple: HTTP 201 Created + JSON Body
-    (
-        StatusCode::CREATED, 
-        Json(json!({ "message": "Cat created successfully" }))
-    )
-}
-```
-
-## Custom Headers
-
-You can also specify custom response headers using the exact same tuple syntax.
-
-```rust
-use axum::{http::{HeaderMap, StatusCode}, response::IntoResponse};
-
-async fn custom_header_route() -> impl IntoResponse {
-    let mut headers = HeaderMap::new();
-    headers.insert("X-Custom-Header", "FerroxIsAwesome".parse().unwrap());
-    
-    // Ferrox resolves the tuple (StatusCode, Headers, Body) automatically
-    (StatusCode::OK, headers, "Hello World")
-}
-```
-
-## Request Payloads (DTOs)
-
-In Enterprise applications, you must use **Data Transfer Objects (DTO)** to define how data is sent over the network. 
-
-In Ferrox, DTOs are just Rust structs annotated with `serde::Deserialize` and our validation macros. Thanks to the Code Factory, these DTOs are also automatically converted into TypeScript interfaces for the Frontend.
-
-```rust
-use validator::Validate;
-use serde::{Deserialize, Serialize};
-use ts_rs::TS;
-
-#[derive(Deserialize, Serialize, Validate, TS)]
-#[ts(export)]
-pub struct CreateCatDto {
-    #[validate(length(min = 3))]
-    pub name: String,
-    
-    #[validate(range(min = 1, max = 20))]
-    pub age: u8,
-    
-    pub breed: String,
-}
-```
-
-## Handling Errors
-
-Unlike JavaScript where you `throw new Error()`, Rust uses the explicit `Result<T, E>` type. 
-
-In Ferrox, you should **never** `unwrap()` inside a controller, as it will crash the Thread. Instead, you return a `Result<T, AppError>`, and Ferrox will automatically map the Error to a standard JSON HTTP response.
-
-```rust
-use ferrox_errors::AppError;
-
-async fn find_one(Path(id): Path<String>) -> Result<Json<Cat>, AppError> {
-    let cat = database.find(&id).await?; // Use the `?` operator!
-    
-    if cat.is_none() {
-        // This will automatically return an HTTP 404 Not Found to the client
-        return Err(AppError::NotFound("Cat not found".to_string()));
+async fn upload_video(mut multipart: Multipart) {
+    while let Some(field) = multipart.next_field().await.unwrap() {
+        let name = field.name().unwrap().to_string();
+        let file_name = field.file_name().unwrap().to_string();
+        
+        // We can process the file chunks asynchronously here
+        // avoiding Memory Out Of Bounds errors.
+        let data = field.bytes().await.unwrap();
+        println!("Received {} bytes for {}", data.len(), file_name);
     }
-    
-    Ok(Json(cat.unwrap()))
 }
 ```
 
-## Full Resource Controller Example
-
-Here is a complete, real-world example of a RESTful Controller mapping standard CRUD operations.
+#### Server-Sent Events (SSE)
+For real-time unidirectional data (like a ChatGPT typing response), you can return an Event Stream.
 
 ```rust
-use axum::{
-    extract::{Path, State},
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post, put, delete},
-    Json, Router,
-};
-use ferrox_errors::AppError;
+use axum::response::sse::{Event, Sse};
+use futures::stream::{self, Stream};
+use std::{convert::Infallible, time::Duration};
 
-pub fn cats_controller() -> Router<AppState> {
-    Router::new()
-        .route("/cats", get(find_all).post(create))
-        .route("/cats/:id", get(find_one).put(update).delete(remove))
-}
+async fn sse_handler() -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    // Create a stream that yields an event every second
+    let stream = tokio_stream::wrappers::IntervalStream::new(tokio::time::interval(Duration::from_secs(1)))
+        .map(|_| Ok(Event::default().data("Server time tick!")));
 
-async fn create(
-    State(db): State<DatabaseConnection>,
-    Json(create_cat_dto): Json<CreateCatDto>,
-) -> Result<impl IntoResponse, AppError> {
-    let new_cat = db.cats().insert(create_cat_dto).await?;
-    Ok((StatusCode::CREATED, Json(new_cat)))
-}
-
-async fn find_all(
-    State(db): State<DatabaseConnection>,
-) -> Result<Json<Vec<Cat>>, AppError> {
-    let cats = db.cats().find_all().await?;
-    Ok(Json(cats))
-}
-
-async fn find_one(
-    State(db): State<DatabaseConnection>,
-    Path(id): Path<String>,
-) -> Result<Json<Cat>, AppError> {
-    let cat = db.cats().find_by_id(&id).await?
-        .ok_or(AppError::NotFound("Cat not found".to_string()))?;
-    Ok(Json(cat))
+    Sse::new(stream).keep_alive(axum::response::sse::KeepAlive::default())
 }
 ```
+
+---
+
+## 3. Advanced Under the Hood
+
+How does Ferrox manage memory when a client sends a 10GB JSON payload? 
+
+By default, the `Json<T>` extractor has a **strict 2MB limit**. If a payload exceeds this limit, Ferrox drops the TCP connection to prevent **OOM (Out of Memory) DDoS attacks**.
+
+If you need to accept larger payloads for a specific route, you explicitly configure the limit per-route using `axum::extract::DefaultBodyLimit`.
+
+```rust
+use axum::extract::DefaultBodyLimit;
+use axum::Router;
+use axum::routing::post;
+
+let app = Router::new()
+    .route("/massive-upload", post(massive_handler))
+    // Override the limit to 50MB for this specific route
+    .layer(DefaultBodyLimit::max(50 * 1024 * 1024)); 
+```
+
+---
+
+## 4. ✅ Best Practices
+
+### 4.1 Thin Controllers, Fat Providers
+A Controller should never contain business logic, complex IF statements, or direct database queries. It should only extract data, pass it to a Provider (Service), and format the Provider's result into an HTTP Response.
+
+**✅ DO:**
+```rust
+async fn create_user(
+    State(user_service): State<UserService>,
+    Json(payload): Json<CreateUserDto>,
+) -> Result<Json<User>, AppError> {
+    // The controller delegates everything to the service
+    let user = user_service.create(payload).await?;
+    Ok(Json(user))
+}
+```
+
+### 4.2 Sub-Router Composition (Nesting)
+Don't define all your routes in a giant `main.rs` file. Nest routers to keep your codebase modular, exactly like NestJS Modules.
+
+**✅ DO:**
+```rust
+let api_router = Router::new()
+    .nest("/users", users_controller())
+    .nest("/orders", orders_controller());
+
+let app = Router::new().nest("/api/v1", api_router);
+```
+
+---
+
+## 5. ❌ Anti-Patterns
+
+Understanding what *not* to do in Rust is critical, as some mistakes can bring down your entire server cluster.
+
+### 5.1 Blocking the Tokio Thread 💀
+Ferrox runs on **Tokio**, an asynchronous runtime. Tokio uses a pool of Worker Threads (usually equal to your CPU cores). If you run a synchronous, blocking operation (like reading a huge file with `std::fs` or heavy cryptography) inside an `async fn` controller, you "steal" that thread. If you have 8 cores and 8 requests do this concurrently, **your entire server stops responding to all other users**.
+
+**❌ DON'T:**
+```rust
+async fn blocking_controller() -> &'static str {
+    // 💀 FATAL: This blocks the Tokio Worker thread!
+    std::thread::sleep(std::time::Duration::from_secs(5)); 
+    
+    // 💀 FATAL: Synchronous File I/O blocks the thread!
+    let data = std::fs::read_to_string("huge_log.txt").unwrap(); 
+    
+    "Done"
+}
+```
+
+**✅ DO:**
+```rust
+async fn non_blocking_controller() -> &'static str {
+    // ✅ SAFE: Yields the thread back to Tokio while waiting
+    tokio::time::sleep(std::time::Duration::from_secs(5)).await; 
+    
+    // ✅ SAFE: Asynchronous File I/O
+    let data = tokio::fs::read_to_string("huge_log.txt").await.unwrap(); 
+    
+    // ✅ SAFE: For CPU-heavy math/crypto, offload to a blocking thread pool
+    let hash = tokio::task::spawn_blocking(|| {
+        bcrypt::hash("password", 10).unwrap()
+    }).await.unwrap();
+    
+    "Done"
+}
+```
+
+### 5.2 Unwrapping inside a Controller
+If a client sends an unexpected header, and you call `.unwrap()` to parse it, your thread will Panic. While Axum catches panics and prevents the server from crashing entirely, it is a severe anti-pattern that disrupts the connection abruptly. Always use `?` and return proper `AppError` types.
