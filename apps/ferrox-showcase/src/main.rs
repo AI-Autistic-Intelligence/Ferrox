@@ -1,83 +1,54 @@
-use axum::{
-    routing::{get, post},
-    Router, Json, middleware,
-};
-use serde::{Deserialize, Serialize};
+mod config;
+mod modules;
+
+use axum::Router;
 use std::sync::Arc;
-use tokio::net::TcpListener;
-use tracing::info;
-use tracing_subscriber;
 use secrecy::Secret;
+use tracing::info;
 
-// Import our framework components
-use ferrox_security::{PasetoAuth, auth_middleware::{require_auth, require_role}};
-use ferrox_errors::AppError;
-use ferrox_utils::date::now_utc;
+use ferrox_app::FerroxApp;
+use ferrox_transports::http::HttpTransport;
+use ferrox_logger::{setup_logger, LoggerConfig};
+use ferrox_security::PasetoAuth;
 
-#[derive(Serialize)]
-struct SystemStatus {
-    status: String,
-    timestamp: String,
-    version: String,
-}
-
-#[derive(Serialize)]
-struct UserData {
-    message: String,
-    secret_balance: u64,
-}
-
-async fn health_check() -> Json<SystemStatus> {
-    Json(SystemStatus {
-        status: "operational".to_string(),
-        timestamp: now_utc().to_rfc3339(),
-        version: "1.0.0".to_string(),
-    })
-}
-
-/// Protected by require_auth middleware
-async fn get_user_profile() -> Json<UserData> {
-    // In a real app, this reads the `x-ferrox-user-id` header
-    // injected by the API Gateway middleware.
-    Json(UserData {
-        message: "Welcome to the secure zone!".into(),
-        secret_balance: 10_000,
-    })
-}
+use crate::config::AppConfig;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt::init();
+    // 1. Load Configuration (from .env or default.toml)
+    // We mock it for the showcase if not present
+    std::env::set_var("FERROX_SERVER_PORT", "3000");
+    std::env::set_var("FERROX_JWT_SECRET", "super_secret_key_that_is_32_bytes_long_12345678901234567890");
+    std::env::set_var("FERROX_LOGGER.SERVICE_NAME", "ferrox-showcase");
+    
+    let config = AppConfig::load();
+
+    // 2. Setup Structured Logger & Tracing
+    let _sentry_guard = setup_logger(config.logger.clone())
+        .expect("Failed to initialize logger");
+
     info!("🚀 Booting Ferrox Showcase App...");
 
-    // 1. Boot Config & Security
-    let secret = Secret::new("my_super_secret_key_that_is_32_bytes_long_12345678901234567890".to_string());
+    // 3. Initialize Security (PASETO)
+    let secret = Secret::new(config.jwt_secret);
     let paseto_auth = Arc::new(PasetoAuth::new(secret).unwrap());
 
-    // 2. Setup Routes
-    // Public routes
-    let public_routes = Router::new()
-        .route("/health", get(health_check));
+    // 4. Assemble Router
+    let app_router = Router::new()
+        .merge(modules::health::router())
+        .nest("/api/v1/auth", modules::auth::router(paseto_auth));
 
-    // Protected routes (API Gateway Pattern)
-    let protected_routes = Router::new()
-        .route("/profile", get(get_user_profile))
-        // Protect with PASETO JWT Middleware
-        .route_layer(middleware::from_fn_with_state(
-            paseto_auth.clone(),
-            require_auth,
-        ));
+    // 5. Setup HTTP Transport with Zero Trust CORS
+    let http_transport = HttpTransport::new(app_router, config.server_port)
+        .with_strict_cors(vec!["http://localhost:8080", "https://myfrontend.com"]);
 
-    // Combine
-    let app = Router::new()
-        .merge(public_routes)
-        .merge(protected_routes);
+    // 6. Bootstrap Ferrox App Lifecycle Manager
+    info!("Starting Ferrox lifecycle manager...");
+    let app = FerroxApp::new()
+        .add_transport(http_transport);
 
-    // 3. Start Server
-    let listener = TcpListener::bind("127.0.0.1:3000").await?;
-    info!("✅ Server running on http://127.0.0.1:3000");
-    
-    axum::serve(listener, app).await?;
+    // This will block and wait for SIGINT/SIGTERM for graceful shutdown
+    app.start().await?;
 
     Ok(())
 }

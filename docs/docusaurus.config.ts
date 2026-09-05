@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Rust-FERROX',
   tagline: 'The Ultimate Rust Arsenal',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.png',
 
   // Set the production url of your site here
   url: 'https://ferrox.dev',
@@ -60,7 +60,7 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          sidebarId: 'ferroxSidebar',
           position: 'left',
           label: 'Documentation',
         },
@@ -79,7 +79,7 @@ const config: Config = {
           items: [
             {
               label: 'Getting Started',
-              to: '/docs/getting-started/introduction',
+              to: '/docs/overview/introduction',
             },
           ],
         },

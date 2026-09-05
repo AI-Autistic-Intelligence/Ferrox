@@ -2,58 +2,146 @@
 sidebar_position: 3
 ---
 
-# 🧅 Middlewares
+# 🔗 Middlewares
 
-Middlewares are functions that have access to the request object, the response object, and the `next` middleware function in the application’s request-response cycle.
+Middleware is a function which is called **before** the route handler. Middleware functions have access to the request and response objects, and the `next()` middleware function in the application’s request-response cycle.
 
-In Ferrox, Middlewares are executed **before** the request reaches your Guards or Controllers. They are the perfect place to implement things like:
-- Execution tracing and logging
-- Request ID injection
-- API Gateway Token Translation (See [Zero-Trust Security](../security/jwt))
+Ferrox middlewares are equivalent to Express/NestJS middlewares but execute with zero-cost abstractions thanks to `tower::Service`.
 
-## High-Level Example
+Middleware functions can perform the following tasks:
+- Execute any code.
+- Make changes to the request and the response objects (e.g. injecting Headers or Extensions).
+- End the request-response cycle early (e.g. returning 401 Unauthorized before hitting the DB).
+- Call the next middleware function in the stack.
 
-Here is how you can write a simple middleware that measures how long a request takes to process.
+## Functional Middleware
+
+The simplest way to define a middleware in Ferrox is by using a standard asynchronous function.
 
 ```rust
 use axum::{
     http::Request,
-    middleware::{self, Next},
+    middleware::Next,
     response::Response,
-    routing::get,
-    Router,
 };
-use std::time::Instant;
 
 // 1. Define the Middleware function
-async fn timing_middleware<B>(
+pub async fn logger_middleware<B>(
     req: Request<B>,
-    next: Next,
+    next: Next<B>,
 ) -> Response {
-    let start = Instant::now();
+    let method = req.method().clone();
+    let uri = req.uri().clone();
+    
+    println!("👉 Incoming Request: {} {}", method, uri);
 
-    // Pass control to the next layer (Guards -> Controller)
+    // Call the next middleware (or the controller)
     let response = next.run(req).await;
 
-    let latency = start.elapsed();
-    println!("Request took {} ms", latency.as_millis());
+    println!("👈 Outgoing Response: {}", response.status());
 
     response
 }
+```
 
-// 2. Attach it to your router
+### Applying Middleware
+
+You can apply middleware to specific routes, or globally to the entire application.
+
+```rust
+use axum::{routing::get, Router, middleware};
+
 pub fn app_router() -> Router {
     Router::new()
-        .route("/fast-route", get(|| async { "Hello" }))
-        .layer(middleware::from_fn(timing_middleware)) // <--- Attached globally
+        // The logger_middleware will only apply to routes ABOVE this layer
+        .route("/cats", get(get_cats))
+        .route_layer(middleware::from_fn(logger_middleware))
+        
+        // It will NOT apply to this route! (Order matters in Axum)
+        .route("/health", get(health_check))
 }
 ```
 
-## Low-Level Internal Details
+> [!WARNING]
+> In Ferrox/Axum, middleware layers are evaluated **bottom-to-top** when applied via `.layer()`, but the routing matches top-to-bottom. Always be mindful of where you place `.route_layer()` to ensure it only protects the routes you intend it to!
 
-Ferrox uses the `tower::Service` abstraction under the hood for its middleware layer. 
+## Class Middleware (Tower Services)
 
-Unlike Extractors (which parse data and can only fail or succeed), a Middleware wraps the entire request-response execution. This means a Middleware can:
-1. **Mutate the Request**: You can inject HTTP headers into `req.headers_mut()` before calling `next.run(req)`. This is exactly how Ferrox propagates the `X-User-Id` downstream in a microservice architecture.
-2. **Mutate the Response**: You can read the `response` after the controller finishes, and append custom HTTP headers (like CORS or Rate Limiting counters) before the client receives it.
-3. **Short-circuit**: If a Middleware returns a `Response` directly without calling `next.run()`, the request is aborted early (useful for IP blocklisting).
+For highly complex enterprise middlewares that require their own internal state (e.g., Rate Limiters, Circuit Breakers, Request Batchers), functional middlewares might not be enough.
+
+You can implement the `tower::Service` trait directly. This is the equivalent of a `class` Middleware in NestJS.
+
+```rust
+use tower::{Service, Layer};
+use std::task::{Context, Poll};
+use futures::future::BoxFuture;
+
+// The Middleware "Class"
+#[derive(Clone)]
+pub struct RateLimiterMiddleware<S> {
+    inner: S,
+    max_requests: u32,
+}
+
+impl<S, ReqBody, ResBody> Service<axum::http::Request<ReqBody>> for RateLimiterMiddleware<S>
+where
+    S: Service<axum::http::Request<ReqBody>, Response = axum::http::Response<ResBody>> + Clone + Send + 'static,
+    S::Future: Send + 'static,
+    ReqBody: Send + 'static,
+{
+    type Response = S::Response;
+    type Error = S::Error;
+    type Future = BoxFuture<'static, Result<Self::Response, Self::Error>>;
+
+    fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        self.inner.poll_ready(cx)
+    }
+
+    fn call(&mut self, req: axum::http::Request<ReqBody>) -> Self::Future {
+        // Complex stateful logic here...
+        
+        let clone = self.inner.clone();
+        let mut inner = std::mem::replace(&mut self.inner, clone);
+        
+        Box::pin(async move {
+            let response = inner.call(req).await?;
+            Ok(response)
+        })
+    }
+}
+```
+
+## Passing Data to Controllers
+
+A very common use case for Middleware is extracting a JWT token, looking up the User ID, and passing it to the Controller so the Controller doesn't have to duplicate the logic.
+
+In Ferrox, you use `Extensions` to mutate the request context.
+
+```rust
+pub async fn auth_middleware<B>(
+    mut req: Request<B>,
+    next: Next<B>,
+) -> Result<Response, AppError> {
+    
+    // 1. Verify token...
+    let user_id = "user-uuid-123".to_string(); 
+    
+    // 2. Attach data to the request extensions
+    req.extensions_mut().insert(user_id);
+    
+    // 3. Continue execution
+    Ok(next.run(req).await)
+}
+```
+
+Inside your Controller, you simply extract it!
+
+```rust
+use axum::extract::Extension;
+
+async fn profile(
+    Extension(user_id): Extension<String>, // Extracts the data injected by the middleware
+) -> String {
+    format!("Hello, user {}", user_id)
+}
+```
