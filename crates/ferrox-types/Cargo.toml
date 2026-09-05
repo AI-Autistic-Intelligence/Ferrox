@@ -7,3 +7,4 @@ edition.workspace = true
 serde.workspace = true
 validator = { version = "0.18", features = ["derive"] }
 ferrox-errors = { path = "../ferrox-errors" }
+ts-rs.workspace = true

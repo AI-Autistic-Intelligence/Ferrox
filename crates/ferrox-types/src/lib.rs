@@ -32,9 +32,12 @@ impl Pagination {
 }
 
 use validator::Validate;
+use ts_rs::TS;
 
 /// Example of a Validatable DTO using the `validator` crate (like class-validator in TS)
-#[derive(Debug, Clone, Serialize, Deserialize, Validate)]
+/// It is also exported to TypeScript automatically!
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, TS)]
+#[ts(export)]
 pub struct CreateUserDto {
     #[validate(email)]
     pub email: String,
