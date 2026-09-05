@@ -31,12 +31,17 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '🛡️ Architectural Abstractions',
-      items: [],
+      items: [
+        'abstractions/pipes',
+        'abstractions/guards',
+      ],
     },
     {
       type: 'category',
       label: '🔒 Enterprise Security',
-      items: [],
+      items: [
+        'security/jwt',
+      ],
     },
     {
       type: 'category',
@@ -46,7 +51,9 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '🛠️ CLI & Code Factory',
-      items: [],
+      items: [
+        'cli/code-factory',
+      ],
     }
   ],
 };
