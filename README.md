@@ -133,7 +133,7 @@ Ferrox is structured as a modular workspace containing 35+ specialized crates:
 | | `ferrox-reports` | PDF & CSV report generation helpers |
 | | `ferrox-cloud-helpers` | Cloud SDK utilities (AWS/GCP/Azure) |
 | | `ferrox-i18n` | Multi-language translation & locale extraction |
-| **Tooling** | `ferrox-cli` | Command Line Interface (`ferrox init`, `ferrox generate --lang ts`) |
+| **Tooling** | `cargo-ferrox` | Command Line Interface (`cargo ferrox init`, `cargo ferrox generate --lang ts`) |
 
 ---
 

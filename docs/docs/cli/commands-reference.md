@@ -4,22 +4,22 @@ sidebar_position: 2
 
 # 🛠️ CLI Commands Reference
 
-`ferrox-cli` provides an interactive command-line interface for scaffolding new projects and generating strongly typed TypeScript API clients for frontend applications.
+`cargo-ferrox` provides an interactive command-line interface for scaffolding new projects and generating strongly typed TypeScript API clients for frontend applications.
 
 ---
 
 ## 1. Installation
 
-To install `ferrox-cli` globally via Cargo:
+To install `cargo-ferrox` globally via Cargo from crates.io:
 
 ```bash
-cargo install --path crates/ferrox-cli
+cargo install cargo-ferrox
 ```
 
 Verify installation:
 
 ```bash
-ferrox --version
+cargo ferrox --version
 ```
 
 ---
