@@ -141,6 +141,13 @@ const sidebars: SidebarsConfig = {
         'cli/commands-reference',
       ],
     },
+    {
+      type: 'category',
+      label: '💖 Community & Support',
+      items: [
+        'community/donations',
+      ],
+    },
   ],
 };
 

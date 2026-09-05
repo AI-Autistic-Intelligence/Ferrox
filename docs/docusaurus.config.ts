@@ -46,7 +46,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/logo.jpg',
     colorMode: {
       respectPrefersColorScheme: true,
     },
@@ -63,6 +63,11 @@ const config: Config = {
           sidebarId: 'ferroxSidebar',
           position: 'left',
           label: 'Documentation',
+        },
+        {
+          href: 'https://www.paypal.com/donate/?hosted_button_id=9Q3UG829FHT6J',
+          label: '❤️ Sponsor',
+          position: 'right',
         },
         {
           href: 'https://discord.gg/Bx3CzGec7d',
@@ -96,6 +101,10 @@ const config: Config = {
         {
           title: 'Community & Support',
           items: [
+            {
+              label: '❤️ Support / Donate (PayPal)',
+              href: 'https://www.paypal.com/donate/?hosted_button_id=9Q3UG829FHT6J',
+            },
             {
               label: 'Official Email Support',
               href: 'mailto:info@ferrox-rust.dev',

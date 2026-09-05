@@ -31,14 +31,19 @@ function HomepageHeader() {
             🚀 Getting Started
           </Link>
           <Link
+            className="button button--danger button--lg"
+            href="https://www.paypal.com/donate/?hosted_button_id=9Q3UG829FHT6J">
+            ❤️ Sponsor Project
+          </Link>
+          <Link
             className="button button--secondary button--lg"
             href="https://discord.gg/Bx3CzGec7d">
-            💬 Discord Community
+            💬 Discord
           </Link>
           <Link
             className="button button--outline button--lg"
             href="https://www.reddit.com/r/Ferrox/">
-            📱 Reddit r/Ferrox
+            📱 Reddit
           </Link>
         </div>
 
@@ -177,6 +182,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`}</code>
               </pre>
+            </div>
+          </div>
+        </section>
+
+        <section className="margin-vert--xl text--center">
+          <div className="card padding--xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <Heading as="h2">💖 Support Ferrox Open-Source Development</Heading>
+            <p style={{ maxWidth: '750px', margin: '0 auto 1.5rem auto', fontSize: '1.1rem' }}>
+              Developing a 45-crate ecosystem, running benchmark suites, hosting domain services (<code>ferrox-rust.dev</code>), and maintaining multi-language docs requires ongoing servers and infrastructure. Your donations directly power rapid releases and continuous open-source development!
+            </p>
+            <div className="row row--align-center" style={{ justifyContent: 'center' }}>
+              <div className="col col--6 text--center">
+                <a href="https://www.paypal.com/donate/?hosted_button_id=9Q3UG829FHT6J" target="_blank" rel="noopener noreferrer">
+                  <img src="/img/paypal_qr.png" alt="Scan to donate via PayPal" style={{ width: '180px', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.3)', marginBottom: '1rem' }} />
+                </a>
+                <div>
+                  <Link
+                    className="button button--danger button--lg"
+                    href="https://www.paypal.com/donate/?hosted_button_id=9Q3UG829FHT6J">
+                    💳 Donate via PayPal
+                  </Link>
+                  <span style={{ margin: '0 0.5rem' }}></span>
+                  <Link
+                    className="button button--outline button--secondary button--lg"
+                    to="/docs/community/donations">
+                    📖 Read Donation Info
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>
