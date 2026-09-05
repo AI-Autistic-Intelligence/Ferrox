@@ -213,4 +213,9 @@ Join the official global **Ferrox Discord Community Server** to discuss framewor
 
 ## 📜 License
 
-Ferrox is released under the **MIT License**.
+Ferrox is dual-licensed under either of the following licenses at your option:
+
+- **[MIT License](LICENSE-MIT)**
+- **[Apache License, Version 2.0](LICENSE-APACHE)**
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in Ferrox by you shall be dual-licensed as above, without any additional terms or conditions.

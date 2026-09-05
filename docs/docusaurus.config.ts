@@ -102,7 +102,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} AI-Autistic-Intelligence. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} AI-Autistic-Intelligence & Ferrox Contributors. Dual-licensed under MIT or Apache 2.0.`,
     },
     prism: {
       theme: prismThemes.github,

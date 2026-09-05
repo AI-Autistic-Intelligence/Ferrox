@@ -51,7 +51,9 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-authors = ["Antigravity"]
+authors = ["AI-Autistic-Intelligence & Ferrox Contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/AI-Autistic-Intelligence/Ferrox"
 
 [workspace.dependencies]
 axum = "0.7"
