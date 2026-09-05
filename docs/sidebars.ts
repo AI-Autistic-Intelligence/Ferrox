@@ -46,7 +46,11 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '🧠 Complex Architectures',
-      items: [],
+      items: [
+        'architectures/cqrs',
+        'architectures/caching',
+        'architectures/sagas',
+      ],
     },
     {
       type: 'category',
