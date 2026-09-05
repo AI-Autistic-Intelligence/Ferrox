@@ -35,6 +35,7 @@ Throughout this documentation, you will find:
 
 ## 💬 Join the Community
 
-Have questions or want to collaborate? Join the official **Ferrox Discord Community Server**:
-👉 [https://discord.gg/Bx3CzGec7d](https://discord.gg/Bx3CzGec7d)
+Have questions or want to collaborate? Join the official **Ferrox Community**:
+- 💬 **Discord Server:** [https://discord.gg/Bx3CzGec7d](https://discord.gg/Bx3CzGec7d)
+- 🤖 **Reddit Subreddit:** [r/Ferrox](https://www.reddit.com/r/Ferrox/)
 

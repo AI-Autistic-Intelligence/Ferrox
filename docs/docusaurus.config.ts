@@ -70,6 +70,11 @@ const config: Config = {
           position: 'right',
         },
         {
+          href: 'https://www.reddit.com/r/Ferrox/',
+          label: 'Reddit',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/AI-Autistic-Intelligence',
           label: 'GitHub',
           position: 'right',
@@ -94,6 +99,10 @@ const config: Config = {
             {
               label: 'Discord Community Server',
               href: 'https://discord.gg/Bx3CzGec7d',
+            },
+            {
+              label: 'Reddit Subreddit (r/Ferrox)',
+              href: 'https://www.reddit.com/r/Ferrox/',
             },
             {
               label: 'Autistic Intelligence GitHub',
