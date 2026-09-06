@@ -1,6 +1,7 @@
 use crate::Transport;
 use async_trait::async_trait;
 use ferrox_errors::AppError;
+#[allow(unused_imports)]
 use suppaftp::AsyncFtpStream;
 
 /// Placeholder for an FTP Background Worker/Transport

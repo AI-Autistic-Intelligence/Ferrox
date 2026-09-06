@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-metrics for Ferrox Framework."
+description = "Prometheus metrics exporter, request duration histograms, and system telemetry for Ferrox."
 [dependencies]
 metrics = "0.22"
 metrics-exporter-prometheus = "0.13"

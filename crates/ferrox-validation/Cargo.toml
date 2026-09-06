@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-validation for Ferrox Framework."
+description = "ValidatedJson extractor and payload validation pipeline powered by the validator crate."
 [dependencies]
 axum = { version = "0.7" }
 serde = { version = "1.0", features = ["derive"] }

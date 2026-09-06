@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-database-mongo for Ferrox Framework."
+description = "Document database repository implementation and BSON utilities powered by MongoDB Rust Driver."
 [dependencies]
 mongodb = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

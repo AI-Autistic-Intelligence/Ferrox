@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-rate-limiter for Ferrox Framework."
+description = "Fixed window and token bucket rate limiters backed by Redis and memory."
 [dependencies]
 redis = { version = "0.25", features = ["tokio-comp"] }
 tower = "0.4"

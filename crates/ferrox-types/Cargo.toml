@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-types for Ferrox Framework."
+description = "Standardized domain primitives, type-safe PublicId identifiers, and Pagination models for Ferrox."
 [dependencies]
 serde.workspace = true
 validator = { version = "0.18", features = ["derive"] }

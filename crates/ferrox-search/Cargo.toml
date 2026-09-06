@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-search for Ferrox Framework."
+description = "Full-text search engine integration for Meilisearch and Elasticsearch in Ferrox backends."
 [features]
 default = ["elastic", "meili", "qdrant"]
 elastic = ["dep:reqwest"]

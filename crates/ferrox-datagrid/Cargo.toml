@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-datagrid for Ferrox Framework."
+description = "Server-side pagination, sorting, and filtering query parameter parsers for AG-Grid, MUI X, and TanStack Table."
 [features]
 default = ["seaorm", "aggrid", "mui", "tanstack"]
 seaorm = ["dep:sea-orm"]

@@ -1,3 +1,7 @@
+//! # Ferrox Mailer (`ferrox-mailer`)
+//!
+//! `ferrox-mailer` provides async transactional email delivery using `lettre` with support for SMTP, SendGrid, and AWS SES.
+
 use lettre::{
     message::{header::ContentType, Mailbox},
     transport::smtp::authentication::Credentials,

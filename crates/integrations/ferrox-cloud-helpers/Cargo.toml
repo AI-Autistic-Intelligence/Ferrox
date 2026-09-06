@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-cloud-helpers for Ferrox Framework."
+description = "Cloud provider SDK helpers for AWS Secrets Manager, GCP Secret Manager, and Azure Key Vault."
 [dependencies]
 aws-config = "1.1"
 aws-sdk-secretsmanager = "1.21"

@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-database-seaorm for Ferrox Framework."
+description = "Relational database repository implementation powered by SeaORM (PostgreSQL, MySQL, SQLite)."
 [dependencies]
 sea-orm = { workspace = true, features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 log = "0.4"

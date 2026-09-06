@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-migrations for Ferrox Framework."
+description = "Database schema migration runner supporting SeaORM and raw SQL migration files."
 [dependencies]
 sea-orm-migration = "1.0"
 tokio = { version = "1", features = ["full"] }

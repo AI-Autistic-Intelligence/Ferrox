@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Command Line Interface for scaffolding Rust-FERROX Enterprise Apps"
+description = "Command Line Interface (cargo ferrox) for project scaffolding, code generation, and TypeScript export."
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }

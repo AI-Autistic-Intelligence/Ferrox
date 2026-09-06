@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-health for Ferrox Framework."
+description = "Kubernetes liveness (/healthz) and readiness (/readyz) health check probe handlers."
 [dependencies]
 axum = "0.7"
 serde = { version = "1.0", features = ["derive"] }

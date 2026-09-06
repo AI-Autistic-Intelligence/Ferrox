@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-database-redis for Ferrox Framework."
+description = "In-memory key-value cache client, connection pool manager, and Pub/Sub helper for Redis."
 [dependencies]
 redis = { version = "0.25", features = ["tokio-comp"] }
 bb8 = "0.8"

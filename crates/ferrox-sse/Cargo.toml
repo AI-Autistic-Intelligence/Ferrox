@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-sse for Ferrox Framework."
+description = "Server-Sent Events (SSE) stream builders and real-time event pushing for Axum."
 [dependencies]
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }

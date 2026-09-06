@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-schedule for Ferrox Framework."
+description = "Asynchronous cron job scheduler and background task orchestrator for Ferrox."
 [dependencies]
 tokio-cron-scheduler = "0.10"
 tokio = { version = "1", features = ["full"] }

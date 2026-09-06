@@ -1,3 +1,7 @@
+//! # Ferrox Jobs (`ferrox-jobs`)
+//!
+//! `ferrox-jobs` provides async background job processing powered by Redis and Apalis, enabling persistent task queues with retry logic.
+
 use apalis::{prelude::*, redis::RedisStorage};
 use serde::{Deserialize, Serialize};
 use ferrox_errors::AppError;

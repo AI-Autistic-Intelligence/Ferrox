@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-graphql for Ferrox Framework."
+description = "GraphQL transport integration, schema builders, and SDL export tools powered by async-graphql."
 [dependencies]
 async-graphql = { workspace = true, features = ["tokio"] }
 tokio = { workspace = true, features = ["full"] }

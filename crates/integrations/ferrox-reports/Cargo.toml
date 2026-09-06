@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-reports for Ferrox Framework."
+description = "CSV and Excel report generation utilities for Ferrox data exports."
 [dependencies]
 csv = "1.3"
 rust_xlsxwriter = "0.74"

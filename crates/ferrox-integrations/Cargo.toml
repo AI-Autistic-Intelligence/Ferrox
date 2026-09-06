@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-integrations for Ferrox Framework."
+description = "Core traits and unified contracts for third-party service providers (Payment, Mailer, Storage, Notifications)."
 [dependencies]
 async-trait = "0.1"
 ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }

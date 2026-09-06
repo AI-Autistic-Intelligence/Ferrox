@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-sync for Ferrox Framework."
+description = "Distributed locking and synchronization mechanisms backed by Redis Redlock and SQL advisory locks."
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"

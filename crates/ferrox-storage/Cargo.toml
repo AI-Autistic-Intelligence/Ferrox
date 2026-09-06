@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-storage for Ferrox Framework."
+description = "Unified file storage abstraction supporting local filesystem, AWS S3, and MinIO storage backends."
 [dependencies]
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }

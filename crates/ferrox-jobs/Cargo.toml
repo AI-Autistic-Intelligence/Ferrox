@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-jobs for Ferrox Framework."
+description = "Async background worker queue engine powered by Redis & Apalis."
 [dependencies]
 apalis = { version = "0.5", features = ["redis"] }
 serde = { workspace = true, features = ["derive"] }

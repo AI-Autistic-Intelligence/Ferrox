@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-singleflight for Ferrox Framework."
+description = "Cache stampede (dogpile effect) prevention mechanism using Tokio broadcast channels."
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"

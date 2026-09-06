@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-payments-google for Ferrox Framework."
+description = "Google Pay API client and in-app purchase verification adapter for Ferrox."
 [dependencies]
 reqwest = { version = "0.12", features = ["json"] }
 serde = { workspace = true, features = ["derive"] }

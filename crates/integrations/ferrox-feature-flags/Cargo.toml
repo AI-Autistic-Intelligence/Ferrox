@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-feature-flags for Ferrox Framework."
+description = "Feature flag evaluation engine backed by Redis and configuration toggles."
 [dependencies]
 redis = { version = "0.25", features = ["tokio-comp"] }
 serde = { workspace = true, features = ["derive"] }

@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-interceptors for Ferrox Framework."
+description = "Request/response lifecycle interceptor pipeline and response caching middleware for Ferrox."
 [dependencies]
 async-trait = "0.1"
 axum = "0.7"

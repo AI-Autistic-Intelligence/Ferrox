@@ -7,12 +7,13 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-app for Ferrox Framework."
+description = "Multi-transport application bootstrapper and graceful shutdown orchestrator for Axum & Tokio web applications."
 [dependencies]
 axum = { workspace = true, features = ["tokio"] }
 tokio = { workspace = true, features = ["full", "signal"] }
+tracing = "0.1"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "timeout", "catch-panic", "set-header"] }
-ferrox-transports = { version = "0.1.0", path = "../ferrox-transports"  }
+ferrox-transports = { version = "0.1.2", path = "../ferrox-transports"  }
 sentry-tower = { version = "0.34", features = ["http"] }
-ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.1.1", path = "../ferrox-errors"  }

@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-tracing for Ferrox Framework."
+description = "OpenTelemetry distributed tracing subscriber and W3C trace context correlation ID handler."
 [dependencies]
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }

@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-transports for Ferrox Framework."
+description = "Multi-protocol transport abstractions (HTTP, gRPC, WebSockets, FTP) for FerroxApp."
 [features]
 default = ["http", "grpc", "ftp"]
 http = ["dep:axum", "dep:tokio"]
@@ -16,7 +16,7 @@ ftp = ["dep:suppaftp", "dep:tokio"]
 
 [dependencies]
 async-trait = "0.1"
-ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.1.1", path = "../ferrox-errors"  }
 tower-http = { version = "0.5", features = ["cors"] }
 
 # Optional Dependencies
@@ -24,4 +24,4 @@ axum = { version = "0.7", features = ["ws"], optional = true }
 tokio = { version = "1.35", features = ["full"], optional = true }
 tonic = { version = "0.10", optional = true }
 prost = { version = "0.12", optional = true }
-suppaftp = { version = "5.2", optional = true }
+suppaftp = { version = "5.2", features = ["async"], optional = true }

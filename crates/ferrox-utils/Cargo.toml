@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-utils for Ferrox Framework."
+description = "Core helper functions, date/time UTC formatters, string casing utilities, and UUID generators."
 [dependencies]
 time = { version = "0.3" }
 uuid = { version = "1.0", features = ["v7", "fast-rng"] }

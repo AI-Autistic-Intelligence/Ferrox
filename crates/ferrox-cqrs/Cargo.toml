@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-cqrs for Ferrox Framework."
+description = "Decoupled CommandBus and QueryBus dispatching architecture pattern for Ferrox."
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"

@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-i18n for Ferrox Framework."
+description = "Multi-language internationalization, translation catalog resolution, and locale extractors."
 [dependencies]
 axum = "0.7"
 serde = { version = "1.0", features = ["derive"] }

@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-saga for Ferrox Framework."
+description = "Distributed transaction orchestrator engine implementing the Saga pattern with rollback compensation."
 [dependencies]
 async-trait = "0.1"
 ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }

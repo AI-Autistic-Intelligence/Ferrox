@@ -1,3 +1,7 @@
+//! # Ferrox Notifications Slack (`ferrox-notifications-slack`)
+//!
+//! `ferrox-notifications-slack` provides a Slack notification adapter implementing `NotificationProvider` for dispatching formatted alerts to Slack channels via webhooks.
+
 use async_trait::async_trait;
 use ferrox_errors::AppError;
 use ferrox_integrations::NotificationProvider;

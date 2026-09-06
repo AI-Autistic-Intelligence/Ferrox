@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-events for Ferrox Framework."
+description = "Domain event dispatcher and in-memory pub/sub message bus for decoupled event-driven architectures."
 [dependencies]
 tokio = { workspace = true, features = ["sync", "rt", "macros"] }
 serde.workspace = true

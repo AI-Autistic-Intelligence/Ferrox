@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-errors for Ferrox Framework."
+description = "Centralized AppError type, error classification, and Axum IntoResponse implementation for Ferrox."
 [dependencies]
 thiserror.workspace = true
 axum.workspace = true

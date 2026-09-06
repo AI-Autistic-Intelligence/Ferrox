@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-logger for Ferrox Framework."
+description = "Structured JSON logging subscriber, Sentry integration, and tracing configuration for Ferrox."
 [dependencies]
 tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }

@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-crud-gen for Ferrox Framework."
+description = "Procedural macros for generating zero-boilerplate REST CRUD routes and vertical slices in Ferrox."
 [dependencies]
 axum.workspace = true
 serde.workspace = true

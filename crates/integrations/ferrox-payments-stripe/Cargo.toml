@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-payments-stripe for Ferrox Framework."
+description = "Stripe payment adapter, Checkout session builder, and Webhook verification for Ferrox."
 [dependencies]
 async-trait = "0.1"
 ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }

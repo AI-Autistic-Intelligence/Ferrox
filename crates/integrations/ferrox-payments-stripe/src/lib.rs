@@ -1,3 +1,7 @@
+//! # Ferrox Payments Stripe (`ferrox-payments-stripe`)
+//!
+//! `ferrox-payments-stripe` provides Stripe payment integration, including Checkout session creation and Webhook signature verification.
+
 use async_trait::async_trait;
 use ferrox_errors::AppError;
 use ferrox_integrations::PaymentProvider;

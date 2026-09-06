@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-webhooks for Ferrox Framework."
+description = "Outgoing webhook dispatch engine with HMAC-SHA256 signatures and exponential backoff retry."
 [dependencies]
 reqwest = { version = "0.11", features = ["json"] }
 hmac = "0.12"

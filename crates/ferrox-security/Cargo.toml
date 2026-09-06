@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-security for Ferrox Framework."
+description = "PASETO v4 token translation engine, JWT claim extractors, and role-based authentication primitives."
 [dependencies]
 secrecy = "0.8"
 argon2 = "0.5"

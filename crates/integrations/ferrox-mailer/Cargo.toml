@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-mailer for Ferrox Framework."
+description = "Async email dispatcher client backed by Lettre (SMTP, AWS SES, SendGrid)."
 [dependencies]
 lettre = { version = "0.11", features = ["tokio1", "tokio1-native-tls", "builder"] }
 ferrox-errors = { version = "0.1.0", path = "../../ferrox-errors"  }

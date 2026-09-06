@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Enterprise module ferrox-guards for Ferrox Framework."
+description = "Declarative role-based access control (RBAC) route extractors and permission guards for Axum."
 [dependencies]
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }
