@@ -11,7 +11,7 @@ const config: Config = {
 
   // Set the production url of your site here
   url: 'https://ferrox-rust.dev',
-  baseUrl: '/',
+  baseUrl: process.env.BASE_URL || '/',
 
   i18n: {
     defaultLocale: 'en',
