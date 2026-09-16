@@ -7,7 +7,10 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Structured JSON logging subscriber, Sentry integration, and tracing configuration for Ferrox."
+description = "Structured JSON logging subscriber, Sentry integration, and Merkle root cryptographic log chain auditing for Ferrox."
+readme = "README.md"
+keywords = ["logging", "merkle", "tracing", "sentry", "security"]
+categories = ["development-tools::debugging", "cryptography"]
 [dependencies]
 tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
@@ -18,3 +21,8 @@ tracing-opentelemetry = "0.22"
 sentry = { version = "0.34" }
 sentry-tracing = { version = "0.34" }
 ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+

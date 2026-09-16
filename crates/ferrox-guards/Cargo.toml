@@ -7,7 +7,10 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Declarative role-based access control (RBAC) route extractors and permission guards for Axum."
+description = "Declarative role-based access control (RBAC) route extractors, zero-width evasion sanitizers, and session replay guards for Axum."
+readme = "README.md"
+keywords = ["security", "axum", "middleware", "rbac", "owasp"]
+categories = ["web-programming::http-server", "cryptography"]
 [dependencies]
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }
@@ -15,3 +18,4 @@ serde = { version = "1.0", features = ["derive"] }
 ferrox-security = { version = "0.1.0", path = "../ferrox-security"  }
 ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
 async-trait = "0.1"
+sha2 = "0.10"

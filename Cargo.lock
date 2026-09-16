@@ -1044,7 +1044,7 @@ dependencies = [
  "http-body 0.4.6",
  "hyper 0.14.32",
  "itoa",
- "matchit",
+ "matchit 0.7.3",
  "memchr",
  "mime",
  "percent-encoding",
@@ -1074,7 +1074,7 @@ dependencies = [
  "hyper 1.11.1",
  "hyper-util",
  "itoa",
- "matchit",
+ "matchit 0.7.3",
  "memchr",
  "mime",
  "percent-encoding",
@@ -1088,6 +1088,39 @@ dependencies = [
  "sync_wrapper 1.0.2",
  "tokio",
  "tokio-tungstenite",
+ "tower 0.5.3",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
+name = "axum"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "31b698c5f9a010f6573133b09e0de5408834d0c82f8d7475a89fc1867a71cd90"
+dependencies = [
+ "axum-core 0.5.6",
+ "bytes",
+ "form_urlencoded",
+ "futures-util",
+ "http 1.5.0",
+ "http-body 1.1.0",
+ "http-body-util",
+ "hyper 1.11.1",
+ "hyper-util",
+ "itoa",
+ "matchit 0.8.4",
+ "memchr",
+ "mime",
+ "percent-encoding",
+ "pin-project-lite",
+ "serde_core",
+ "serde_json",
+ "serde_path_to_error",
+ "serde_urlencoded",
+ "sync_wrapper 1.0.2",
+ "tokio",
  "tower 0.5.3",
  "tower-layer",
  "tower-service",
@@ -1126,6 +1159,25 @@ dependencies = [
  "mime",
  "pin-project-lite",
  "rustversion",
+ "sync_wrapper 1.0.2",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
+name = "axum-core"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08c78f31d7b1291f7ee735c1c6780ccde7785daae9a9206026862dab7d8792d1"
+dependencies = [
+ "bytes",
+ "futures-core",
+ "http 1.5.0",
+ "http-body 1.1.0",
+ "http-body-util",
+ "mime",
+ "pin-project-lite",
  "sync_wrapper 1.0.2",
  "tower-layer",
  "tower-service",
@@ -1389,6 +1441,7 @@ name = "cargo-ferrox"
 version = "0.1.2"
 dependencies = [
  "clap",
+ "ferrox-selftest",
  "inquire",
  "serde",
  "serde_json",
@@ -1506,6 +1559,16 @@ name = "colorchoice"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
+
+[[package]]
+name = "colored"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "117725a109d387c937a1533ce01b450cbde6b88abceea8473c4d7a85853cda3c"
+dependencies = [
+ "lazy_static",
+ "windows-sys 0.52.0",
+]
 
 [[package]]
 name = "combine"
@@ -2277,12 +2340,11 @@ name = "ferrox-crud-gen"
 version = "0.1.2"
 dependencies = [
  "async-trait",
- "axum 0.7.9",
- "ferrox-database-core",
- "ferrox-errors",
- "ferrox-validation",
+ "proc-macro2",
+ "quote",
  "serde",
  "serde_json",
+ "syn 2.0.119",
  "tokio",
  "uuid",
 ]
@@ -2316,6 +2378,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -2394,6 +2457,7 @@ dependencies = [
  "ferrox-errors",
  "ferrox-security",
  "serde",
+ "sha2 0.10.9",
  "tokio",
 ]
 
@@ -2456,12 +2520,15 @@ dependencies = [
 name = "ferrox-logger"
 version = "0.1.2"
 dependencies = [
+ "chrono",
  "ferrox-errors",
  "opentelemetry",
  "opentelemetry-otlp",
  "opentelemetry_sdk",
+ "rand 0.8.8",
  "sentry",
  "sentry-tracing",
+ "serde",
  "tracing",
  "tracing-opentelemetry",
  "tracing-subscriber",
@@ -2520,6 +2587,7 @@ dependencies = [
  "async-trait",
  "ferrox-errors",
  "ferrox-integrations",
+ "uuid",
 ]
 
 [[package]]
@@ -2579,16 +2647,57 @@ version = "0.1.2"
 dependencies = [
  "argon2",
  "axum 0.7.9",
+ "chrono",
  "ferrox-errors",
  "hex",
  "pasetors",
  "rand 0.8.8",
  "rand_core 0.6.4",
+ "reqwest 0.12.28",
  "secrecy",
  "serde",
  "serde_json",
  "time",
+ "tokio",
  "uuid",
+]
+
+[[package]]
+name = "ferrox-selftest"
+version = "0.1.2"
+dependencies = [
+ "axum 0.7.9",
+ "chrono",
+ "colored",
+ "ferrox-errors",
+ "ferrox-security",
+ "reqwest 0.12.28",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "time",
+ "tokio",
+ "tower 0.4.13",
+ "tower-http 0.6.11",
+ "tracing",
+]
+
+[[package]]
+name = "ferrox-sentinel"
+version = "0.1.2"
+dependencies = [
+ "axum 0.8.9",
+ "chrono",
+ "colored",
+ "ferrox-errors",
+ "ferrox-security",
+ "rand 0.8.8",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tokio",
+ "tower 0.4.13",
+ "tracing",
 ]
 
 [[package]]
@@ -2596,10 +2705,14 @@ name = "ferrox-showcase"
 version = "0.1.0"
 dependencies = [
  "axum 0.7.9",
+ "ferrox-app",
  "ferrox-config",
  "ferrox-errors",
+ "ferrox-logger",
  "ferrox-security",
+ "ferrox-transports",
  "ferrox-utils",
+ "secrecy",
  "serde",
  "serde_json",
  "tokio",
@@ -4152,6 +4265,12 @@ name = "matchit"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e7465ac9959cc2b1404e8e2367b43684a6d13790fe23056cc8c6c5a6b7bcb94"
+
+[[package]]
+name = "matchit"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "47e1ffaa40ddd1f3ed91f717a33c8c0ee23fff369e3aa8772b9605cc1d22f4c3"
 
 [[package]]
 name = "md-5"
@@ -5718,6 +5837,10 @@ dependencies = [
  "subtle",
  "zeroize",
 ]
+
+[[package]]
+name = "rust-yalc"
+version = "0.1.0"
 
 [[package]]
 name = "rust_decimal"

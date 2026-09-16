@@ -28,6 +28,9 @@ use ferrox_errors::AppError;
 pub mod auth_middleware;
 pub mod dual_token;
 pub mod public_id;
+pub mod threats;
+pub mod mtd;
+pub mod fingerprint;
 
 /// Hashes a password securely using Argon2.
 /// The input is wrapped in `Secret<String>` to guarantee it doesn't leak in logs.
@@ -37,7 +40,7 @@ pub fn hash_password(password: Secret<String>) -> Result<String, AppError> {
 
     let password_hash = argon2
         .hash_password(password.expose_secret().as_bytes(), &salt)
-        .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
+        .map_err(|e| AppError::InternalServerError(Box::new(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))))?;
 
     Ok(password_hash.to_string())
 }
@@ -66,7 +69,15 @@ pub struct AuthPayload {
 
 impl PasetoAuth {
     pub fn new(secret: Secret<String>) -> Result<Self, AppError> {
-        let key = SymmetricKey::<V4>::from(secret.expose_secret().as_bytes())
+        let bytes = secret.expose_secret().as_bytes();
+        let mut key_bytes = [0u8; 32];
+        if bytes.len() >= 32 {
+            key_bytes.copy_from_slice(&bytes[..32]);
+        } else {
+            key_bytes[..bytes.len()].copy_from_slice(bytes);
+        }
+
+        let key = SymmetricKey::<V4>::from(&key_bytes)
             .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
         Ok(Self { key })
     }
@@ -100,30 +111,34 @@ impl PasetoAuth {
     /// Validates a PASETO v4 token and returns the payload if successful
     pub fn validate_token(&self, token: &str) -> Result<AuthPayload, AppError> {
         let validation_rules = ClaimsValidationRules::new();
-        let untrusted_token = UntrustedToken::<Local, V4>::try_from(token)
-            .map_err(|_| AppError::Unauthorized("Invalid token format".into()))?;
+        
+        let untrusted_token = pasetors::token::UntrustedToken::<pasetors::Local, pasetors::version4::V4>::try_from(token)
+            .map_err(|_| AppError::ValidationError("Invalid token format".to_string()))?;
 
-        let claims = pasetors::local::decrypt(
+        let trusted_token = pasetors::local::decrypt(
             &self.key,
             &untrusted_token,
             &validation_rules,
             None,
             Some(b"ferrox-auth-footer"),
-        )
-        .map_err(|_| AppError::Unauthorized("Token validation failed".into()))?;
+        ).map_err(|e| AppError::InternalServerError(Box::new(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))))?;
 
-        let user_id = claims.get_claim("user_id")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| AppError::Unauthorized("Missing user_id".into()))?;
-        
-        let role = claims.get_claim("role")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| AppError::Unauthorized("Missing role".into()))?;
+        let payload_json = trusted_token.payload();
 
-        Ok(AuthPayload {
-            user_id: user_id.to_string(),
-            role: role.to_string(),
-        })
+        let mut claims: serde_json::Value = serde_json::from_slice(payload_json.as_bytes())
+            .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
+
+        let user_id = claims.get("user_id")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+            .ok_or_else(|| AppError::ValidationError("Missing user_id claim".to_string()))?;
+
+        let role = claims.get("role")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+            .ok_or_else(|| AppError::ValidationError("Missing role claim".to_string()))?;
+
+        Ok(AuthPayload { user_id, role })
     }
 }
 

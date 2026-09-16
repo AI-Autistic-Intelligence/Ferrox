@@ -46,7 +46,10 @@ members = [
     "crates/integrations/ferrox-webhooks",
     "crates/ferrox-jobs",
     "crates/ferrox-rate-limiter",
-    "apps/ferrox-showcase"
+    "apps/ferrox-showcase",
+    "crates/rust-yalc",
+    "crates/ferrox-selftest",
+    "crates/ferrox-sentinel",
 ]
 
 [workspace.package]

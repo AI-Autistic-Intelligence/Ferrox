@@ -12,6 +12,7 @@ use bb8_redis::RedisConnectionManager;
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use ferrox_errors::AppError;
+use tracing;
 
 pub type RedisPool = Pool<RedisConnectionManager>;
 
@@ -33,7 +34,8 @@ impl RedisClient {
             .map_err(|e| AppError::DatabaseError(format!("Redis Pool Error: {}", e)))?;
 
         // Test connection
-        let mut conn = pool.get().await
+        let pool_clone = pool.clone();
+        let mut conn = pool_clone.get().await
             .map_err(|e| AppError::DatabaseError(format!("Redis Ping Failed: {}", e)))?;
             
         let _: String = redis::cmd("PING")
@@ -54,7 +56,7 @@ impl RedisClient {
         let json_str = serde_json::to_string(value)
             .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
             
-        conn.set_ex(key, json_str, ttl_seconds)
+        let _: () = conn.set_ex(key, json_str, ttl_seconds)
             .await
             .map_err(|e| AppError::DatabaseError(e.to_string()))?;
             

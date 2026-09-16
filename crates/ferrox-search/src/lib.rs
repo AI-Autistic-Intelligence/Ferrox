@@ -39,6 +39,30 @@ pub mod meili;
 #[cfg(feature = "qdrant")]
 pub mod qdrant;
 
+/// Computes Cosine Similarity between two embedding vectors: \cos(\theta) = \frac{A \cdot B}{\|A\| \|B\|}
+pub fn cosine_similarity(vec_a: &[f32], vec_b: &[f32]) -> f32 {
+    if vec_a.len() != vec_b.len() || vec_a.is_empty() {
+        return 0.0;
+    }
+
+    let mut dot = 0.0f32;
+    let mut norm_a = 0.0f32;
+    let mut norm_b = 0.0f32;
+
+    for i in 0..vec_a.len() {
+        dot += vec_a[i] * vec_b[i];
+        norm_a += vec_a[i] * vec_a[i];
+        norm_b += vec_b[i] * vec_b[i];
+    }
+
+    let denom = norm_a.sqrt() * norm_b.sqrt();
+    if denom < 1e-6 {
+        0.0
+    } else {
+        dot / denom
+    }
+}
+
 pub fn setup() {
     println!("ferrox-search initialized: Lexical and Semantic Vector Search Engine ready.");
 }

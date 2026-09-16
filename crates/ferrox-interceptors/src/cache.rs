@@ -7,7 +7,7 @@ use axum::{
 };
 use ferrox_database_redis::RedisClient;
 use ferrox_singleflight::Singleflight;
-use ferrox_security::paseto::PasetoAuth;
+use ferrox_security::PasetoAuth;
 use std::sync::Arc;
 use tracing::{info, debug, warn};
 use secrecy::Secret;

@@ -1,9 +1,9 @@
-use crate::dual_token::DualTokenManager;
-use crate::paseto::PasetoAuth;
-use crate::public_id::PublicId;
+use ferrox_security::dual_token::DualTokenManager;
+use ferrox_security::PasetoAuth;
+use ferrox_security::public_id::PublicId;
 use secrecy::Secret;
 use uuid::Uuid;
-use crate::AuthPayload;
+use ferrox_security::AuthPayload;
 
 #[test]
 fn test_public_id_masking() {

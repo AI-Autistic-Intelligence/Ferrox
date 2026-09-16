@@ -1,0 +1,7 @@
+{
+  "model_name": "FerroxSentinelRandomForest",
+  "num_features": 129,
+  "entropy_threshold": 4.794972006998396,
+  "feature_hasher_buckets": 128,
+  "status": "Trained & Hardened against UAP/Evasion"
+}

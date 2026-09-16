@@ -14,10 +14,13 @@ argon2 = "0.5"
 pasetors = "0.6"
 rand_core = { version = "0.6", features = ["std"] }
 serde = { version = "1.0", features = ["derive"] }
-uuid = { version = "1.0", features = ["v7"] }
+uuid = { version = "1.0", features = ["v4", "v7"] }
 rand = "0.8"
 hex = "0.4"
 serde_json = "1.0"
 time = { workspace = true }
 ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
 axum = { version = "0.7" }
+tokio = { version = "1.0", features = ["sync", "rt"] }
+chrono = { version = "0.4", features = ["serde"] }
+reqwest = { version = "0.12", features = ["json"] }

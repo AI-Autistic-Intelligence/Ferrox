@@ -15,3 +15,8 @@ ferrox-config = { path = "../../crates/ferrox-config" }
 ferrox-security = { path = "../../crates/ferrox-security" }
 ferrox-errors = { path = "../../crates/ferrox-errors" }
 ferrox-utils = { path = "../../crates/ferrox-utils" }
+ferrox-app = { path = "../../crates/ferrox-app" }
+ferrox-logger = { path = "../../crates/ferrox-logger" }
+ferrox-transports = { path = "../../crates/ferrox-transports" }
+secrecy = "0.8"
+

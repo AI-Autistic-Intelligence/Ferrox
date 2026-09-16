@@ -7,12 +7,17 @@
 //! - 🛡️ **Declarative Guard Extractors**: Protect handlers with compile-safe role constraints.
 //! - 🔒 **PASETO/JWT Integration**: Inspects authenticated user claims directly from request extensions.
 
+pub mod squeezer;
+pub use squeezer::FeatureSqueezer;
+pub mod session_replay_guard;
+pub use session_replay_guard::{ClientFingerprint, SessionReplayDetector, SessionStatus};
+
 use axum::{
     async_trait,
     extract::FromRequestParts,
     http::{request::Parts, StatusCode, header},
 };
-use ferrox_security::paseto::PasetoAuth;
+use ferrox_security::PasetoAuth;
 use ferrox_errors::AppError;
 
 pub struct RequireRole(pub String);

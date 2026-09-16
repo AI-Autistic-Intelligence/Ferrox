@@ -37,6 +37,16 @@ enum Commands {
         #[arg(long, default_value = "./frontend/src/api")]
         output: String,
     },
+    /// OWASP WSTG Security Auditor: Self-test target domain
+    Audit {
+        /// Target URL (e.g. 'http://127.0.0.1:8080')
+        #[arg(long, default_value = "http://127.0.0.1:8080")]
+        url: String,
+
+        /// Export report to markdown file path
+        #[arg(long)]
+        export_md: Option<String>,
+    },
 }
 
 struct I18n {
@@ -90,10 +100,11 @@ impl I18n {
         Self { lang, dict }
     }
 
-    fn t(&self, key: &str) -> &str {
+    fn t<'a>(&'a self, key: &'a str) -> &'a str {
         self.dict.get(self.lang.as_str())
             .and_then(|lang_dict| lang_dict.get(key))
-            .unwrap_or(&key)
+            .copied()
+            .unwrap_or(key)
     }
 }
 
@@ -170,6 +181,26 @@ export class FerroxClient {
             // std::fs::write(format!("{}/FerroxClient.ts", output), client_code).unwrap();
             
             println!("✅ Code Generation Complete! Frontend is now perfectly synchronized with the Backend.");
+        }
+        Commands::Audit { url, export_md } => {
+            println!("🛡️ Starting Ferrox OWASP WSTG Self-Test Auditor against {}", url);
+            let config = ferrox_selftest::AuditConfig {
+                target_url: url.clone(),
+                timeout_secs: 5,
+                verbose: true,
+            };
+            let auditor = ferrox_selftest::WstgAuditor::new(config);
+            let report = auditor.run_all().await;
+            ferrox_selftest::reporter::ReportPrinter::print_terminal(&report);
+
+            if let Some(path) = export_md {
+                let md = ferrox_selftest::reporter::ReportPrinter::to_markdown(&report);
+                if let Err(e) = std::fs::write(path, &md) {
+                    eprintln!("❌ Failed to write report to {}: {}", path, e);
+                } else {
+                    println!("📄 Audit report saved to {}", path);
+                }
+            }
         }
     }
 }
