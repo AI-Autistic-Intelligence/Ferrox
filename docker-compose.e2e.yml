@@ -1,0 +1,63 @@
+services:
+  ferrox-vps-gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vps
+    container_name: ferrox-vps-gateway
+    environment:
+      - RUST_LOG=info
+      - SERVER_PORT=9090
+    ports:
+      - "9090:9090"
+    networks:
+      ferrox-e2e-mesh:
+        ipv4_address: 172.28.0.5
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  ferrox-client-node:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+    container_name: ferrox-client-node
+    environment:
+      - RUST_LOG=info
+      - SERVER_PORT=8080
+      - VPS_GATEWAY_URL=http://ferrox-vps-gateway:9090
+    ports:
+      - "8080:8080"
+    networks:
+      ferrox-e2e-mesh:
+        ipv4_address: 172.28.0.10
+    depends_on:
+      ferrox-vps-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  e2e-runner:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.kali-e2e
+    container_name: ferrox-kali-e2e-runner
+    networks:
+      ferrox-e2e-mesh:
+        ipv4_address: 172.28.0.20
+    depends_on:
+      ferrox-vps-gateway:
+        condition: service_healthy
+      ferrox-client-node:
+        condition: service_healthy
+
+networks:
+  ferrox-e2e-mesh:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

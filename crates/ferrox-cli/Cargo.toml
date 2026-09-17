@@ -17,5 +17,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 uuid = { version = "1.4", features = ["v4"] }
 sys-locale = "0.3"
+chrono = "0.4"
 ferrox-selftest = { version = "0.1.0", path = "../ferrox-selftest" }
+ferrox-sentinel = { version = "0.1.2", path = "../ferrox-sentinel", features = ["founder-suite"] }
 

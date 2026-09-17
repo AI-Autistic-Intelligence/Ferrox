@@ -1,0 +1,13 @@
+FROM kalilinux/kali-rolling:latest
+
+RUN apt-get update -qq && apt-get install -y -qq \
+    curl \
+    nmap \
+    jq \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY docker/e2e_test_suite.sh /e2e_test_suite.sh
+RUN chmod +x /e2e_test_suite.sh
+
+CMD ["/bin/bash", "/e2e_test_suite.sh"]

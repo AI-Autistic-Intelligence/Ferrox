@@ -36,6 +36,8 @@ pub mod sanitizer;
 pub mod dp;
 pub mod weekly_report;
 pub mod merkle;
+pub mod merkle_audit_chain;
+pub use merkle_audit_chain::{AuditLogRecord, MerkleAuditChain};
 
 pub struct LoggerConfig {
     pub service_name: String,

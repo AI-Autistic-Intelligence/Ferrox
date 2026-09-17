@@ -11,6 +11,8 @@ pub mod squeezer;
 pub use squeezer::FeatureSqueezer;
 pub mod session_replay_guard;
 pub use session_replay_guard::{ClientFingerprint, SessionReplayDetector, SessionStatus};
+pub mod unbypassable_enforcer;
+pub use unbypassable_enforcer::{MandatoryComplianceEnforcer, mandatory_compliance_middleware};
 
 use axum::{
     async_trait,

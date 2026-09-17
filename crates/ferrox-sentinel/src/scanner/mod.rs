@@ -8,6 +8,10 @@ use serde::{Deserialize, Serialize};
 pub mod honeypot_decoy;
 pub mod integrity_watchdog;
 pub mod canary_tokens;
+pub mod honeynet_mesh;
+pub mod self_healing;
+pub use honeynet_mesh::{BlacklistEntry, HoneynetMeshRegistry, HoneynetTrapEvent};
+pub use self_healing::{SanitizedStateSnapshot, SelfHealingEngine, SelfHealingEvent};
 
 /// Result emitted by static file upload heuristic inspection
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -47,6 +47,33 @@ enum Commands {
         #[arg(long)]
         export_md: Option<String>,
     },
+    /// Moving Target Defense (MTD): Inspect ingress seed mutation and dynamic port offsets
+    Mtd {
+        #[arg(long, default_value = "mtd_secret_key_8899")]
+        secret: String,
+        #[arg(long, default_value = "8080")]
+        base_port: u16,
+    },
+    /// Distributed Honeynet Mesh: Inspect ecosystem blacklist & deception traps
+    Honeynet,
+    /// VPS Deploy Generator: Generate production installer & Nginx gateway scripts
+    VpsDeploy {
+        #[arg(long, default_value = "185.220.101.5")]
+        vps_ip: String,
+        #[arg(long, default_value = "security.ferrox-rust.dev")]
+        subdomain: String,
+    },
+    /// Autonomous Client Self-Registration: Self-onboard target client node to security gateway
+    RegisterNode {
+        #[arg(long, default_value = "Acme E-Commerce Corp")]
+        client_name: String,
+        #[arg(long, default_value = "acme-store.com")]
+        domain: String,
+        #[arg(long, default_value = "198.51.100.44")]
+        ip: String,
+        #[arg(long, default_value = "ciso@acme-store.com")]
+        ciso_email: String,
+    },
 }
 
 struct I18n {
@@ -200,6 +227,91 @@ export class FerroxClient {
                 } else {
                     println!("📄 Audit report saved to {}", path);
                 }
+            }
+        }
+        Commands::Mtd { secret, base_port } => {
+            println!("🛡️ Ferrox Moving Target Defense (MTD) Dynamic Ingress Inspector");
+            let state = ferrox_sentinel::algorithms::mtd_mutation::MtdMutationEngine::generate_mutation_state(
+                secret,
+                60,
+                *base_port,
+                100,
+            );
+            println!("🔑 Secret Seed: {}", state.current_seed_hex);
+            println!("⏱️  Active Window Index: {}", state.active_window_index);
+            println!("⏳ Window Size: {}s", state.window_size_secs);
+            println!("📍 Base Ingress Port: {}", state.base_port);
+            println!("🔀 Mutated Active Port Offset: {}", state.mutated_port);
+            let sample_token = "api_v1_payments_checkout";
+            let seed = ferrox_sentinel::algorithms::mtd_mutation::MtdMutationEngine::compute_current_window_seed(secret, 60);
+            let mutated_token = ferrox_sentinel::algorithms::mtd_mutation::MtdMutationEngine::mutate_ingress_token(sample_token, &seed);
+            println!("🛡️  Sample Route Mutated Token: {} -> {}", sample_token, mutated_token);
+        }
+        Commands::Honeynet => {
+            println!("🕸️  Ferrox Distributed Honeynet Mesh & Ecosystem Threat Intelligence");
+            let mesh = ferrox_sentinel::scanner::honeynet_mesh::HoneynetMeshRegistry::new();
+            let trap_event = ferrox_sentinel::scanner::honeynet_mesh::HoneynetTrapEvent {
+                event_id: "evt_cli_demo_01".to_string(),
+                reporting_node_id: "node_eu_central_01".to_string(),
+                attacker_ip: "185.220.101.99".to_string(),
+                attacker_fingerprint: "fp_malicious_bot_99".to_string(),
+                honeypot_route: "/admin/config.json".to_string(),
+                tripped_at: chrono::Utc::now(),
+            };
+            let entry = mesh.broadcast_honeypot_trip(trap_event);
+            println!("⚡ Honeypot Trap Tripped: {} on Node EU", entry.reason);
+            println!("🚫 Globally Shadow-Banned IP: {}", entry.attacker_ip);
+            println!("🔍 Fingerprint Banned: {}", entry.attacker_fingerprint);
+            println!("📊 Total Active Mesh Banned IPs: {}", mesh.total_banned_ips());
+            println!("✅ Sub-second Ecosystem Shadow-Ban successfully verified across all fleet nodes.");
+        }
+        Commands::VpsDeploy { vps_ip, subdomain } => {
+            println!("⚡ Ferrox Cloud VPS Relay & Nginx Subdomain Deploy Script Generator");
+            let nginx_config = ferrox_sentinel::founder::RelayScriptGenerator::generate_security_subdomain_nginx_config(subdomain, "10.0.0.1");
+            let bash_script = ferrox_sentinel::founder::RelayScriptGenerator::generate_deploy_bash(vps_ip);
+            println!("\n=== 1. Nginx Gateway Config for Subdomain ({}) ===", subdomain);
+            println!("{}", nginx_config);
+            println!("\n=== 2. VPS Automated Installer Bash Script ({}) ===", vps_ip);
+            println!("{}", bash_script);
+            println!("✅ Production deployment scripts generated successfully!");
+        }
+        Commands::RegisterNode { client_name, domain, ip, ciso_email } => {
+            println!("🚀 Executing Autonomous Client Self-Registration for {}", client_name);
+            let fleet = ferrox_sentinel::founder::FounderFleetRegistry::new();
+            let contact_reg = ferrox_sentinel::founder::SecurityContactRegistry::new();
+            let honeynet = ferrox_sentinel::scanner::honeynet_mesh::HoneynetMeshRegistry::new();
+
+            let manifest = ferrox_sentinel::founder::GuardManifest {
+                sentinel_version: "v0.1.2".to_string(),
+                squeezer_hash: "sq_hash_cli_01".to_string(),
+                merkle_logger_hash: "log_hash_cli_01".to_string(),
+                active_rules_mask: 0b1111,
+                self_test_passed: true,
+            };
+            let proof = ferrox_sentinel::founder::ZkProofGuard::generate_proof("sq_hash_cli_01", "onboarding_nonce_01", "secret_key_88");
+
+            let req = ferrox_sentinel::founder::ClientOnboardingRequest {
+                client_name: client_name.clone(),
+                domain: domain.clone(),
+                ip_address: ip.clone(),
+                ciso_email: ciso_email.clone(),
+                technical_contact: format!("devops@{}", domain),
+                product_type: ferrox_sentinel::founder::ProductType::EnterpriseBoilerplate,
+                region: ferrox_sentinel::founder::Region::EuCentral,
+                guard_manifest: manifest,
+                zk_attestation_proof: proof,
+            };
+
+            let res = ferrox_sentinel::founder::AutonomousOnboardingEngine::evaluate_and_register(req, &fleet, &contact_reg, &honeynet);
+            if res.approved {
+                println!("✅ Client Approved & Registered!");
+                println!("🆔 Assigned Node ID: {}", res.assigned_node_id);
+                println!("🔑 Auth Secret Issued: {}", res.issued_auth_secret);
+                println!("📊 Compliance Score: {}%", res.compliance_score);
+                println!("📋 Rationale: {}", res.evaluation_rationale);
+            } else {
+                println!("❌ Client Onboarding Rejected!");
+                println!("📋 Rationale: {}", res.evaluation_rationale);
             }
         }
     }

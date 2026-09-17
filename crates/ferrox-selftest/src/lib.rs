@@ -12,6 +12,8 @@ pub mod audits;
 pub mod reporter;
 pub mod vocabulary;
 pub mod pipeline;
+pub mod continuous_benchmark;
+pub use continuous_benchmark::{BenchmarkReport, ContinuousSecurityBenchmark, InnovationCheckResult};
 
 /// Severity level for OWASP WSTG findings
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]

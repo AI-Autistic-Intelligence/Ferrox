@@ -1,0 +1,41 @@
+[package]
+name = "ferrox-saas-backend"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+tokio.workspace = true
+axum.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+secrecy.workspace = true
+time.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+async-trait.workspace = true
+pasetors.workspace = true
+base64 = "0.22"
+
+# Ferrox Crates
+ferrox-app = { path = "../../crates/ferrox-app" }
+ferrox-transports = { path = "../../crates/ferrox-transports" }
+ferrox-errors = { path = "../../crates/ferrox-errors" }
+ferrox-logger = { path = "../../crates/ferrox-logger" }
+ferrox-health = { path = "../../crates/ferrox-health" }
+ferrox-metrics = { path = "../../crates/ferrox-metrics" }
+ferrox-sentinel = { path = "../../crates/ferrox-sentinel" }
+ferrox-guards = { path = "../../crates/ferrox-guards" }
+
+# Auxiliary Crates
+totp-rs = "5.5"
+oauth2 = "4.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+[features]
+default = []
+founder-suite = ["ferrox-sentinel/founder-suite"]

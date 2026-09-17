@@ -1,0 +1,24 @@
+# Multi-stage Docker build for Founder VPS Security Gateway
+FROM rust:1.75-slim as builder
+WORKDIR /usr/src/ferrox
+
+RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+
+COPY Cargo.toml Cargo.lock ./
+COPY crates ./crates
+COPY apps ./apps
+
+RUN cargo build --release -p ferrox-saas-backend --features founder-suite
+
+FROM debian:bookworm-slim
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl libssl3 && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/src/ferrox/target/release/ferrox-saas-backend /app/ferrox-vps-gateway
+
+ENV SERVER_PORT=9090
+ENV RUST_LOG=info
+EXPOSE 9090
+
+CMD ["/app/ferrox-vps-gateway"]
