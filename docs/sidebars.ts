@@ -61,6 +61,8 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: '🔒 Security & Resilience',
       items: [
+        'security/ferrox-sentinel',
+        'security/ferrox-selftest',
         'security/jwt',
         'security/advanced-auth',
         'security/rate-limiting',
