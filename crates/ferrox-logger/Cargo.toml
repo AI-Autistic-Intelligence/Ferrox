@@ -20,7 +20,7 @@ opentelemetry-otlp = { version = "0.14", features = ["tonic"] }
 tracing-opentelemetry = "0.22"
 sentry = { version = "0.34" }
 sentry-tracing = { version = "0.34" }
-ferrox-errors = { version = "0.4.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.5.0", path = "../ferrox-errors"  }
 rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }

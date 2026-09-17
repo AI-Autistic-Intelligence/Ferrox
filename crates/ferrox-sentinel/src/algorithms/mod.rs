@@ -24,12 +24,23 @@ pub mod network_protocol_mesh;
 pub mod edr_anti_evasion;
 pub mod ai_cognitive_security;
 pub mod soar_vps_enforcer;
+pub mod lsass_credential_guard;
+pub mod pe_static_analyzer;
+pub mod polymorphic_routes;
+pub mod multimodal_ai_guardrails;
+pub mod cryptographic_downgrade_guard;
+pub mod deep_packet_signature_dpi;
+pub mod sbom_supply_chain_verifier;
+pub mod rag_hallucination_groundedness;
+pub mod honeynet_mesh;
 
 pub use ai_cognitive_security::{AgentToolRequest, AiCognitiveAssessment, AiCognitiveSecurityEngine, RagContextQuery};
 pub use ai_guardrails::{AiGuardrailAssessment, AiPromptGuardrailEngine, AiPromptThreatLevel};
 pub use attack_graph::{AttackGraphEngine, AttackNode};
 pub use behavioral_biometrics::{BiometricAssessment, BiometricCadenceAnalyzer};
 pub use continuous_security_metrics::{ContinuousSecurityEngine, ContinuousSecurityMetrics};
+pub use cryptographic_downgrade_guard::{CryptographicDowngradeGuardEngine, DowngradeAlert, TlsHandshakeTelemetry};
+pub use deep_packet_signature_dpi::{DeepPacketSignatureDpiEngine, DpiInspectionResult, IdentifiedProtocol};
 pub use deterministic_replay::{LockstepStateVector, LockstepStateVerifier, StateDesyncAlert};
 pub use differential_privacy::{DifferentiallyPrivateMetrics, LaplacianNoiseGenerator};
 pub use double_ratchet::{DoubleRatchetSession, SymmetricKey};
@@ -38,21 +49,23 @@ pub use edr_anti_evasion::{EdrAntiEvasionEngine, EdrEvasionAssessment, ProcessCo
 pub use etwti_telemetry_guard::{EdrIntegrityAlert, EtwTiTelemetryGuardEngine, MemoryRegionTelemetry};
 pub use garbled_circuits::{GarbledCircuit, GarbledGate, WireLabel};
 pub use homomorphic_telemetry::{EncryptedMetric, PaillierTelemetryAggregator};
+pub use honeynet_mesh::{AttackerReputationRecord, HoneypotTrapEvent, HoneynetMeshEngine};
 pub use isolation_forest::IsolationForest;
 pub use isolation_playbooks::ThreatIsolationPlaybook;
+pub use lsass_credential_guard::{CredentialDumpAlert, LsassCredentialGuardEngine, ProcessHandleAccessTelemetry};
 pub use markov::{BehaviorAssessment, MarkovBehaviorEngine};
 pub use minhash_lsh::LshClusterIndex;
 pub use mtd_mutation::{MtdMutationEngine, MtdMutationState};
+pub use multimodal_ai_guardrails::{MultimodalAiGuardrailEngine, MultimodalThreatAssessment};
 pub use network_protocol_mesh::{DnsQueryPayload, NetFlowRecord, NetworkProtocolMeshEngine, NetworkSecurityAssessment};
+pub use pe_static_analyzer::{PeAnalysisAssessment, PeStaticAnalyzerEngine};
+pub use polymorphic_routes::{PolymorphicRouteEngine, PolymorphicRouteState, RouteValidationResult};
 pub use post_quantum::{KyberCiphertext, KyberKemSession, KyberPublicKey};
 pub use protocol_fuzzer_sanitizer::{BinaryFrameHeader, ProtocolFuzzerSanitizerEngine, ProtocolSanitizeResult};
+pub use rag_hallucination_groundedness::{GroundednessAssessment, RagHallucinationGroundednessEngine};
 pub use reinforcement_tuner::{MultiArmedBanditTuner, TunedAlgorithmWeights};
+pub use sbom_supply_chain_verifier::{SbomComponentRecord, SbomSupplyChainVerifierEngine, SupplyChainIntegrityReport};
 pub use soar_vps_enforcer::{SoarActionPlan, SoarVpsEnforcerEngine};
 pub use uap::UapDetector;
 pub use zk_burraco_attest::{BurracoZkProofPayload, ZkBurracoAttestor};
 pub use zscore::VelocityTracker;
-
-
-
-
-
