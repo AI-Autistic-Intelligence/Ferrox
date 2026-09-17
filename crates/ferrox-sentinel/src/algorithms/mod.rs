@@ -33,6 +33,8 @@ pub mod deep_packet_signature_dpi;
 pub mod sbom_supply_chain_verifier;
 pub mod rag_hallucination_groundedness;
 pub mod honeynet_mesh;
+pub mod seccomp_landlock_sandbox;
+pub mod kernel_sysctl_hardener;
 
 pub use ai_cognitive_security::{AgentToolRequest, AiCognitiveAssessment, AiCognitiveSecurityEngine, RagContextQuery};
 pub use ai_guardrails::{AiGuardrailAssessment, AiPromptGuardrailEngine, AiPromptThreatLevel};
@@ -52,6 +54,7 @@ pub use homomorphic_telemetry::{EncryptedMetric, PaillierTelemetryAggregator};
 pub use honeynet_mesh::{AttackerReputationRecord, HoneypotTrapEvent, HoneynetMeshEngine};
 pub use isolation_forest::IsolationForest;
 pub use isolation_playbooks::ThreatIsolationPlaybook;
+pub use kernel_sysctl_hardener::{KernelSysctlHardenerEngine, KernelSysctlProfile, SysctlEntry};
 pub use lsass_credential_guard::{CredentialDumpAlert, LsassCredentialGuardEngine, ProcessHandleAccessTelemetry};
 pub use markov::{BehaviorAssessment, MarkovBehaviorEngine};
 pub use minhash_lsh::LshClusterIndex;
@@ -65,6 +68,7 @@ pub use protocol_fuzzer_sanitizer::{BinaryFrameHeader, ProtocolFuzzerSanitizerEn
 pub use rag_hallucination_groundedness::{GroundednessAssessment, RagHallucinationGroundednessEngine};
 pub use reinforcement_tuner::{MultiArmedBanditTuner, TunedAlgorithmWeights};
 pub use sbom_supply_chain_verifier::{SbomComponentRecord, SbomSupplyChainVerifierEngine, SupplyChainIntegrityReport};
+pub use seccomp_landlock_sandbox::{LandlockLsmProfile, SeccompBpfProfile, SeccompLandlockSandboxEngine};
 pub use soar_vps_enforcer::{SoarActionPlan, SoarVpsEnforcerEngine};
 pub use uap::UapDetector;
 pub use zk_burraco_attest::{BurracoZkProofPayload, ZkBurracoAttestor};

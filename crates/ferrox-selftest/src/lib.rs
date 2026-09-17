@@ -13,7 +13,10 @@ pub mod reporter;
 pub mod vocabulary;
 pub mod pipeline;
 pub mod continuous_benchmark;
+pub mod kali_audit_runner;
+
 pub use continuous_benchmark::{BenchmarkReport, ContinuousSecurityBenchmark, InnovationCheckResult};
+pub use kali_audit_runner::{KaliAuditFinding, KaliAuditReport, KaliAuditRunnerEngine, KaliTool};
 
 /// Severity level for OWASP WSTG findings
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
