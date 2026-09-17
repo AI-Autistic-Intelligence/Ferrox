@@ -12,4 +12,4 @@ description = "Async background worker queue engine powered by Redis & Apalis."
 apalis = { version = "0.5", features = ["redis"] }
 serde = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"] }
-ferrox-errors = { version = "0.2.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.3.0", path = "../ferrox-errors"  }

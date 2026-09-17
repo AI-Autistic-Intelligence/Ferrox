@@ -11,5 +11,5 @@ description = "Relational database repository implementation powered by SeaORM (
 [dependencies]
 sea-orm = { workspace = true, features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 log = "0.4"
-ferrox-database-core = { version = "0.2.0", path = "../ferrox-database-core"  }
-ferrox-errors = { version = "0.2.0", path = "../../ferrox-errors"  }
+ferrox-database-core = { version = "0.3.0", path = "../ferrox-database-core"  }
+ferrox-errors = { version = "0.3.0", path = "../../ferrox-errors"  }

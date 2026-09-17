@@ -14,6 +14,6 @@ tokio = { workspace = true, features = ["full", "signal"] }
 tracing = "0.1"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "timeout", "catch-panic", "set-header"] }
-ferrox-transports = { version = "0.2.0", path = "../ferrox-transports"  }
+ferrox-transports = { version = "0.3.0", path = "../ferrox-transports"  }
 sentry-tower = { version = "0.34", features = ["http"] }
-ferrox-errors = { version = "0.2.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.3.0", path = "../ferrox-errors"  }
