@@ -11,5 +11,5 @@ description = "Decoupled CommandBus and QueryBus dispatching architecture patter
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"
-ferrox-errors = { version = "0.1.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.2.0", path = "../ferrox-errors"  }
 tracing = "0.1"

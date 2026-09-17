@@ -19,8 +19,8 @@ colored = "2.1"
 rand = "0.8"
 axum = "0.8"
 tower = { version = "0.4", features = ["util"] }
-ferrox-errors = { version = "0.1.0", path = "../ferrox-errors" }
-ferrox-security = { version = "0.1.0", path = "../ferrox-security" }
+ferrox-errors = { version = "0.2.0", path = "../ferrox-errors" }
+ferrox-security = { version = "0.2.0", path = "../ferrox-security" }
 sha2 = "0.10"
 
 [features]
