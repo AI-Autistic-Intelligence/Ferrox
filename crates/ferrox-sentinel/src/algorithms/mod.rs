@@ -12,5 +12,15 @@ pub mod behavioral_biometrics;
 pub mod reinforcement_tuner;
 pub mod mtd_mutation;
 pub mod zk_burraco_attest;
+pub mod double_ratchet;
+pub mod garbled_circuits;
+pub mod post_quantum;
+pub mod attack_graph;
+
+pub use attack_graph::{AttackGraphEngine, AttackNode};
+pub use double_ratchet::{DoubleRatchetSession, SymmetricKey};
+pub use garbled_circuits::{GarbledCircuit, GarbledGate, WireLabel};
 pub use mtd_mutation::{MtdMutationEngine, MtdMutationState};
+pub use post_quantum::{KyberCiphertext, KyberKemSession, KyberPublicKey};
 pub use zk_burraco_attest::{BurracoZkProofPayload, ZkBurracoAttestor};
+
