@@ -11,5 +11,5 @@ description = "Standardized domain primitives, type-safe PublicId identifiers, a
 [dependencies]
 serde.workspace = true
 validator = { version = "0.18", features = ["derive"] }
-ferrox-errors = { version = "0.3.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.4.0", path = "../ferrox-errors"  }
 ts-rs.workspace = true

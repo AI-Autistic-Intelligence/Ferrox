@@ -20,7 +20,12 @@ pub mod ai_guardrails;
 pub mod etwti_telemetry_guard;
 pub mod protocol_fuzzer_sanitizer;
 pub mod continuous_security_metrics;
+pub mod network_protocol_mesh;
+pub mod edr_anti_evasion;
+pub mod ai_cognitive_security;
+pub mod soar_vps_enforcer;
 
+pub use ai_cognitive_security::{AgentToolRequest, AiCognitiveAssessment, AiCognitiveSecurityEngine, RagContextQuery};
 pub use ai_guardrails::{AiGuardrailAssessment, AiPromptGuardrailEngine, AiPromptThreatLevel};
 pub use attack_graph::{AttackGraphEngine, AttackNode};
 pub use behavioral_biometrics::{BiometricAssessment, BiometricCadenceAnalyzer};
@@ -29,6 +34,7 @@ pub use deterministic_replay::{LockstepStateVector, LockstepStateVerifier, State
 pub use differential_privacy::{DifferentiallyPrivateMetrics, LaplacianNoiseGenerator};
 pub use double_ratchet::{DoubleRatchetSession, SymmetricKey};
 pub use drift::{ConceptDriftDetector, DriftAlert, DriftStatus};
+pub use edr_anti_evasion::{EdrAntiEvasionEngine, EdrEvasionAssessment, ProcessContextTelemetry};
 pub use etwti_telemetry_guard::{EdrIntegrityAlert, EtwTiTelemetryGuardEngine, MemoryRegionTelemetry};
 pub use garbled_circuits::{GarbledCircuit, GarbledGate, WireLabel};
 pub use homomorphic_telemetry::{EncryptedMetric, PaillierTelemetryAggregator};
@@ -37,12 +43,15 @@ pub use isolation_playbooks::ThreatIsolationPlaybook;
 pub use markov::{BehaviorAssessment, MarkovBehaviorEngine};
 pub use minhash_lsh::LshClusterIndex;
 pub use mtd_mutation::{MtdMutationEngine, MtdMutationState};
+pub use network_protocol_mesh::{DnsQueryPayload, NetFlowRecord, NetworkProtocolMeshEngine, NetworkSecurityAssessment};
 pub use post_quantum::{KyberCiphertext, KyberKemSession, KyberPublicKey};
 pub use protocol_fuzzer_sanitizer::{BinaryFrameHeader, ProtocolFuzzerSanitizerEngine, ProtocolSanitizeResult};
 pub use reinforcement_tuner::{MultiArmedBanditTuner, TunedAlgorithmWeights};
+pub use soar_vps_enforcer::{SoarActionPlan, SoarVpsEnforcerEngine};
 pub use uap::UapDetector;
 pub use zk_burraco_attest::{BurracoZkProofPayload, ZkBurracoAttestor};
 pub use zscore::VelocityTracker;
+
 
 
 

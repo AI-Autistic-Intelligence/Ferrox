@@ -10,8 +10,12 @@ pub mod integrity_watchdog;
 pub mod canary_tokens;
 pub mod honeynet_mesh;
 pub mod self_healing;
+pub mod pe_static_analyzer;
+
 pub use honeynet_mesh::{BlacklistEntry, HoneynetMeshRegistry, HoneynetTrapEvent};
+pub use pe_static_analyzer::{PeAnalysisAssessment, PeSectionInfo, PeStaticAnalyzer};
 pub use self_healing::{SanitizedStateSnapshot, SelfHealingEngine, SelfHealingEvent};
+
 
 /// Result emitted by static file upload heuristic inspection
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -10,4 +10,4 @@ documentation.workspace = true
 description = "Abstract Repository trait interface and generic entity persistence contracts for Ferrox."
 [dependencies]
 async-trait = "0.1"
-ferrox-errors = { version = "0.3.0", path = "../../ferrox-errors"  }
+ferrox-errors = { version = "0.4.0", path = "../../ferrox-errors"  }
