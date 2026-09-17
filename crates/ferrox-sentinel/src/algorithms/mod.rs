@@ -18,9 +18,23 @@ pub mod post_quantum;
 pub mod attack_graph;
 
 pub use attack_graph::{AttackGraphEngine, AttackNode};
+pub use behavioral_biometrics::{BiometricAssessment, BiometricCadenceAnalyzer};
+pub use deterministic_replay::{LockstepStateVector, LockstepStateVerifier, StateDesyncAlert};
+pub use differential_privacy::{DifferentiallyPrivateMetrics, LaplacianNoiseGenerator};
 pub use double_ratchet::{DoubleRatchetSession, SymmetricKey};
+pub use drift::{ConceptDriftDetector, DriftAlert, DriftStatus};
 pub use garbled_circuits::{GarbledCircuit, GarbledGate, WireLabel};
+pub use homomorphic_telemetry::{EncryptedMetric, PaillierTelemetryAggregator};
+pub use isolation_forest::IsolationForest;
+pub use isolation_playbooks::ThreatIsolationPlaybook;
+pub use markov::{BehaviorAssessment, MarkovBehaviorEngine};
+pub use minhash_lsh::LshClusterIndex;
 pub use mtd_mutation::{MtdMutationEngine, MtdMutationState};
 pub use post_quantum::{KyberCiphertext, KyberKemSession, KyberPublicKey};
+pub use reinforcement_tuner::{MultiArmedBanditTuner, TunedAlgorithmWeights};
+pub use uap::UapDetector;
 pub use zk_burraco_attest::{BurracoZkProofPayload, ZkBurracoAttestor};
+pub use zscore::VelocityTracker;
+
+
 
