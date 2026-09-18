@@ -104,6 +104,7 @@ const sidebars: SidebarsConfig = {
         'transports/sse',
         'transports/file-storage',
         'transports/datagrid',
+        'transports/sync',
       ],
     },
     {
@@ -117,6 +118,7 @@ const sidebars: SidebarsConfig = {
         'integrations/webhooks',
         'integrations/reports-and-cloud',
         'integrations/i18n',
+        'integrations/search',
       ],
     },
     {

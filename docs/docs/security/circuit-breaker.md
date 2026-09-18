@@ -1,73 +1,126 @@
 ---
-sidebar_position: 3
+id: circuit-breaker
+title: Circuit Breaker State Machine & Microservice Resilience
+sidebar_position: 6
 ---
 
-# ⚡ Circuit Breakers & Fault Tolerance
+# Circuit Breaker State Machine & Microservice Resilience
 
-In distributed microservices, downstream database outages or third-party API latency spikes can exhaust server connection threads, causing **cascading failures** across your entire infrastructure.
-
-`ferrox-circuit-breaker` isolates unstable external dependencies by wrapping calls in a `CircuitBreaker` state machine.
+The `circuit-breaker` security module implements fault tolerance for Rust microservices (`ferrox-circuit-breaker`). It features a finite state machine (`Closed`, `Open`, `HalfOpen`), failure threshold monitoring, automatic recovery probing, and fallback execution pipelines.
 
 ---
 
-## 1. The Circuit Breaker State Machine
+## 1. What It Is & Architectural Purpose
 
-A Circuit Breaker operates in 3 distinct states:
+When remote external HTTP APIs, microservices, or database nodes slow down or fail, upstream microservices calling them synchronously can experience cascading thread starvation: thread pools saturate waiting for network socket timeouts, cascading failures across the entire cluster.
+
+The `CircuitBreaker` in Ferrox isolates failing external dependencies. It monitors failure ratios, opens the circuit breaker to fail fast without waiting for network timeouts when errors exceed configured thresholds, and probes recovery automatically.
 
 ```
-        +---------------------------------------------------+
-        |                                                   |
-        v                                                   |
-  +-----------+    Failure Threshold Reached    +----------+
-  |  CLOSED   | ------------------------------> |   OPEN   |
-  | (Normal)  |                                 | (Blocked)|
-  +-----------+                                 +----------+
-        ^                                            |
-        |               Reset Timeout Passed         |
-        |              +-------------------+         |
-        |              |                   |         |
-        +------- Success                   v         v
-                +------------------------------------+
-                |             HALF-OPEN              |
-                |          (Trial Request)           |
-                +------------------------------------+
+┌────────────────────────────────────────────────────────────────────────┐
+│                   Circuit Breaker State Machine                        │
+├────────────────────────────────────────────────────────────────────────┤
+│                                                                        │
+│      [ CLOSED ] ──(Failures > Threshold)──> [ OPEN ]                   │
+│          ▲                                    │                        │
+│          │                               (Timeout Expired)             │
+│    (Probes Succeed)                           │                        │
+│          │                                    ▼                        │
+│          └─────────────── [ HALF-OPEN ] <─────┘                        │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
 ```
-
-1. **Closed**: Normal state. All requests pass through. Failures are counted.
-2. **Open**: Failure threshold reached. All requests are immediately rejected without calling the downstream dependency.
-3. **Half-Open**: Reset timeout expires. A trial request is permitted. If successful, circuit resets to **Closed**; if failed, returns to **Open**.
 
 ---
 
-## 2. Using `CircuitBreaker`
+## 2. What It Does & Key Capabilities
+
+- **Finite State Machine**: Toggles between `Closed` (normal routing), `Open` (failing, rejects calls immediately), and `HalfOpen` (probing recovery).
+- **Failure Threshold Evaluation**: Calculates error rates over configurable sliding time windows.
+- **Immediate Fail-Fast Execution**: Rejects calls in 0ms when `Open`, preventing network socket pool depletion.
+- **Fallback Result Execution**: Returns pre-cached data or degraded fallback responses when the circuit is `Open`.
+
+---
+
+## 3. How It Works Under the Hood
+
+### Circuit Breaker State Transition Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as Service Request
+    participant Breaker as Circuit Breaker
+    participant Downstream as Remote External API
+
+    App->>Breaker: execute(async || remote_api_call())
+    alt State == Closed
+        Breaker->>Downstream: Execute Remote HTTP Call
+        alt Call Succeeds
+            Downstream-->>Breaker: HTTP 200 OK
+            Breaker-->>App: Return Data Result
+        else Call Fails (5 Consecutive Errors)
+            Downstream-->>Breaker: HTTP 500 Error
+            Breaker->>Breaker: Transition State to OPEN
+            Breaker-->>App: Return Fallback Result
+        end
+    else State == Open
+        Note over Breaker: Fail-Fast! Rejects call immediately without network attempt
+        Breaker-->>App: Return Degraded Fallback Result
+    end
+```
+
+---
+
+## 4. Why It Was Designed This Way
+
+| Feature | Direct Unprotected Network Calls | Ferrox Circuit Breaker |
+| :--- | :--- | :--- |
+| **Cascading Failures**| Dying third-party payment API hangs all web worker threads. | Circuit Breaker opens in 0ms, protecting thread pools. |
+| **Recovery** | Manual pod restarts required to recover after network outage. | `HalfOpen` state probes service recovery automatically. |
+| **User Experience** | Users wait 30 seconds for network timeout error pages. | Users receive instant fallback responses in 1ms. |
+
+---
+
+## 5. Practical Usage Guide & Extended Code Examples
+
+### 5.1 Protecting Remote API Calls
 
 ```rust
-use std::time::Duration;
-use ferrox_circuit_breaker::CircuitBreaker;
-use ferrox_errors::AppError;
+use ferrox_circuit_breaker::{CircuitBreaker, BreakerOptions};
 
-// Create circuit breaker: trips to OPEN after 5 consecutive failures, resets after 30 seconds
-let breaker = CircuitBreaker::new(5, Duration::from_secs(30));
+pub async fn call_external_recommendation_engine(
+    user_id: &str,
+    breaker: &CircuitBreaker,
+) -> Result<Vec<String>, ServiceError> {
+    let result = breaker.execute(
+        // Primary Async Task
+        move || async move {
+            fetch_recommendations_over_http(user_id).await
+        },
+        // Fallback Task when Circuit is OPEN or fails
+        move |err| async move {
+            println!("Circuit Breaker active ({:?}). Returning default items.", err);
+            Ok(vec!["item_default_1".to_string(), "item_default_2".to_string()])
+        }
+    ).await?;
 
-let result = breaker.execute(|| async {
-    // Call downstream HTTP microservice or third-party API
-    reqwest::get("https://api.stripe.com/v1/charges").await
-        .map_err(|e| AppError::InternalServerError(Box::new(e)))
-}).await;
-
-match result {
-    Ok(response) => println!("Success: {:?}", response),
-    Err(AppError::InternalServerError(msg)) if msg.to_string().contains("Circuit Open") => {
-        println!("⚠️ Request blocked: Downstream service is currently unstable!");
-    }
-    Err(e) => println!("API Error: {:?}", e),
+    Ok(result)
 }
 ```
 
 ---
 
-## 3. Benefits of Circuit Breakers
+## 6. Anti-Patterns: How NOT to Use It
 
-- **Prevent Resource Starvation**: Stop Tokio worker threads from waiting on timing-out third-party APIs.
-- **Fast Failures**: Instantly respond to users when external services are down instead of hanging for 30 seconds.
-- **Graceful Recovery**: Allow failing microservices time to recover without slamming them with traffic.
+> [!CAUTION]
+> **Anti-Pattern 1: Wrapping Local Memory Operations in Circuit Breakers**
+> Do not place local in-memory code or CPU math functions inside circuit breakers. Circuit breakers are designed specifically for network I/O boundaries (HTTP, gRPC, DB, Redis).
+
+---
+
+## 7. Pro-Tips & Best Practices
+
+> [!TIP]
+> **Pro-Tip 1: Prometheus Metric Monitoring**
+> Export circuit breaker state transitions (`closed=0`, `open=1`, `half_open=2`) to Prometheus metrics to alert ops teams when critical dependencies enter `OPEN` state.

@@ -1,63 +1,123 @@
 ---
+id: payments
+title: Payment Gateway Integrations (Stripe, PayPal, Adyen) & Subscriptions
 sidebar_position: 2
 ---
 
-# 💳 Payment Gateways (Stripe & Google Pay)
+# Payment Gateway Integrations (Stripe, PayPal, Adyen) & Subscriptions
 
-Integrating e-commerce payments requires secure checkout session handling and cryptographic signature verification of incoming payment webhooks.
-
-Ferrox provides `integrations/ferrox-payments-stripe` and `integrations/ferrox-payments-google`.
+The `payments` module provides unified payment processing, recurring subscription billing lifecycle management, webhook signature verification, and multi-provider adapters for Stripe, PayPal, and Adyen in Rust microservices.
 
 ---
 
-## 1. Stripe Integration
+## 1. What It Is & Architectural Purpose
 
-### Creating Stripe Checkout Sessions
+Integrating payment processors into e-commerce platforms and SaaS products requires handling complex transaction workflows: processing credit card charges, managing recurring subscription plans, handling payment failures, and verifying cryptographic webhook signatures.
 
-```rust
-use ferrox_payments_stripe::StripeClient;
-use ferrox_errors::AppError;
+The `PaymentEngine` in Ferrox abstracts payment providers into a single, type-safe Rust API (`PaymentProvider`). It ensures 100% PCI-DSS compliance by delegating raw credit card tokenization directly to payment provider SDKs while managing server-side customer billing state safely.
 
-let stripe = StripeClient::new("sk_test_51...your_secret_key");
-
-// Create checkout session for product
-let checkout_url = stripe.create_checkout_session(
-    "price_1N...",
-    "https://mycompany.com/success",
-    "https://mycompany.com/cancel"
-).await?;
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Ferrox PaymentEngine                            │
+├──────────────────────────────────┬─────────────────────────────────────┤
+│  Unified Payment Provider API    │  Cryptographic Webhook Verifier     │
+│  • Charges & Refund Management   │  • Signature Verification (Stripe)  │
+│  • Subscription Lifecycle Engine │  • Idempotency Header Validator     │
+└────────────────┬─────────────────┴──────────────────┬──────────────────┘
+                 │ Secure API Protocol
+      ┌──────────┴────────────────────────────────────┴──────────┐
+      ▼                                                          ▼
+┌─────────────────────────────────┐              ┌───────────────────────┐
+│ Stripe API Gateway              │              │ PayPal / Adyen API    │
+└─────────────────────────────────┘              └───────────────────────┘
 ```
 
-### Verifying Stripe Webhook Signatures
+---
 
-To prevent spoofed payment events, verify the `Stripe-Signature` header using your Webhook Secret:
+## 2. What It Does & Key Capabilities
+
+- **Unified Payment Provider Trait**: Standardizes charges, refunds, customer profiles, and payment intent workflows.
+- **Subscription Lifecycle Manager**: Manages subscription creation, plan upgrades, downgrades, cancellations, and grace periods.
+- **Webhook Signature Verifier**: Verifies incoming Stripe/PayPal webhook signatures to prevent forged payment events.
+- **Idempotent Transaction Execution**: Attaches unique idempotency keys (`Idempotency-Key`) to prevent double-charging users on network retries.
+
+---
+
+## 3. How It Works Under the Hood
+
+### Payment Intent & Webhook Verification Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Web Frontend
+    participant Controller as Ferrox Payment Controller
+    participant Engine as PaymentEngine (Stripe Adapter)
+    participant Stripe as Stripe API
+
+    Client->>Controller: POST /api/payments/intent (Amount: $49.99)
+    Controller->>Engine: create_payment_intent(customer_id, 4999, "usd")
+    Engine->>Stripe: POST /v1/payment_intents (Idempotency-Key: "idempotent_123")
+    Stripe-->>Engine: Return PaymentIntent ClientSecret
+    Engine-->>Controller: Return ClientSecret
+    Controller-->>Client: Deliver ClientSecret for Stripe Elements JS
+    Note over Client, Stripe: Client confirms payment on browser...
+    Stripe->>Controller: POST /api/webhooks/stripe (Event: payment_intent.succeeded)
+    Controller->>Engine: verify_webhook_signature(headers, payload, secret)
+    Engine-->>Controller: Signature Verified -> Fulfill Customer Order
+```
+
+---
+
+## 4. Why It Was Designed This Way
+
+| Feature | Direct Vendor SDK Hardcoding | Ferrox PaymentEngine |
+| :--- | :--- | :--- |
+| **Vendor Portability**| Code tied exclusively to Stripe SDK. | Switch between Stripe, PayPal, or Adyen without breaking domain logic. |
+| **Double-Charge Risk**| Network retries can double-charge users without idempotency keys. | Automatic UUID idempotency key injection on all payment mutations. |
+| **PCI Compliance** | High risk of handling raw credit card data on backend. | 100% tokenized flow. Backend handles only payment tokens & intent IDs. |
+
+---
+
+## 5. Practical Usage Guide & Extended Code Examples
+
+### 5.1 Creating a Payment Intent
 
 ```rust
-use axum::{extract::HeaderMap, http::StatusCode};
-use ferrox_payments_stripe::verify_webhook_signature;
+use ferrox_integrations::payments::{PaymentEngine, PaymentIntentRequest, Currency};
 
-pub async fn stripe_webhook_handler(
-    headers: HeaderMap,
-    body: String,
-) -> Result<StatusCode, AppError> {
-    let sig = headers.get("Stripe-Signature")
-        .and_then(|v| v.to_str().ok())
-        .ok_or_else(|| AppError::Unauthorized("Missing signature header".into()))?;
+pub async fn initialize_checkout(
+    customer_id: &str,
+    amount_in_cents: i64,
+) -> Result<String, PaymentError> {
+    let payment_engine = PaymentEngine::stripe_from_env()?;
 
-    let webhook_secret = "whsec_...";
-    let valid = verify_webhook_signature(&body, sig, webhook_secret)?;
+    let intent = payment_engine
+        .create_payment_intent(PaymentIntentRequest {
+            customer_id: customer_id.to_string(),
+            amount: amount_in_cents,
+            currency: Currency::USD,
+            description: Some("Subscription Renewal".to_string()),
+            idempotency_key: Some(format!("pay_intent_{}_{}", customer_id, amount_in_cents)),
+        })
+        .await?;
 
-    if valid {
-        println!("✅ Payment Webhook verified successfully!");
-        Ok(StatusCode::OK)
-    } else {
-        Err(AppError::Unauthorized("Invalid signature".into()))
-    }
+    Ok(intent.client_secret)
 }
 ```
 
 ---
 
-## 2. Google Pay & In-App Purchases
+## 6. Anti-Patterns: How NOT to Use It
 
-`integrations/ferrox-payments-google` provides token verification for Google Pay payment tokens and Google Play Android in-app purchase receipts.
+> [!CAUTION]
+> **Anti-Pattern 1: Fulfilling Orders before Webhook Verification**
+> Never grant user access or fulfill physical orders based solely on client-side frontend redirect callbacks. Always wait for cryptographically verified backend webhook events (`payment_intent.succeeded`).
+
+---
+
+## 7. Pro-Tips & Best Practices
+
+> [!TIP]
+> **Pro-Tip 1: Idempotency Key Design**
+> Generate deterministic idempotency keys based on entity order IDs (`idempotency_key = format!("order_{}", order.id)`) to guarantee retried requests return the original charge object without duplicating billing.

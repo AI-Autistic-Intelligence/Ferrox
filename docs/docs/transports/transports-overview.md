@@ -1,58 +1,97 @@
 ---
+id: transports-overview
+title: Multi-Protocol Transports Architecture Overview
 sidebar_position: 1
 ---
 
-# 🌐 Multi-Transport Application System
+# Multi-Protocol Transports Architecture Overview
 
-Most traditional web frameworks only support HTTP REST servers out of the box. Enterprise backend applications, however, often need to run multiple server protocols simultaneously—for example, an HTTP REST API server on port `3000`, a gRPC microservice server on port `50051`, and an FTP or WebSocket file server.
-
-Ferrox decouples server transports from the core application using the `Transport` trait and `FerroxApp` lifecycle manager (`ferrox-transports` & `ferrox-app`).
+The `ferrox-transports` crate delivers a multi-protocol transport engine for Rust applications. It abstracts HTTP/1.1, HTTP/2, WebSockets, gRPC (tonic), Server-Sent Events (SSE), and Apache Kafka messaging into a single transport-agnostic pipeline.
 
 ---
 
-## 1. The `Transport` Trait
+## 1. What It Is & Architectural Purpose
 
-All transport layers implement the `Transport` trait:
+Enterprise microservices must serve multiple transport channels simultaneously: RESTful HTTP endpoints for public consumers, GraphQL queries for web frontends, gRPC for low-latency internal RPC calls, WebSockets/SSE for real-time updates, and Kafka for asynchronous message processing.
 
-```rust
-use async_trait::async_trait;
-use ferrox_errors::AppError;
+`ferrox-transports` provides a unified transport engine. It decouples domain handlers from specific protocol drivers, allowing a single domain controller function to serve requests arriving over HTTP, gRPC, or Kafka transparently.
 
-#[async_trait]
-pub trait Transport: Send + Sync {
-    /// Returns the name of the transport layer (e.g. "HttpTransport", "GrpcTransport")
-    fn name(&self) -> &'static str;
-
-    /// Starts the transport server asynchronously
-    async fn start(&self) -> Result<(), AppError>;
-}
+```
+                               ┌─────────────────────────────┐
+                               │     ferrox-transports       │
+                               └──────────────┬──────────────┘
+                                              │
+           ┌──────────────────────────────────┼──────────────────────────────────┐
+           │                                  │                                  │
+           ▼                                  ▼                                  ▼
+┌─────────────────────┐            ┌─────────────────────┐            ┌─────────────────────┐
+│  HTTP / REST Engine │            │  gRPC / Protobuf    │            │  Kafka Messaging    │
+│  (Axum / Hyper / SSE)│           │  (Tonic / gRPC v2)  │            │  (rdkafka Consumer) │
+└─────────────────────┘            └─────────────────────┘            └─────────────────────┘
 ```
 
 ---
 
-## 2. Bootstrapping Concurrent Transports in `FerroxApp`
+## 2. What It Does & Key Capabilities
 
-`FerroxApp` spawns all added transports into concurrent Tokio tasks and manages OS signals (`SIGINT`, `SIGTERM`) for graceful shutdown:
+- **Protocol Agnostic Context Pipeline**: Standardizes request context (`TransportContext`) across HTTP, gRPC, and Kafka.
+- **Axum & Hyper HTTP Transport**: High-speed, non-blocking HTTP/1.1 and HTTP/2 transport engine built on Hyper and Axum.
+- **Tonic gRPC Adapter**: High-performance gRPC transport supporting Protobuf serialization and streaming RPCs.
+- **Kafka Event Stream Adapter**: Consumes and dispatches Kafka topic messages with partition key hashing and consumer group rebalance hooks.
+
+---
+
+## 3. How It Works Under the Hood
+
+### Multi-Protocol Transport Dispatch Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Client Channel
+    participant Adapter as Transport Protocol Adapter
+    participant Core as ferrox-transports Pipeline
+    participant Service as Rust Domain Service
+
+    Client->>Adapter: Incoming Event (HTTP POST / gRPC Call / Kafka Message)
+    Adapter->>Core: Convert to Unified TransportContext & Payload Bytes
+    Core->>Core: Inject Correlation ID & Tracing Context
+    Core->>Service: Dispatch to Domain Service Handler(ctx, payload)
+    Service-->>Core: Return Domain Output Object
+    Core->>Adapter: Convert Result to Protocol Response Format
+    Adapter-->>Client: Deliver Protocol Response (HTTP 200 / gRPC Status / Kafka Ack)
+```
+
+---
+
+## 4. Why It Was Designed This Way
+
+| Feature | Protocol-Specific Controller Code | Ferrox Multi-Protocol Transports |
+| :--- | :--- | :--- |
+| **Code Duplication**| Duplicate business logic written for HTTP and gRPC handlers. | Shared domain service logic across HTTP, gRPC, and Kafka. |
+| **Performance** | High serialization overhead on protocol conversions. | Zero-copy byte buffer passing between transport layers. |
+| **Observability** | Correlation breaks when jumping from HTTP to Kafka. | Automated trace context propagation across all transport channels. |
+
+---
+
+## 5. Practical Usage Guide & Extended Code Examples
+
+### 5.1 Registering Multi-Protocol Transport Engines
 
 ```rust
-use axum::{routing::get, Router};
-use ferrox_app::FerroxApp;
-use ferrox_transports::http::HttpTransport;
+use ferrox_transports::{TransportEngine, HttpTransport, KafkaTransport};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let http_router = Router::new().route("/ping", get(|| async { "pong" }));
+pub async fn bootstrap_transports() -> Result<(), TransportError> {
+    let mut engine = TransportEngine::new();
 
-    // HTTP Transport listening on port 3000
-    let http = HttpTransport::new(http_router, 3000);
+    // Attach HTTP REST Transport Server on port 8080
+    engine.add_transport(HttpTransport::new("0.0.0.0:8080"));
 
-    // Multi-transport execution
-    FerroxApp::new()
-        .add_transport(http)
-        // .add_transport(grpc_transport)
-        // .add_transport(ftp_transport)
-        .start()
-        .await?;
+    // Attach Kafka Event Consumer Transport
+    engine.add_transport(KafkaTransport::new(vec!["localhost:9092"], "order-group"));
+
+    // Start all transport servers concurrently
+    engine.listen_all().await?;
 
     Ok(())
 }
@@ -60,9 +99,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ---
 
-## 3. Graceful Shutdown Flow
+## 6. Anti-Patterns: How NOT to Use It
 
-When a `Ctrl+C` or `SIGTERM` signal is received by `FerroxApp`:
-1. `FerroxApp` stops accepting new incoming connections across all active transports.
-2. In-flight requests are allowed to finish within a graceful timeout.
-3. Database pools, Redis connections, and background workers close cleanly.
+> [!CAUTION]
+> **Anti-Pattern 1: Protocol Coupling in Domain Services**
+> Avoid accepting protocol-specific request types (e.g., `axum::extract::Path` or `tonic::Request`) inside core domain services. Keep domain services protocol-agnostic.
+
+---
+
+## 7. Pro-Tips & Best Practices
+
+> [!TIP]
+> **Pro-Tip 1: Multiplexing HTTP and gRPC**
+> Run HTTP and gRPC transport servers on a single TCP port using gRPC HTTP/2 header multiplexing to simplify Kubernetes container port mappings.

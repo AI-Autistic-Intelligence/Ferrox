@@ -1,81 +1,117 @@
 ---
+id: benchmarks
+title: Micro-Benchmarks, Criterion Suites & Comparative Metrics
 sidebar_position: 1
 ---
 
-# ⚡ High-Throughput Benchmarks & Tuning
+# Micro-Benchmarks, Criterion Suites & Comparative Metrics
 
-Ferrox is designed to process **100,000+ HTTP requests per second** per node with sub-millisecond latencies.
-
-Achieving peak hardware utilization under extreme concurrency requires fine-tuning Tokio runtime worker threads, choosing high-performance memory allocators (`jemalloc`/`mimalloc`), and tuning TCP socket parameters.
+The `benchmarks` performance module provides automated micro-benchmarking suites (via `Criterion.rs`), latency comparison metrics against standard Rust and Node.js frameworks, and throughput regression testing tools.
 
 ---
 
-## 1. Memory Allocators (`jemalloc` / `mimalloc`)
+## 1. What It Is & Architectural Purpose
 
-The standard C library allocator (`glibc malloc`) suffers from severe lock contention and memory fragmentation when running hundreds of concurrent Tokio worker threads allocating and freeing short-lived JSON buffers.
+High-performance frameworks require continuous benchmarking to ensure new features, middleware layers, or dependency upgrades do not introduce performance regressions or memory allocation bloat.
 
-Replacing the global memory allocator with `jemalloc` or `mimalloc` yields a **20-35% throughput increase**:
+The `benchmarks` suite provides automated performance testing for Ferrox components. It uses `Criterion.rs` to measure throughput (req/sec), execution latencies (ns/µs), and memory allocation overheads, outputting statistical comparison charts.
 
-### Integrating `tikv-jemallocator`
-
-Add `tikv-jemallocator` to `Cargo.toml`:
-
-```toml
-[dependencies]
-tikv-jemallocator = "0.5"
 ```
-
-Configure `jemalloc` as global allocator in `main.rs`:
-
-```rust
-#[global_allocator]
-static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Ferrox Criterion Benchmarks                     │
+├──────────────────────────────────┬─────────────────────────────────────┤
+│  Micro-Benchmark Suites          │  Statistical Analysis Engine        │
+│  • HTTP Router Dispatch (ns)     │  • Mean, Median, StdDev Analysis    │
+│  • Serialization / Deserialization│  • Outlier & Regression Detection   │
+└────────────────┬─────────────────┴──────────────────┬──────────────────┘
+                 │ Benchmark Statistical Report
+                 ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        HTML Criterion Charts & Logs                    │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Tuning the Tokio Runtime
+## 2. What It Does & Key Capabilities
 
-By default, Tokio spawns one worker thread per CPU core. For I/O-bound microservices handling 50k+ active WebSockets or HTTP connections, configure custom runtime thread counts:
+- **High-Precision Timing**: Measures nano-second execution times using CPU cycle counters.
+- **Statistical Regression Detection**: Identifies performance regressions between git commits automatically.
+- **HTTP Transport Benchmarks**: Measures requests-per-second throughput across REST, gRPC, and WebSocket transports.
+- **Memory Allocation Tracking**: Quantifies heap allocations per operation using custom allocators.
+
+---
+
+## 3. How It Works Under the Hood
+
+### Criterion Statistical Benchmark Execution
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant CI as CI/CD Pipeline
+    participant Criterion as Criterion Benchmark Engine
+    participant Code as Ferrox Router / Serializer
+    participant Report as HTML Statistical Report
+
+    CI->>Criterion: cargo bench --bench router_bench
+    Criterion->>Criterion: Warm-up CPU Cache (100 Iterations)
+    loop Sampling Phase (10,000 Iterations)
+        Criterion->>Code: Execute Router Dispatch Function
+        Code-->>Criterion: Return Execution Timing (nanoseconds)
+    end
+    Criterion->>Criterion: Compute Mean, StdDev, Confidence Intervals (95%)
+    Criterion->>Report: Generate HTML Graphs & Regression Warnings
+    Report-->>CI: Fail CI if Performance Regressed > 5%
+```
+
+---
+
+## 4. Why It Was Designed This Way
+
+| Metric | Basic Stopwatch Timing | Ferrox Criterion Suite |
+| :--- | :--- | :--- |
+| **Statistical Accuracy**| Affected by OS background noise and CPU frequency scaling. | Uses 95% confidence intervals and outlier rejection algorithms. |
+| **Regression Prevention**| Manual testing misses minor 3% performance drops. | Automated CI build failures on any statistically significant regression. |
+| **CPU Warmup** | Cold cache distorts first iteration results. | Automated cache warm-up phases isolate steady-state performance. |
+
+---
+
+## 5. Practical Usage Guide & Extended Code Examples
+
+### 5.1 Writing Criterion Micro-Benchmarks
 
 ```rust
-fn main() {
-    tokio::runtime::Builder::new_multi_thread()
-        .worker_threads(16)
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(async {
-            // Run FerroxApp...
-        });
+use criterion::{criterion_group, criterion_main, Criterion, BlackBox};
+use ferrox_transports::router::RouterEngine;
+
+pub fn bench_router_dispatch(c: &mut Criterion) {
+    let router = RouterEngine::new_with_routes();
+
+    c.bench_function("router_path_matching", |b| {
+        b.iter(|| {
+            // BlackBox prevents Rust compiler from optimizing away execution
+            router.match_route(BlackBox("/api/v1/users/usr_999"))
+        })
+    });
 }
+
+criterion_group!(benches, bench_router_dispatch);
+criterion_main!(benches);
 ```
 
 ---
 
-## 3. Database Connection Pool Sizing Formula
+## 6. Anti-Patterns: How NOT to Use It
 
-Setting database pool max connections too high causes CPU context-switching churn on DB nodes.
-
-Use the standard PostgreSQL connection pool formula:
-
-```text
-Max Connections = (CPU Cores * 2) + Effective Spindle Count
-```
-
-For a 4-core database server with SSD storage:
-```text
-Max Connections = (4 * 2) + 1 = 9 Connections
-```
+> [!CAUTION]
+> **Anti-Pattern 1: Compiler Optimization Elimination**
+> Always wrap benchmark input variables in `criterion::BlackBox`. Omitting `BlackBox` allows the Rust compiler to optimize away un-used return values during compilation, producing fake 0ns timing results.
 
 ---
 
-## 4. Benchmark Comparison
+## 7. Pro-Tips & Best Practices
 
-Benchmark executed using `wrk -t12 -c400 -d30s http://127.0.0.1:3000/api/v1/ping`:
-
-| Framework | Runtime Engine | Throughput (req/sec) | P99 Latency | Memory Footprint |
-|---|---|---|---|---|
-| NestJS (Node.js 20) | Express / V8 | 14,200 req/sec | 28.4 ms | 185 MB |
-| Spring Boot 3 | Java 21 / Netty | 38,500 req/sec | 12.1 ms | 340 MB |
-| **Ferrox Framework** | **Tokio / Axum** | **118,400 req/sec** | **0.84 ms** | **14 MB** |
+> [!TIP]
+> **Pro-Tip 1: CI/CD Performance Thresholds**
+> Run `cargo bench -- --save-baseline main` in your CI/CD pipeline to catch performance regressions automatically on every pull request.

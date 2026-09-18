@@ -1,86 +1,121 @@
 ---
-sidebar_position: 2
+id: rate-limiting
+title: Rate Limiting Engine, Leaky Bucket & Sliding Window Log
+sidebar_position: 5
 ---
 
-# 🛡️ Rate Limiting & Throttling
+# Rate Limiting Engine, Leaky Bucket & Sliding Window Log
 
-To protect APIs from abuse, credential stuffing attacks, and Denial of Service (DoS), Ferrox provides `ferrox-rate-limiter`—a Redis-backed rate limiting engine implementing atomic fixed-window and token-bucket algorithms.
+The `rate-limiting` security module delivers distributed rate-limiting and traffic shaping for Rust web applications (`ferrox-rate-limiter`). It features Sliding Window Log, Token Bucket, and Leaky Bucket algorithms backed by atomic Redis operations.
 
 ---
 
-## 1. How Rate Limiting Works
+## 1. What It Is & Architectural Purpose
 
-`RateLimiter` increments a counter in Redis for a specific identifier (such as client IP address or authenticated User ID). If the count exceeds the max allowed limit within a time window, the request is rejected with `429 Too Many Requests`.
+Web applications and public API gateways are subject to denial-of-service (DoS) floods, credential stuffing attacks, web scraping bots, and brute-force password cracking attempts. Without rate limiting, malicious traffic exhausts server CPU cores and database connections.
+
+The `RateLimiter` in Ferrox controls incoming traffic velocity. It tracks request frequencies per IP address, user ID, or API key using high-performance Redis Lua scripts, returning `429 Too Many Requests` when limits are exceeded.
 
 ```
-Incoming Request ---> [ Check Redis Rate Limit Key ]
-                               |
-               +---------------+---------------+
-               |                               |
-        Count <= Limit                  Count > Limit
-               |                               |
-               v                               v
-    Proceed to Controller           Return 429 Too Many Requests
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Ferrox RateLimiter Engine                       │
+├──────────────────────────────────┬─────────────────────────────────────┤
+│  Atomic Redis Lua Scripting      │  Multi-Algorithm Rate Limiters      │
+│  • 0.1ms Atomic Counter Check    │  • Sliding Window Log Algorithm     │
+│  • Automatic Expiration TTL      │  • Token Bucket & Leaky Bucket      │
+└────────────────┬─────────────────┴──────────────────┬──────────────────┘
+                 │ Rate Evaluation
+                 ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        HTTP API Response Pipeline                      │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Using `RateLimiter`
+## 2. What It Does & Key Capabilities
+
+- **Sliding Window Log Algorithm**: Eliminates burst boundary vulnerabilities found in fixed-window limiters.
+- **Token Bucket Traffic Shaper**: Allows controlled bursts while maintaining strict steady-state throughput limits.
+- **IP & User Identity Extractor**: Rate limits based on client IP (`x-forwarded-for`), JWT `user_id`, or API key headers.
+- **Automated HTTP Header Emission**: Emits standard rate-limiting headers (`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`).
+
+---
+
+## 3. How It Works Under the Hood
+
+### Sliding Window Rate Evaluation Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as API Client
+    participant Router as Ferrox Transport Router
+    participant Limiter as RateLimiter Middleware
+    participant Redis as Redis Atomic Lua Script
+
+    Client->>Router: HTTP POST /api/login (Client IP: 1.2.3.4)
+    Router->>Limiter: check_rate_limit(key: "rate:login:1.2.3.4", limit: 5, window: 60s)
+    Limiter->>Redis: Execute Atomic Lua Script (ZADD timestamp, ZREMRANGEBYSCORE)
+    Redis-->>Limiter: Current Count in Window = 6 (> Limit 5)
+    Limiter-->>Router: Deny Access (Return Retry-After: 45)
+    Router-->>Client: 429 Too Many Requests Payload { success: false, retryAfter: 45 }
+```
+
+---
+
+## 4. Why It Was Designed This Way
+
+| Feature | Fixed Window Algorithm | Ferrox Sliding Window Log |
+| :--- | :--- | :--- |
+| **Burst Vulnerability**| 2x limit requests can burst at boundary minutes (e.g. 11:59:59 & 12:00:01). | Smooth sliding time window eliminates boundary burst exploits. |
+| **Atomic Concurrency** | Race conditions allow extra requests in multi-threaded setups. | Single atomic Redis Lua script guarantees thread-safe counters. |
+| **Headers** | No standard headers emitted. | Full compliance with IETF `RateLimit-*` header standards. |
+
+---
+
+## 5. Practical Usage Guide & Extended Code Examples
+
+### 5.1 Applying Rate Limiting to Endpoints
 
 ```rust
-use ferrox_rate_limiter::RateLimiter;
-use ferrox_errors::AppError;
+use ferrox_rate_limiter::{RateLimiter, RateLimitConfig, Algorithm};
 
-let limiter = RateLimiter::new("redis://127.0.0.1:6379")?;
+pub async fn protect_login_endpoint(
+    client_ip: &str,
+    limiter: &RateLimiter,
+) -> Result<(), RateLimitError> {
+    let key = format!("ratelimit:login:{}", client_ip);
 
-// Allow maximum 100 requests per 60 seconds per IP
-let client_ip = "192.168.1.50";
-let allowed = limiter.check_limit(client_ip, 100, 60).await?;
+    // Limit to 5 requests per 60 seconds per IP address
+    let decision = limiter.evaluate(&key, RateLimitConfig {
+        limit: 5,
+        window_seconds: 60,
+        algorithm: Algorithm::SlidingWindowLog,
+    }).await?;
 
-if !allowed {
-    return Err(AppError::ValidationError("Rate limit exceeded. Please wait.".into()));
-}
-```
-
----
-
-## 3. Rate Limiter Axum Middleware
-
-You can attach rate limiting as global or per-route middleware:
-
-```rust
-use axum::{
-    body::Body,
-    http::{Request, StatusCode},
-    middleware::Next,
-    response::{IntoResponse, Response},
-    Json,
-};
-use serde_json::json;
-
-pub async fn rate_limit_middleware(
-    limiter: RateLimiter,
-    req: Request<Body>,
-    next: Next,
-) -> Response {
-    let ip = req.headers()
-        .get("X-Forwarded-For")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("unknown_ip");
-
-    match limiter.check_limit(ip, 60, 60).await {
-        Ok(true) => next.run(req).await,
-        Ok(false) => (
-            StatusCode::TOO_MANY_REQUESTS,
-            Json(json!({ "status": 429, "message": "Too Many Requests" }))
-        ).into_response(),
-        Err(_) => next.run(req).await, // Fail open if Redis drops
+    if !decision.is_allowed {
+        return Err(RateLimitError::TooManyRequests {
+            retry_after_seconds: decision.retry_after,
+        });
     }
+
+    Ok(())
 }
 ```
 
 ---
 
-## 4. ✅ Best Practices
+## 6. Anti-Patterns: How NOT to Use It
 
-- **Differentiate public vs authenticated endpoints**: Apply tighter rate limits (e.g. 5 req/min) on `/api/v1/auth/login` to stop brute-force attacks, while allowing higher limits (e.g. 1000 req/min) for authenticated API users.
+> [!CAUTION]
+> **Anti-Pattern 1: Trusting Spoofable Headers for Client IP**
+> Avoid blindly using `req.headers["x-forwarded-for"]` without validating reverse proxy IP whitelist rules. Attackers can forge IP header values to bypass IP rate limiters.
+
+---
+
+## 7. Pro-Tips & Best Practices
+
+> [!TIP]
+> **Pro-Tip 1: Tiered Rate Limiting**
+> Configure higher rate limits for authenticated premium users (`10,000 req/min`) versus unauthenticated guest traffic (`60 req/min`).

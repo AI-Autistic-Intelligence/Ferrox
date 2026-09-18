@@ -1,49 +1,117 @@
 ---
+id: introduction
+title: Introduction & Ferrox Crate Architecture
 sidebar_position: 1
 ---
 
-# 🚀 Introduction
+# Introduction & Ferrox Crate Architecture
 
-Welcome to **Ferrox** (v0.5.0), a progressive Rust framework for building efficient, reliable, enterprise-grade server-side applications.
-
-Ferrox is built on top of [Axum](https://github.com/tokio-rs/axum) and [Tokio](https://tokio.rs/), bringing the developer experience and architectural patterns of frameworks like **NestJS** and **Spring Boot** to the Rust ecosystem.
+Welcome to **Ferrox**, the enterprise-grade Rust web framework designed for building ultra-resilient microservices, multi-protocol API gateways, high-frequency real-time applications, and WebAssembly frontend clients.
 
 ---
 
-## Philosophy
+## 1. What It Is & Architectural Purpose
 
-In recent years, JavaScript/TypeScript and frameworks like NestJS have become dominant for web backends. However, as applications scale to enterprise levels, developers often face performance bottlenecks, massive memory footprints, and single-threaded CPU limitations.
+Building production-ready software in Rust requires assembling multiple asynchronous crates: web servers (`Axum` / `Hyper`), ORMs (`SeaORM`), security modules, resilience tools, and logging engines. Without a unified framework, developers spend significant time configuring boilerplate code and managing dependency compatibility.
 
-Rust solves all of these concurrency and memory problems, but historically lacked the rapid *"Developer Experience (DX)"* that web developers love.
+**Ferrox** provides a modular suite of 35+ specialized Rust crates. It delivers NestJS-style dependency injection ergonomics, zero-copy performance, end-to-end type safety, and production observability out of the box.
 
-**Ferrox bridges this gap.**
-
-It provides an out-of-the-box application architecture that allows developers and teams to create highly testable, scalable, loosely coupled, and easily maintainable applications with Angular/NestJS-style **Inversion of Control** and modularity.
-
----
-
-## 🤖 35 SOTA Literature Innovations & Zero-Trust Mesh
-
-Starting in version `0.5.0`, Ferrox features **Ferrox Sentinel** (`ferrox-sentinel`) and **Ferrox Selftest** (`ferrox-selftest`) — an exhaustive 7-tier AI/ML security mesh implementing **35 SOTA Literature Innovations** synthesized from 11 authoritative technical security and AI publications:
-
-- **AI & Multi-Agent Cognitive Security**: Direct/indirect prompt injection sanitizer, ChatML delimiter stripping, RAG hallucination groundedness scoring, and AI agent tool sandboxing.
-- **Host & EDR Anti-Evasion Watchdog**: LSASS credential dumping guard (`ObRegisterCallbacks`), ETW-TI direct syscall trampoline interception, ETW NOPing patch detection, and unbacked executable memory execution protection.
-- **Deep Packet Inspection & Network Mesh**: Raw magic-byte signature matching for non-standard ports (gRPC, TLS, SSH, Modbus/ICS), DNS TXT exfiltration tunneling detection, NetFlow volume asymmetry, and Gratuitous ARP traps.
-- **Zero-Trust & Cryptographic Core**: Double Ratchet forward secrecy, Post-Quantum Kyber ML-KEM lattice key encapsulation, Yao's Garbled Circuits 2PC confidential scoring, ZK-SNARK Burraco game attestation, and Laplacian local differential privacy.
-- **SOAR Auto-Remediation & MTD**: Ephemeral ingress port mutation (`T_rotate = 60s`), polymorphic API route rotation, automated `nftables` / XDP eBPF kernel packet drop dispatch.
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                   YOUR FERROX APP                                      │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  ferrox-app  │  ferrox-cqrs  │  ferrox-sentinel  │  ferrox-transports  │  ferrox-sync  │
+├──────────────┴───────────────┴───────────────────┴─────────────────────┴───────────────┤
+│                                 FERROX FRAMEWORK KERNEL                                │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  Tokio Async Runtime  │  Hyper HTTP / Axum  │  SeaORM Database  │  Pino / Tracing Logs │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## High-Level vs Low-Level
+## 2. Comprehensive Crate Ecosystem Taxonomy
 
-Ferrox is designed for both Junior developers and Senior Architects:
-- **High-Level Usage**: Simple `#[derive]` macros and plug-and-play code snippets to get work done fast.
-- **Low-Level Internals**: Deep dives into how Ferrox manipulates the Axum request lifecycle, allowing you to build custom Interceptors, Guards, and Sentinel algorithms.
+| Crate | Category & Domain | Key Feature |
+| :--- | :--- | :--- |
+| **`ferrox-app`** | Application Kernel | Application lifecycle bootstrap & dependency injection. |
+| **`ferrox-circuit-breaker`**| Fault Tolerance | State machine (`Closed`, `Open`, `HalfOpen`) for remote APIs. |
+| **`ferrox-cli`** | Command Line Tooling | Code generator, module scaffolder, migration runner. |
+| **`ferrox-config`** | Dynamic Settings | Environment variable parsing with schema validation. |
+| **`ferrox-cqrs`** | Architecture Pattern | Command Bus, Query Bus, and Event Sourcing dispatchers. |
+| **`ferrox-crud-gen`** | Automated CRUD | Auto-generates REST/GraphQL CRUD routes from SeaORM entities.|
+| **`ferrox-datagrid`** | Query Translation | Server-side AG-Grid / TanStack Table SeaORM query builder. |
+| **`ferrox-errors`** | System Taxonomy | Type-safe error taxonomies with localized messages. |
+| **`ferrox-events`** | Event Bus | In-process and distributed Kafka/AMQP event bus. |
+| **`ferrox-graphql`** | Transport | Async-GraphQL schema stitching, scalars, and federation. |
+| **`ferrox-guards`** | Security & Auth | Declarative RBAC / ABAC / Multi-Tenant access guards. |
+| **`ferrox-health`** | Diagnostics | Health checks, readiness probes, and liveness endpoints. |
+| **`ferrox-i18n`** | Internationalization| Translation catalogs, fallback resolution, pluralization. |
+| **`ferrox-integrations`**| Third-Party Services | Mailer, Payments (Stripe), Notifications (FCM/Twilio), Flags. |
+| **`ferrox-interceptors`**| Middleware | Dynamic request/response pipeline interceptors. |
+| **`ferrox-jobs`** | Background Queues | Distributed Redis job queue worker engine. |
+| **`ferrox-logger`** | Structured Logging | Fast JSON logging with OpenTelemetry trace bindings. |
+| **`ferrox-metrics`** | Observability | Prometheus metric exporter (`req/sec`, latency histograms). |
+| **`ferrox-migrations`** | Database Schema | Versioned schema migration runner & SQL DDL generator. |
+| **`ferrox-rate-limiter`**| Security | Sliding Window Log & Token Bucket rate limiters. |
+| **`ferrox-saga`** | Distributed Sagas | Distributed transaction orchestrator with compensations. |
+| **`ferrox-schedule`** | Task Scheduling | Distributed Cron scheduler engine & heartbeat workers. |
+| **`ferrox-search`** | Search Integration | Full-text & vector search integration (Meilisearch/Qdrant). |
+| **`ferrox-security`** | Cryptography | JWT signing (Ed25519), AES-256-GCM, distributed Redlock locks.|
+| **`ferrox-selftest`** | Compliance | OWASP security compliance scan & p95 latency runner. |
+| **`ferrox-sentinel`** | Edge Protection | Helmet CSP headers, CORS regex matcher, payload bouncer. |
+| **`ferrox-singleflight`**| Thundering Herd Shield| Lock-free concurrent request deduplicator. |
+| **`ferrox-sse`** | Real-Time Transport | Server-Sent Events streaming with reconnect resume support. |
+| **`ferrox-storage`** | Cloud Object Storage| Zero-buffer S3 streams & presigned download URLs. |
+| **`ferrox-sync`** | CRDT Real-Time Sync | Collaborative CRDT state synchronization over WebSockets. |
+| **`ferrox-tracing`** | Distributed Tracing| OpenTelemetry trace span exporter (OTLP gRPC). |
+| **`ferrox-transports`**| Multi-Protocol | Unified HTTP, gRPC, and Kafka transport engine. |
+| **`ferrox-types`** | Type Primitives | Shared type primitives & value objects. |
+| **`ferrox-utils`** | Shared Tools | High-performance helper routines & collections. |
+| **`ferrox-validation`**| Schema Validation | Zero-cost validation macros & JSON schema checks. |
 
 ---
 
-## 💬 Join the Community
+## 3. Core Architectural Philosophy
 
-Have questions or want to collaborate? Join the official **Ferrox Community**:
-- 💬 **Discord Server:** [https://discord.gg/Bx3CzGec7d](https://discord.gg/Bx3CzGec7d)
-- 🤖 **Reddit Subreddit:** [r/Ferrox](https://www.reddit.com/r/Ferrox/)
+### 1. High Performance & Zero-Cost Abstractions
+Ferrox uses Rust's affine type system and Tokio async runtime to deliver near-bare-metal performance with zero garbage collection pauses.
+
+### 2. Built-in Fault Tolerance & Resilience
+Circuit breakers, singleflight deduplicators, and distributed Redlocks are built directly into the framework primitives.
+
+### 3. End-to-End Type Safety
+Share identical data models between backend Rust microservices and frontend WebAssembly applications (`ferrox-front`).
+
+---
+
+## 4. Execution Sequence Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Client Request
+    participant Sentinel as ferrox-sentinel Shield
+    participant App as Ferrox Kernel
+    participant Guard as Security Guard
+    participant Bus as CQRS CommandBus
+    participant DB as Database (SeaORM)
+
+    Client->>Sentinel: Incoming HTTP / gRPC Request
+    Sentinel->>Sentinel: Verify CSP Headers, CORS & Payload Size Limit
+    Sentinel->>App: Forward Clean Request
+    App->>Guard: Evaluate Roles & Tenant Isolation
+    Guard-->>App: Access Granted
+    App->>Bus: Dispatch Command ('CreateOrderCommand')
+    Bus->>DB: Execute Query inside CircuitBreaker
+    DB-->>Bus: Return Saved Entity
+    Bus-->>App: Command Execution Success
+    App-->>Client: Standard Response Payload { success: true, data }
+```
+
+---
+
+## 5. Next Steps
+
+- Proceed to [First Steps](first-steps.md) to build your first Ferrox application.
+- Explore individual crate guides in the **Fundamentals** and **Security** sidebar sections.

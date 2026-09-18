@@ -1,61 +1,122 @@
 ---
-sidebar_position: 8
-title: "🧪 Ferrox Selftest (Automated Audit & Benchmarks)"
+id: ferrox-selftest
+title: Self-Test Security Suite, OWASP Scans & Latency Runner
+sidebar_position: 2
 ---
 
-# 🧪 Ferrox Selftest: Continuous Security Benchmark & Red-Team Audit Engine
+# Self-Test Security Suite, OWASP Scans & Latency Runner
 
-`ferrox-selftest` is the autonomous verification, continuous integration security benchmark runner, and OWASP Web Security Testing Guide (WSTG) self-attack auditor for the Ferrox ecosystem.
-
-It provides zero-trust automated regression testing across all 35 SOTA literature innovations, ensuring that no build is released to production unless the entire security mesh is 100% operational.
-
----
-
-## 🎯 Key Capabilities
-
-1. **Continuous Security Benchmark Runner**: Tests all 35 SOTA algorithms in real-time, outputting an ecosystem health score (0-100%) and detailed academic innovation audit reports.
-2. **Autonomous Red-Team Self-Attack Suite**: Simulates hostile penetration testing attacks (SQLi, XSS, SSRF, JWT forgery, replay attacks, timing attacks, prompt injection) against running Ferrox instances.
-3. **WSTG Compliance Auditor**: Automatically maps threat vulnerabilities against OWASP Top 10 and WSTG v4.2 test categories.
+The `ferrox-selftest` crate delivers self-diagnostic security compliance checks, OWASP WSTG compliance verification, p50/p95/p99 latency benchmark execution, and automated deployment readiness audits for Rust microservices.
 
 ---
 
-## 🛠️ Usage Example
+## 1. What It Is & Architectural Purpose
 
-Add `ferrox-selftest` to your `Cargo.toml`:
+Enterprise applications deployed to Kubernetes or cloud clusters need to verify that security posture, database connections, cache readiness, and response latencies satisfy SLA constraints before receiving live production traffic.
 
-```toml
-[dependencies]
-ferrox-selftest = "0.5.0"
+`ferrox-selftest` embeds an automated self-diagnostic runner inside your microservice binary. It runs OWASP security audits, database latency benchmarks, and dependency sanity checks during application startup or when probed via specialized CLI commands.
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        ferrox-selftest Engine                          │
+├──────────────────────────────────┬─────────────────────────────────────┤
+│  OWASP Security Compliance Audit │  Latency Benchmark Engine           │
+│  • Security Header Bouncer Checks│  • p50 / p95 / p99 Latency Metrics  │
+│  • TLS & Secrets Encryption Scan │  • DB & Cache Query Benchmarks      │
+└────────────────┬─────────────────┴──────────────────┬──────────────────┘
+                 │ Diagnostic Result Report
+                 ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Kubernetes Readiness Probe                      │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Running the Continuous Benchmark
+---
+
+## 2. What It Does & Key Capabilities
+
+- **OWASP WSTG Security Audits**: Verifies security header configurations (CSP, HSTS, X-Frame-Options) and CORS origin matchers.
+- **Latency p50/p95/p99 Benchmarking**: Measures internal database query execution latencies and Redis cache get/set roundtrips.
+- **Dependency Sanity Verification**: Tests database schema version compatibility, Kafka broker reachability, and S3 credentials.
+- **Kubernetes Startup & Readiness Integration**: Returns structured diagnostic payloads formatted for K8s `/healthz` and `/readyz` probes.
+
+---
+
+## 3. How It Works Under the Hood
+
+### Self-Test Diagnostic Execution Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant K8s as K8s Readiness Probe
+    participant Endpoint as GET /internal/selftest
+    participant Engine as ferrox-selftest Engine
+    participant DB as Database / Redis / Auth
+
+    K8s->>Endpoint: HTTP GET /internal/selftest
+    Endpoint->>Engine: SelftestRunner.execute_suite()
+    Engine->>DB: Test Database Query Latency (Target < 10ms)
+    Engine->>Engine: Verify Sentinel Security Headers Registered
+    Engine->>Engine: Check SSL / TLS Encryption Parameters
+    alt All Checks PASSED
+        Engine-->>Endpoint: SelftestReport { status: PASSED, p95_latency: "2.4ms" }
+        Endpoint-->>K8s: 200 OK (Pod Ready for Traffic)
+    else Any Critical Test FAILED
+        Engine-->>Endpoint: SelftestReport { status: FAILED, failure: "DB Latency > 100ms" }
+        Endpoint-->>K8s: 503 Service Unavailable (Prevent Traffic Routing)
+    end
+```
+
+---
+
+## 4. Why It Was Designed This Way
+
+| Feature | External Manual Testing | Ferrox Self-Test Engine |
+| :--- | :--- | :--- |
+| **Automation** | Requires manual penetration tests before every release. | Runs automated OWASP & latency audits directly inside application binary. |
+| **Fail-Safe** | Misconfigured pods start serving live user requests silently. | K8s readiness probes fail fast if self-tests fail, blocking deployment. |
+| **Performance** | Unknown p95 latency until production traffic hits. | Built-in p50/p95/p99 latency benchmarks verify SLAs at startup. |
+
+---
+
+## 5. Practical Usage Guide & Extended Code Examples
+
+### 5.1 Running Self-Tests Programmatically
 
 ```rust
-use ferrox_selftest::continuous_benchmark::ContinuousSecurityBenchmark;
+use ferrox_selftest::{SelftestRunner, SelftestSuite};
 
-fn main() {
-    let report = ContinuousSecurityBenchmark::run_benchmark();
+pub async fn run_startup_diagnostics() -> Result<(), String> {
+    let runner = SelftestRunner::builder()
+        .with_suite(SelftestSuite::OwaspSecurity)
+        .with_suite(SelftestSuite::DatabaseLatency)
+        .with_suite(SelftestSuite::CacheReachability)
+        .build();
 
-    println!("Ecosystem Health Score: {}%", report.ecosystem_health_score);
-    println!("Total Innovations Tested: {}", report.total_innovations_tested);
-    println!("Passed Innovations: {}", report.passed_innovations);
+    let report = runner.run().await;
 
-    for result in report.results {
-        println!("- [{}]: {} ({})", 
-            if result.passed { "PASS" } else { "FAIL" }, 
-            result.innovation_name, 
-            result.academic_reference
-        );
+    if report.is_success() {
+        println!("Self-Test Passed! P95 Latency: {:?}", report.p95_latency());
+        Ok(())
+    } else {
+        Err(format!("Self-Test Diagnostics Failed: {:?}", report.failures()))
     }
 }
 ```
 
 ---
 
-## 🧪 Terminal Execution
+## 6. Anti-Patterns: How NOT to Use It
 
-You can also trigger `ferrox-selftest` via `cargo-ferrox` CLI:
+> [!CAUTION]
+> **Anti-Pattern 1: Disabling Self-Tests in Staging/Production**
+> Never bypass self-test runners during deployment pipelines. Running self-tests guarantees that invalid environment secrets or unreachable database pools are caught before traffic is routed.
 
-```bash
-cargo ferrox selftest --full
-```
+---
+
+## 7. Pro-Tips & Best Practices
+
+> [!TIP]
+> **Pro-Tip 1: CLI Integration**
+> Run `ferrox selftest --suite=security` directly from your CI/CD pipeline to block pull-requests that weaken framework security settings.
