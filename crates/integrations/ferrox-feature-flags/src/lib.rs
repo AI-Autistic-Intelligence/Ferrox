@@ -19,7 +19,7 @@ impl FeatureFlagsClient {
 
     /// Checks if a feature flag is globally enabled
     pub async fn is_enabled(&self, feature_name: &str) -> Result<bool, AppError> {
-        let mut con = self.redis_client.get_async_connection().await
+        let mut con = self.redis_client.get_multiplexed_async_connection().await
             .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
 
         let key = format!("feature_flag:{}", feature_name);
@@ -33,12 +33,12 @@ impl FeatureFlagsClient {
 
     /// Enables or disables a feature flag globally
     pub async fn set_flag(&self, feature_name: &str, enabled: bool) -> Result<(), AppError> {
-        let mut con = self.redis_client.get_async_connection().await
+        let mut con = self.redis_client.get_multiplexed_async_connection().await
             .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
 
         let key = format!("feature_flag:{}", feature_name);
         
-        con.set(&key, enabled)
+        con.set::<_, _, ()>(&key, enabled)
             .await
             .map_err(|e| AppError::InternalServerError(Box::new(e)))?;
 
