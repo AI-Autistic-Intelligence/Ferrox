@@ -14,4 +14,4 @@ tokio = { version = "1", features = ["full"] }
 tokio-util = { version = "0.7", features = ["io"] }
 aws-sdk-s3 = "1.0"
 async-trait = "0.1"
-ferrox-errors = { version = "0.6.0", path = "../ferrox-errors"  }
+ferrox-errors = { version = "0.7.0", path = "../ferrox-errors"  }

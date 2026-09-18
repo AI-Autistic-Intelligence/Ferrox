@@ -11,5 +11,5 @@ description = "Document database repository implementation and BSON utilities po
 [dependencies]
 mongodb = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
-ferrox-database-core = { version = "0.6.0", path = "../ferrox-database-core"  }
-ferrox-errors = { version = "0.6.0", path = "../../ferrox-errors"  }
+ferrox-database-core = { version = "0.7.0", path = "../ferrox-database-core"  }
+ferrox-errors = { version = "0.7.0", path = "../../ferrox-errors"  }

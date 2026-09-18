@@ -10,4 +10,4 @@ description = "Enterprise module ferrox-storage for Ferrox Framework."
 aws-config = "1.1"
 aws-sdk-s3 = "1.21"
 tokio = { workspace = true, features = ["full"] }
-ferrox-errors = { version = "0.6.0", path = "../../ferrox-errors"  }
+ferrox-errors = { version = "0.7.0", path = "../../ferrox-errors"  }

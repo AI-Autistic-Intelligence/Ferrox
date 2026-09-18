@@ -20,8 +20,8 @@ reqwest = { version = "0.12", features = ["json"] }
 tracing = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 colored = "2.1"
-ferrox-errors = { version = "0.6.0", path = "../ferrox-errors" }
-ferrox-security = { version = "0.6.0", path = "../ferrox-security" }
+ferrox-errors = { version = "0.7.0", path = "../ferrox-errors" }
+ferrox-security = { version = "0.7.0", path = "../ferrox-security" }
 secrecy = "0.8"
 time = { workspace = true }
 axum = "0.7"
