@@ -7,7 +7,7 @@
 //! - 🔗 **W3C Trace Context**: Propagation of correlation IDs (`traceparent`) across HTTP headers and microservices.
 
 use opentelemetry::global;
-use opentelemetry_sdk::trace::Tracer;
+
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Registry};
 
 /// Initializes OpenTelemetry and Tracing for Distributed Systems

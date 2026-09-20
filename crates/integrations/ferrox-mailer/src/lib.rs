@@ -7,7 +7,7 @@ use lettre::{
     transport::smtp::authentication::Credentials,
     AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
 };
-use std::str::FromStr;
+
 use ferrox_errors::AppError;
 
 #[derive(Clone)]
@@ -28,7 +28,7 @@ impl MailerClient {
 
         let from_address = Mailbox::new(
             Some(from_name.to_string()),
-            from_email.parse().map_err(|_| AppError::BadRequest("Invalid sender email".into()))?
+            from_email.parse().map_err(|_| AppError::ValidationError("Invalid sender email".into()))?
         );
 
         Ok(Self {
@@ -41,7 +41,7 @@ impl MailerClient {
     pub async fn send_html_email(&self, to_email: &str, to_name: &str, subject: &str, html_body: &str) -> Result<(), AppError> {
         let to_address = Mailbox::new(
             Some(to_name.to_string()),
-            to_email.parse().map_err(|_| AppError::BadRequest("Invalid recipient email".into()))?
+            to_email.parse().map_err(|_| AppError::ValidationError("Invalid recipient email".into()))?
         );
 
         let email = Message::builder()

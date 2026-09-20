@@ -2,6 +2,7 @@
 name = "rust-yalc"
 version = "0.1.0"
 edition = "2021"
+description = "Rust YALC module for Ferrox ecosystem"
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
