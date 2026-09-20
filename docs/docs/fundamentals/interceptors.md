@@ -114,3 +114,4 @@ pub async fn custom_header_interceptor(
 ## 6. ❌ Anti-Patterns
 
 - **❌ Mutating Request Bodies synchronously**: Never consume or buffer request bodies synchronously inside an interceptor, as this loads entire request payloads into memory and blocks Tokio worker threads.
+\n\n---\n\n## 1. Philosophy / Purpose\n\n*Document the philosophy and core purpose of this component here.*\n\n## 2. Architectural Layering\n\n*Explain where this component sits within the Onion Architecture (e.g., Domain, Application, Infrastructure, or Presentation).* \n\n## 3. How it Works (Under the hood)\n\n*Detail the internal mechanics, memory model, and execution flow.*\n\n## 4. Why it was designed this way\n\n*Explain the historical context, trade-offs, and design rationale.*

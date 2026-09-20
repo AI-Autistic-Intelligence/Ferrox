@@ -115,3 +115,4 @@ sequenceDiagram
 
 - Proceed to [First Steps](first-steps.md) to build your first Ferrox application.
 - Explore individual crate guides in the **Fundamentals** and **Security** sidebar sections.
+\n\n---\n\n## 3. How it Works (Under the hood)\n\n*Detail the internal mechanics, memory model, and execution flow.*\n\n## 4. Why it was designed this way\n\n*Explain the historical context, trade-offs, and design rationale.*\n\n## 5. Usage Guide & Code Examples\n\n*Provide integration examples, setup guides, and typical use cases.*\n\n## 6. Anti-Patterns\n\n*List common mistakes, misconfigurations, and patterns to avoid when using this component.*\n\n## 7. Pro-Tips / Best Practices\n\n*Provide advanced tips, performance optimizations, and recommended patterns.*

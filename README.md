@@ -311,6 +311,22 @@ A 100% isolated, multi-container Docker environment orchestrating:
 ./run-e2e.sh
 ```
 
+## 🚫 8. Anti-Patterns
+
+When building with Ferrox, avoid these common architectural anti-patterns:
+- **Bypassing the Onion Request Pipeline**: Never bypass `ferrox-validation` or `ferrox-guards` by reading raw HTTP payloads in controllers. Always use `ValidatedJson<T>` and custom extractors to ensure payload integrity before business logic execution.
+- **Leaking Domain Entities**: Do not return internal `SeaOrm` or `Mongo` models directly to the HTTP response. Always map them to Data Transfer Objects (DTOs) to prevent sensitive field exposure (e.g., password hashes).
+- **Hardcoding Secrets**: Do not pass raw string secrets to Sentinel or Auth guards. Always use `ferrox-config` with `secrecy` to zeroize secrets in memory.
+
+---
+
+## 💡 9. Pro-Tips & Best Practices
+
+- **Leverage `ferrox-singleflight`**: Wrap your heavy database queries or external API calls with `ferrox-singleflight` to automatically suppress cache stampedes during high traffic spikes.
+- **Compile-Time Safety**: Use `ts-rs` to export your Rust DTOs to TypeScript interfaces. Keep your frontend (`ferrox-front-ui`) perfectly synchronized with your backend types.
+- **Monitoring**: Always enable `ferrox-tracing` with OTLP exporters when deploying to production, to trace request lifecycle bottlenecks across the 7-Layer pipeline.
+- **E2E Testing**: Run the `ferrox-kali-e2e-runner` docker suite locally before committing to verify your honeypots and threat engines are correctly intercepting attacks.
+
 ---
 
 ## 📜 License

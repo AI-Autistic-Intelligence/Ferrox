@@ -53,3 +53,4 @@ When a Controller calls `bus.execute(command)`, it sends the command payload int
 ### Why is this Enterprise-grade?
 1. **Thread Safety**: Controllers and Database Writers operate on different threads without needing Mutex locks.
 2. **Event Sourcing Ready**: Because every mutation is an explicit `Command` struct, it is trivial to log these commands to an Event Store (like Kafka or EventStoreDB) before executing them, achieving full Event Sourcing.
+\n\n---\n\n## 1. Philosophy / Purpose\n\n*Document the philosophy and core purpose of this component here.*\n\n## 2. Architectural Layering\n\n*Explain where this component sits within the Onion Architecture (e.g., Domain, Application, Infrastructure, or Presentation).* \n\n## 6. Anti-Patterns\n\n*List common mistakes, misconfigurations, and patterns to avoid when using this component.*\n\n## 7. Pro-Tips / Best Practices\n\n*Provide advanced tips, performance optimizations, and recommended patterns.*

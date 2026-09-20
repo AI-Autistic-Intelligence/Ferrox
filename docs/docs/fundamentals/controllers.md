@@ -177,3 +177,4 @@ async fn non_blocking_controller() -> &'static str {
 
 ### 5.2 Unwrapping inside a Controller
 If a client sends an unexpected header, and you call `.unwrap()` to parse it, your thread will Panic. While Axum catches panics and prevents the server from crashing entirely, it is a severe anti-pattern that disrupts the connection abruptly. Always use `?` and return proper `AppError` types.
+\n\n---\n\n## 1. Philosophy / Purpose\n\n*Document the philosophy and core purpose of this component here.*\n\n## 2. Architectural Layering\n\n*Explain where this component sits within the Onion Architecture (e.g., Domain, Application, Infrastructure, or Presentation).* \n\n## 4. Why it was designed this way\n\n*Explain the historical context, trade-offs, and design rationale.*

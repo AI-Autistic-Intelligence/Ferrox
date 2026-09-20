@@ -72,3 +72,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 - **Make Event Handlers Idempotent**: Design event listeners to safely process duplicate events without unintended side effects.
 - **Offload Heavy Listener Tasks**: Spawn background Tokio tasks for event handlers so publishing domain events never delays HTTP responses.
+\n\n---\n\n## 1. Philosophy / Purpose\n\n*Document the philosophy and core purpose of this component here.*\n\n## 3. How it Works (Under the hood)\n\n*Detail the internal mechanics, memory model, and execution flow.*\n\n## 4. Why it was designed this way\n\n*Explain the historical context, trade-offs, and design rationale.*\n\n## 5. Usage Guide & Code Examples\n\n*Provide integration examples, setup guides, and typical use cases.*\n\n## 6. Anti-Patterns\n\n*List common mistakes, misconfigurations, and patterns to avoid when using this component.*

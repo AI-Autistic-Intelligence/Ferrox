@@ -103,3 +103,4 @@ graph TD
 4. The internal microservices (`Orders`, `Inventory`) don't even have a JWT decoding library. They blindly trust the `X-Ferrox-User-Id` header, because their firewalls only allow traffic originating from the API Gateway.
 
 This architecture scales infinitely because Authentication becomes a stateless CPU operation rather than a stateful I/O operation.
+\n\n---\n\n## 3. How it Works (Under the hood)\n\n*Detail the internal mechanics, memory model, and execution flow.*\n\n## 5. Usage Guide & Code Examples\n\n*Provide integration examples, setup guides, and typical use cases.*\n\n## 6. Anti-Patterns\n\n*List common mistakes, misconfigurations, and patterns to avoid when using this component.*\n\n## 7. Pro-Tips / Best Practices\n\n*Provide advanced tips, performance optimizations, and recommended patterns.*
