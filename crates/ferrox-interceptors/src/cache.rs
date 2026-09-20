@@ -83,7 +83,7 @@ pub async fn cache_interceptor(
     // 3. Cache Miss with Stampede Prevention
     // Wrap the controller execution in Singleflight
     let cache_key_clone = cache_key.clone();
-    let result = config.singleflight.execute(&cache_key, || async {
+    let result = config.singleflight.execute(&cache_key, || async move {
         debug!("🐌 Cache Miss [{}]: Executing controller", cache_key_clone);
         // Note: In a complete implementation, `next.run()` cannot easily be moved into Singleflight
         // because `req` and `next` are not Clone. 
