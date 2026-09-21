@@ -37,16 +37,6 @@ enum Commands {
         #[arg(long, default_value = "./frontend/src/api")]
         output: String,
     },
-    /// OWASP WSTG Security Auditor: Self-test target domain
-    Audit {
-        /// Target URL (e.g. 'http://127.0.0.1:8080')
-        #[arg(long, default_value = "http://127.0.0.1:8080")]
-        url: String,
-
-        /// Export report to markdown file path
-        #[arg(long)]
-        export_md: Option<String>,
-    },
     /// Moving Target Defense (MTD): Inspect ingress seed mutation and dynamic port offsets
     Mtd {
         #[arg(long, default_value = "mtd_secret_key_8899")]
@@ -208,26 +198,6 @@ export class FerroxClient {
             // std::fs::write(format!("{}/FerroxClient.ts", output), client_code).unwrap();
             
             println!("✅ Code Generation Complete! Frontend is now perfectly synchronized with the Backend.");
-        }
-        Commands::Audit { url, export_md } => {
-            println!("🛡️ Starting Ferrox OWASP WSTG Self-Test Auditor against {}", url);
-            let config = ferrox_selftest::AuditConfig {
-                target_url: url.clone(),
-                timeout_secs: 5,
-                verbose: true,
-            };
-            let auditor = ferrox_selftest::WstgAuditor::new(config);
-            let report = auditor.run_all().await;
-            ferrox_selftest::reporter::ReportPrinter::print_terminal(&report);
-
-            if let Some(path) = export_md {
-                let md = ferrox_selftest::reporter::ReportPrinter::to_markdown(&report);
-                if let Err(e) = std::fs::write(path, &md) {
-                    eprintln!("❌ Failed to write report to {}: {}", path, e);
-                } else {
-                    println!("📄 Audit report saved to {}", path);
-                }
-            }
         }
         Commands::Mtd { secret, base_port } => {
             println!("🛡️ Ferrox Moving Target Defense (MTD) Dynamic Ingress Inspector");

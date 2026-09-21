@@ -49,7 +49,6 @@ members = [
     "apps/ferrox-showcase",
     "apps/ferrox-saas-backend",
     "crates/rust-yalc",
-    "crates/ferrox-selftest",
     "crates/ferrox-sentinel",
 ]
 
@@ -83,5 +82,5 @@ chrono = "0.4"
 pasetors = "0.6"
 
 [workspace.lints.clippy]
-pedantic = "warn"
+pedantic = { level = "warn", priority = -1 }
 unwrap_used = "deny"

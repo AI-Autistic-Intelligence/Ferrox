@@ -1454,7 +1454,6 @@ version = "0.7.0"
 dependencies = [
  "chrono",
  "clap",
- "ferrox-selftest",
  "ferrox-sentinel",
  "inquire",
  "serde",
@@ -2714,26 +2713,6 @@ dependencies = [
  "time",
  "tokio",
  "uuid",
-]
-
-[[package]]
-name = "ferrox-selftest"
-version = "0.7.0"
-dependencies = [
- "axum 0.7.9",
- "chrono",
- "colored",
- "ferrox-errors",
- "ferrox-security",
- "reqwest 0.12.28",
- "secrecy",
- "serde",
- "serde_json",
- "time",
- "tokio",
- "tower 0.4.13",
- "tower-http 0.6.11",
- "tracing",
 ]
 
 [[package]]

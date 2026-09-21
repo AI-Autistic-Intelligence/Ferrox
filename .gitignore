@@ -21,3 +21,10 @@ Thumbs.db
 /docs/build/
 /docs/.docusaurus/
 /docs/.cache-loader/
+
+# Security Auditing & Pentest Artifacts
+enterprise_compliance.html
+test_report.html
+ferrox_pentest_report.md
+*.md.tmp
+*.html.tmp
