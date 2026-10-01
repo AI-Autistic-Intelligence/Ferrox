@@ -39,14 +39,8 @@ where
             .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
 
         if let Some(item) = res.item {
-            let json_val = serde_json::to_value(
-                item.into_iter()
-                    .map(|(k, v)| (k, format!("{:?}", v))) // Simplified conversion
-                    .collect::<std::collections::HashMap<_, _>>()
-            ).map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
-
-            let parsed: T = serde_json::from_value(json_val)
-                .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
+            let parsed: T = serde_dynamo::aws_sdk_dynamodb_1::from_item(item)
+                .map_err(|e| FerroxError::DatabaseError(format!("DynamoDB Deserialization Error: {}", e)))?;
             Ok(Some(parsed))
         } else {
             Ok(None)
@@ -54,15 +48,8 @@ where
     }
 
     async fn save(&self, entity: &T) -> Result<(), FerroxError> {
-        let json_val = serde_json::to_value(entity)
-            .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
-            
-        let mut item = std::collections::HashMap::new();
-        if let Some(obj) = json_val.as_object() {
-            for (k, v) in obj {
-                item.insert(k.clone(), AttributeValue::S(v.to_string()));
-            }
-        }
+        let item = serde_dynamo::aws_sdk_dynamodb_1::to_item(entity)
+            .map_err(|e| FerroxError::DatabaseError(format!("DynamoDB Serialization Error: {}", e)))?;
 
         let _req = self.client.put_item()
             .table_name(&self.table_name)
