@@ -2,7 +2,7 @@ use crate::Transport;
 use async_trait::async_trait;
 use ferrox_errors::AppError;
 
-/// Placeholder for a Tonic gRPC server
+/// Tonic gRPC server transport
 pub struct GrpcTransport {
     pub port: u16,
 }
@@ -28,7 +28,7 @@ impl Transport for GrpcTransport {
             
         router.serve_with_shutdown(addr, async {
             rx.await.ok();
-        }).await.map_err(|e| AppError::Internal(e.to_string()))?;
+        }).await.map_err(|e| AppError::InternalError(e.to_string()))?;
         
         Ok(())
     }

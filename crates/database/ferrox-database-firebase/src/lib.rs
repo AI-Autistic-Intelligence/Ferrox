@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use ferrox_database_core::repository::Repository;
-use ferrox_errors::FerroxError;
+use ferrox_database_core::Repository;
+use ferrox_errors::AppError;
 use reqwest::Client;
 use serde::{Serialize, de::DeserializeOwned};
 use std::marker::PhantomData;
@@ -25,42 +25,64 @@ impl<T> FirebaseRepository<T> {
 }
 
 #[async_trait]
-impl<T> Repository<T> for FirebaseRepository<T>
+impl<T> Repository<T, String> for FirebaseRepository<T>
 where
-    T: Serialize + DeserializeOwned + Send + Sync,
+    T: Serialize + DeserializeOwned + Send + Sync + Clone,
 {
-    async fn find_by_id(&self, id: &str) -> Result<Option<T>, FerroxError> {
+    async fn find_by_id(&self, id: String) -> Result<Option<T>, AppError> {
         let url = format!("{}/{}/{}.json", self.base_url, self.collection, id);
-        let res = self.client.get(&url).send().await.map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
+        let res = self.client.get(&url).send().await.map_err(|e| AppError::DatabaseError(e.to_string()))?;
         
         if res.status().is_success() {
-            let entity: Option<T> = res.json().await.map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
+            let entity: Option<T> = res.json().await.map_err(|e| AppError::DatabaseError(e.to_string()))?;
             Ok(entity)
         } else {
             Ok(None)
         }
     }
 
-    async fn save(&self, entity: &T) -> Result<(), FerroxError> {
-        // For demonstration, let's assume T has a way to get its ID, or we auto-generate.
-        // In a real implementation we'd require an Entity trait with `get_id()`.
+    async fn find_all(&self) -> Result<Vec<T>, AppError> {
         let url = format!("{}/{}.json", self.base_url, self.collection);
+        let res = self.client.get(&url).send().await.map_err(|e| AppError::DatabaseError(e.to_string()))?;
         
-        let _res = self.client.post(&url)
-            .json(entity)
-            .send()
-            .await
-            .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
-            
-        Ok(())
+        if res.status().is_success() {
+            let map: std::collections::HashMap<String, T> = res.json().await.map_err(|e| AppError::DatabaseError(e.to_string()))?;
+            Ok(map.into_values().collect())
+        } else {
+            Ok(vec![])
+        }
     }
 
-    async fn delete(&self, id: &str) -> Result<(), FerroxError> {
-        let url = format!("{}/{}/{}.json", self.base_url, self.collection, id);
-        let _res = self.client.delete(&url)
+    async fn insert(&self, entity: T) -> Result<T, AppError> {
+        let url = format!("{}/{}.json", self.base_url, self.collection);
+        
+        self.client.post(&url)
+            .json(&entity)
             .send()
             .await
-            .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
+            .map_err(|e| AppError::DatabaseError(e.to_string()))?;
+            
+        Ok(entity)
+    }
+
+    async fn update(&self, id: String, entity: T) -> Result<T, AppError> {
+        let url = format!("{}/{}/{}.json", self.base_url, self.collection, id);
+        
+        self.client.put(&url)
+            .json(&entity)
+            .send()
+            .await
+            .map_err(|e| AppError::DatabaseError(e.to_string()))?;
+            
+        Ok(entity)
+    }
+
+    async fn delete(&self, id: String) -> Result<(), AppError> {
+        let url = format!("{}/{}/{}.json", self.base_url, self.collection, id);
+        self.client.delete(&url)
+            .send()
+            .await
+            .map_err(|e| AppError::DatabaseError(e.to_string()))?;
             
         Ok(())
     }

@@ -13,7 +13,10 @@ aws-config = "1.1"
 aws-sdk-secretsmanager = "1.21"
 aws-sdk-s3 = "1.21"
 google-cloud-storage = "0.13"
-google-cloud-secretmanager = "0.3"
-google-cloud-default = "0.4"
+google-cloud-auth = "0.11"
+google-cloud-token = "0.1"
+reqwest = { version = "0.12", features = ["json"] }
+serde_json = "1.0"
+base64 = "0.22"
 tokio = { workspace = true, features = ["full"] }
 ferrox-errors = { version = "0.7.0", path = "../../ferrox-errors"  }

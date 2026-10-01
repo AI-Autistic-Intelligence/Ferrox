@@ -54,11 +54,11 @@ where
         }
 
         let res = req.send().await
-            .map_err(|e| AppError::Internal(format!("DynamoDB GetItem Error: {}", e)))?;
+            .map_err(|e| AppError::InternalError(format!("DynamoDB GetItem Error: {}", e)))?;
 
         if let Some(item) = res.item {
             let parsed: T = serde_dynamo::aws_sdk_dynamodb_1::from_item(item)
-                .map_err(|e| AppError::Internal(format!("DynamoDB Deserialization Error: {}", e)))?;
+                .map_err(|e| AppError::InternalError(format!("DynamoDB Deserialization Error: {}", e)))?;
             Ok(Some(parsed))
         } else {
             Ok(None)
@@ -71,13 +71,13 @@ where
             .table_name(&self.table_name)
             .send()
             .await
-            .map_err(|e| AppError::Internal(format!("DynamoDB Scan Error: {}", e)))?;
+            .map_err(|e| AppError::InternalError(format!("DynamoDB Scan Error: {}", e)))?;
 
         let mut entities = Vec::new();
         if let Some(items) = res.items {
             for item in items {
                 let parsed: T = serde_dynamo::aws_sdk_dynamodb_1::from_item(item)
-                    .map_err(|e| AppError::Internal(format!("DynamoDB Deserialization Error: {}", e)))?;
+                    .map_err(|e| AppError::InternalError(format!("DynamoDB Deserialization Error: {}", e)))?;
                 entities.push(parsed);
             }
         }
@@ -86,14 +86,14 @@ where
 
     async fn insert(&self, entity: T) -> Result<T, AppError> {
         let item = serde_dynamo::aws_sdk_dynamodb_1::to_item(entity.clone())
-            .map_err(|e| AppError::Internal(format!("DynamoDB Serialization Error: {}", e)))?;
+            .map_err(|e| AppError::InternalError(format!("DynamoDB Serialization Error: {}", e)))?;
 
         self.client.put_item()
             .table_name(&self.table_name)
             .set_item(Some(item))
             .send()
             .await
-            .map_err(|e| AppError::Internal(format!("DynamoDB PutItem Error: {}", e)))?;
+            .map_err(|e| AppError::InternalError(format!("DynamoDB PutItem Error: {}", e)))?;
 
         Ok(entity)
     }
@@ -114,7 +114,7 @@ where
         }
 
         req.send().await
-            .map_err(|e| AppError::Internal(format!("DynamoDB DeleteItem Error: {}", e)))?;
+            .map_err(|e| AppError::InternalError(format!("DynamoDB DeleteItem Error: {}", e)))?;
             
         Ok(())
     }

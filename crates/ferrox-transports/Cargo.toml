@@ -11,7 +11,7 @@ description = "Multi-protocol transport abstractions (HTTP, gRPC, WebSockets, FT
 [features]
 default = ["http", "grpc", "ftp"]
 http = ["dep:axum", "dep:tokio"]
-grpc = ["dep:tonic", "dep:prost", "dep:tokio"]
+grpc = ["dep:tonic", "dep:prost", "dep:tokio", "dep:tonic-health"]
 ftp = ["dep:suppaftp", "dep:tokio"]
 
 [dependencies]
@@ -24,4 +24,5 @@ axum = { version = "0.7", features = ["ws"], optional = true }
 tokio = { version = "1.35", features = ["full"], optional = true }
 tonic = { version = "0.10", optional = true }
 prost = { version = "0.12", optional = true }
+tonic-health = { version = "0.10", optional = true }
 suppaftp = { version = "5.2", features = ["async"], optional = true }

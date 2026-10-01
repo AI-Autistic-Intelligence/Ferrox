@@ -4,7 +4,7 @@ use ferrox_errors::AppError;
 #[allow(unused_imports)]
 use suppaftp::AsyncFtpStream;
 
-/// Placeholder for an FTP Background Worker/Transport
+/// FTP Background Worker/Transport implementation
 pub struct FtpTransport {
     pub server_addr: String,
 }

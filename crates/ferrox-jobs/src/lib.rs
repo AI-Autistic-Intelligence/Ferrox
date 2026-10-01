@@ -18,11 +18,11 @@ impl Job for BackgroundJob {
 }
 
 pub async fn start_worker(redis_url: &str) -> Result<(), AppError> {
-    let storage = RedisStorage::new(
-        apalis::redis::Config::default().set_url(redis_url)
-    )
-    .await
-    .map_err(|e| AppError::Internal(format!("Redis Job Storage Error: {}", e)))?;
+    let client = redis::Client::open(redis_url)
+        .map_err(|e| AppError::InternalError(format!("Invalid Redis URL: {}", e)))?;
+    let conn = redis::aio::ConnectionManager::new(client).await
+        .map_err(|e| AppError::InternalError(format!("Redis Conn Error: {}", e)))?;
+    let storage = RedisStorage::new(conn);
 
     tracing::info!("Starting Apalis Worker on {}", redis_url);
     
@@ -30,17 +30,17 @@ pub async fn start_worker(redis_url: &str) -> Result<(), AppError> {
         .with_storage(storage)
         .build_fn(process_job);
 
-    apalis::prelude::Monitor::new()
+    apalis::prelude::Monitor::<apalis::prelude::TokioExecutor>::new()
         .register(worker)
-        .run()
+        .run_with_signal(tokio::signal::ctrl_c())
         .await
-        .map_err(|e| AppError::Internal(format!("Worker crashed: {}", e)))?;
+        .map_err(|e| AppError::InternalError(format!("Worker crashed: {}", e)))?;
 
     Ok(())
 }
 
 /// The actual job processing logic
-async fn process_job(job: BackgroundJob, _ctx: apalis::prelude::Context<()>) -> Result<(), apalis::prelude::Error> {
+async fn process_job(job: BackgroundJob) -> Result<(), std::io::Error> {
     tracing::info!("Processing Job: {} with payload: {}", job.task_name, job.payload);
     // Add real execution logic here
     Ok(())

@@ -3,56 +3,30 @@
 //! `ferrox-i18n` provides backend internationalization (i18n) for translating error messages and localized responses based on HTTP `Accept-Language` headers.
 //!
 //! ## Key Features
-use fluent::{FluentBundle, FluentResource};
-use intl_memoizer::concurrent::IntlLangMemoizer;
-use std::collections::HashMap;
-use std::sync::Arc;
+// Using rust-i18n for robust, macro-based, compile-time checked translations.
+// Requires a `locales/` directory in the project root.
+rust_i18n::i18n!("locales", fallback = "en");
 
-/// The i18n translation engine parsing and localizing strings via Project Fluent.
+/// The i18n translation engine parsing and localizing strings.
+#[derive(Clone)]
 pub struct Translator {
     default_lang: String,
-    bundles: HashMap<String, Arc<FluentBundle<FluentResource, IntlLangMemoizer>>>,
 }
 
 impl Translator {
-    /// Loads translation catalogs from memory or disk (Fluent FTL format)
+    /// Initializes the Translation engine.
+    /// In production, `rust_i18n` automatically loads `locales/*.yml` or `locales/*.json`.
     pub fn new(default_lang: &str) -> Self {
-        let mut bundles = HashMap::new();
-        
-        // Example fluent string for English
-        let en_source = "welcome = Welcome to Ferrox\nerror-not-found = Resource missing";
-        let en_res = FluentResource::try_new(en_source.to_string()).expect("Failed to parse FTL");
-        let mut en_bundle = FluentBundle::new_concurrent(vec!["en".parse().unwrap()]);
-        en_bundle.add_resource(en_res).unwrap();
-        bundles.insert("en".to_string(), Arc::new(en_bundle));
-
-        // Example fluent string for Italian
-        let it_source = "welcome = Benvenuto in Ferrox\nerror-not-found = Risorsa mancante";
-        let it_res = FluentResource::try_new(it_source.to_string()).expect("Failed to parse FTL");
-        let mut it_bundle = FluentBundle::new_concurrent(vec!["it".parse().unwrap()]);
-        it_bundle.add_resource(it_res).unwrap();
-        bundles.insert("it".to_string(), Arc::new(it_bundle));
-
+        // Sets the global default language for rust-i18n
+        rust_i18n::set_locale(default_lang);
         Self {
             default_lang: default_lang.to_string(),
-            bundles,
         }
     }
 
     /// Resolves a message using the Accept-Language header fallback logic
     pub fn get_message(&self, lang_header: Option<&str>, key: &str) -> String {
         let lang = lang_header.unwrap_or(&self.default_lang);
-        let bundle = self.bundles.get(lang).unwrap_or_else(|| self.bundles.get(&self.default_lang).unwrap());
-
-        if let Some(msg) = bundle.get_message(key) {
-            if let Some(pattern) = msg.value() {
-                let mut errors = vec![];
-                let value = bundle.format_pattern(pattern, None, &mut errors);
-                if errors.is_empty() {
-                    return value.to_string();
-                }
-            }
-        }
-        format!("[Missing Translation: {}]", key)
+        rust_i18n::t!(key, locale = lang).to_string()
     }
 }

@@ -39,6 +39,7 @@ pub mod merkle;
 pub mod merkle_audit_chain;
 pub use merkle_audit_chain::{AuditLogRecord, MerkleAuditChain};
 
+#[derive(Clone, serde::Deserialize)]
 pub struct LoggerConfig {
     pub service_name: String,
     pub environment: String,
