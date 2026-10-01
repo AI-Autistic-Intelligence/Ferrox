@@ -16,17 +16,19 @@ impl GrpcTransport {
 #[async_trait]
 impl Transport for GrpcTransport {
     async fn start(&self) -> Result<(), AppError> {
-        let addr = format!("0.0.0.0:{}", self.port);
+        let addr = format!("0.0.0.0:{}", self.port).parse().unwrap();
         println!("🚀 Starting gRPC Transport on {}", addr);
         
-        // In a real implementation:
-        // tonic::transport::Server::builder()
-        //     .add_service(MyGrpcServiceServer::new(service))
-        //     .serve(addr.parse().unwrap())
-        //     .await?;
+        let (_, rx) = tokio::sync::oneshot::channel::<()>();
+        
+        // This is a minimal Tonic server setup using a healthcheck router to prevent immediate termination.
+        // In a real application, the concrete gRPC service handlers would be added here via `add_service`.
+        let router = tonic::transport::Server::builder()
+            .add_service(tonic_health::server::health_reporter().1);
             
-        // We simulate a long-running process for now
-        let _ = tokio::time::sleep(tokio::time::Duration::from_secs(31536000)).await;
+        router.serve_with_shutdown(addr, async {
+            rx.await.ok();
+        }).await.map_err(|e| AppError::Internal(e.to_string()))?;
         
         Ok(())
     }

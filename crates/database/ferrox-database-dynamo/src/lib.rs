@@ -39,18 +39,34 @@ where
             .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
 
         if let Some(item) = res.item {
-            // Simplified: convert HashMap<String, AttributeValue> to JSON then to T
-            // In a real scenario, use serde_dynamo
-            Ok(None) // Placeholder for actual deserialization
+            let json_val = serde_json::to_value(
+                item.into_iter()
+                    .map(|(k, v)| (k, format!("{:?}", v))) // Simplified conversion
+                    .collect::<std::collections::HashMap<_, _>>()
+            ).map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
+
+            let parsed: T = serde_json::from_value(json_val)
+                .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
+            Ok(Some(parsed))
         } else {
             Ok(None)
         }
     }
 
     async fn save(&self, entity: &T) -> Result<(), FerroxError> {
-        // Placeholder for serializing T into DynamoDB Item HashMap
+        let json_val = serde_json::to_value(entity)
+            .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;
+            
+        let mut item = std::collections::HashMap::new();
+        if let Some(obj) = json_val.as_object() {
+            for (k, v) in obj {
+                item.insert(k.clone(), AttributeValue::S(v.to_string()));
+            }
+        }
+
         let _req = self.client.put_item()
             .table_name(&self.table_name)
+            .set_item(Some(item))
             .send()
             .await
             .map_err(|e| FerroxError::DatabaseError(e.to_string()))?;

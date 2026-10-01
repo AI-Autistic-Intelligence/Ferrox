@@ -17,9 +17,26 @@ impl Job for BackgroundJob {
     const NAME: &'static str = "ferrox::BackgroundJob";
 }
 
-/// Helper to configure and run the Apalis worker
-pub async fn start_worker(_redis_url: &str) -> Result<(), AppError> {
-    todo!("Apalis worker setup will be provided in a future release.")
+pub async fn start_worker(redis_url: &str) -> Result<(), AppError> {
+    let storage = RedisStorage::new(
+        apalis::redis::Config::default().set_url(redis_url)
+    )
+    .await
+    .map_err(|e| AppError::Internal(format!("Redis Job Storage Error: {}", e)))?;
+
+    tracing::info!("Starting Apalis Worker on {}", redis_url);
+    
+    let worker = WorkerBuilder::new("ferrox-default-worker")
+        .with_storage(storage)
+        .build_fn(process_job);
+
+    apalis::prelude::Monitor::new()
+        .register(worker)
+        .run()
+        .await
+        .map_err(|e| AppError::Internal(format!("Worker crashed: {}", e)))?;
+
+    Ok(())
 }
 
 /// The actual job processing logic
