@@ -1493,7 +1493,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-ferrox"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "clap",
@@ -2383,7 +2383,7 @@ checksum = "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223"
 
 [[package]]
 name = "ferrox-app"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "axum 0.7.9",
  "ferrox-errors",
@@ -2397,7 +2397,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-circuit-breaker"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "tokio",
@@ -2406,7 +2406,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-cloud-helpers"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "aws-config",
  "aws-sdk-s3",
@@ -2423,7 +2423,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-config"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "figment",
@@ -2433,7 +2433,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-cqrs"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2443,7 +2443,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-crud-gen"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "proc-macro2",
@@ -2457,7 +2457,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-database-core"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2465,7 +2465,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-database-dynamo"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "aws-sdk-dynamodb",
@@ -2480,7 +2480,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-database-firebase"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-database-core",
@@ -2494,7 +2494,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-database-mongo"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-database-core",
  "ferrox-errors",
@@ -2505,7 +2505,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-database-redis"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "bb8",
  "bb8-redis",
@@ -2519,7 +2519,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-database-seaorm"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-database-core",
  "ferrox-errors",
@@ -2529,7 +2529,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-datagrid"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-graphql",
  "bson",
@@ -2542,7 +2542,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-errors"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "axum 0.7.9",
  "http 1.5.0",
@@ -2553,7 +2553,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-events"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2564,7 +2564,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-feature-flags"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "redis",
@@ -2575,7 +2575,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-graphql"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-graphql",
  "ferrox-database-core",
@@ -2586,7 +2586,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-guards"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "axum 0.7.9",
@@ -2599,7 +2599,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-health"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "axum 0.7.9",
  "chrono",
@@ -2611,7 +2611,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-i18n"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "axum 0.7.9",
  "rust-i18n",
@@ -2621,7 +2621,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-integrations"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2629,7 +2629,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-interceptors"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "axum 0.7.9",
@@ -2643,7 +2643,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-jobs"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "apalis",
  "ferrox-errors",
@@ -2655,7 +2655,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-logger"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "ferrox-errors",
@@ -2674,7 +2674,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-mailer"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "lettre",
@@ -2682,7 +2682,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-metrics"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "metrics",
@@ -2692,7 +2692,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-migrations"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "sea-orm-migration",
  "tokio",
@@ -2701,7 +2701,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-notifications-slack"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2710,7 +2710,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-payments-google"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "reqwest 0.12.28",
@@ -2720,7 +2720,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-payments-stripe"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2730,7 +2730,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-rate-limiter"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "redis",
@@ -2740,7 +2740,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-reports"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "csv",
  "ferrox-errors",
@@ -2750,7 +2750,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-saas-backend"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2781,7 +2781,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-saga"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2791,7 +2791,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-schedule"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "tokio",
@@ -2801,7 +2801,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-search"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-errors",
@@ -2812,7 +2812,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-security"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "argon2",
  "axum 0.7.9",
@@ -2833,7 +2833,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-sentinel"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "axum 0.8.9",
  "chrono",
@@ -2871,7 +2871,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-singleflight"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "dashmap",
  "ferrox-errors",
@@ -2881,7 +2881,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-sse"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "axum 0.7.9",
  "futures",
@@ -2891,7 +2891,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-storage"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "aws-sdk-s3",
@@ -2903,7 +2903,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-sync"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "ferrox-database-redis",
@@ -2916,7 +2916,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-tracing"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "opentelemetry",
  "opentelemetry-otlp",
@@ -2928,7 +2928,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-transports"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "axum 0.7.9",
@@ -2943,7 +2943,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-types"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "serde",
@@ -2953,7 +2953,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-utils"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "convert_case 0.6.0",
@@ -2964,7 +2964,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-validation"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "axum 0.7.9",
@@ -2975,7 +2975,7 @@ dependencies = [
 
 [[package]]
 name = "ferrox-webhooks"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "ferrox-errors",
  "hex",

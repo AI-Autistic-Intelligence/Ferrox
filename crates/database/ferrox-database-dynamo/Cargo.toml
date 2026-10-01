@@ -10,8 +10,8 @@ documentation.workspace = true
 description = "DynamoDB NoSQL repository connector for Ferrox ecosystem."
 
 [dependencies]
-ferrox-database-core = { version = "0.7.0", path = "../ferrox-database-core" }
-ferrox-errors = { version = "0.7.0", path = "../../ferrox-errors" }
+ferrox-database-core = { version = "0.8.0", path = "../ferrox-database-core" }
+ferrox-errors = { version = "0.8.0", path = "../../ferrox-errors" }
 tokio = { workspace = true }
 async-trait = { workspace = true }
 log = "0.4"
