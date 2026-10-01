@@ -15,6 +15,8 @@ members = [
     "crates/database/ferrox-database-seaorm",
     "crates/database/ferrox-database-mongo",
     "crates/database/ferrox-database-redis",
+    "crates/database/ferrox-database-dynamo",
+    "crates/database/ferrox-database-firebase",
     "crates/ferrox-datagrid",
     "crates/ferrox-validation",
     "crates/ferrox-saga",

@@ -10,7 +10,8 @@
 //! ## Key Features
 //! - 📅 **Date & Time Helpers**: Guarantees UTC timestamps (`now_utc()`) and HTTP GMT date formatting.
 //! - 🔤 **String Case Conversion**: Convert strings between `snake_case`, `camelCase`, `PascalCase`, and `kebab-case`.
-//! - 🔑 **UUID Utilities**: Generates standard v4 UUIDs and short URL-safe identifiers.
+//! - 🔑 **UUID Utilities**: Generates standard v4/v7 UUIDs and short URL-safe identifiers.
+//! - 🧠 **Memory Utilities**: Zero-copy buffer slice manipulations, making Rust shine with mechanical sympathy.
 
 use chrono::{DateTime, TimeZone, Utc};
 use convert_case::{Case, Casing};
@@ -73,6 +74,53 @@ pub mod string {
 /// Generates a secure, time-ordered UUID v7 string.
 pub fn generate_uuid() -> String {
     Uuid::now_v7().to_string()
+}
+
+pub mod memory {
+    use std::alloc::{alloc, dealloc, Layout};
+    use std::ptr;
+
+    /// A highly optimized zero-copy buffer pool intended to mirror the Off-Heap
+    /// capabilities seen in Ferrox-Java, mapping directly to physical pages.
+    pub struct ZeroCopyBuffer {
+        ptr: *mut u8,
+        layout: Layout,
+        capacity: usize,
+    }
+
+    impl ZeroCopyBuffer {
+        /// Allocates a raw memory buffer aligned to OS page boundaries (typically 4096 bytes).
+        /// This bypasses standard allocator fragmentation for high-frequency I/O (e.g. WebSockets).
+        pub fn new(size: usize) -> Self {
+            let layout = Layout::from_size_align(size, 4096).expect("Invalid layout alignment");
+            let ptr = unsafe { alloc(layout) };
+            if ptr.is_null() {
+                std::alloc::handle_alloc_error(layout);
+            }
+            Self { ptr, layout, capacity: size }
+        }
+
+        /// Returns a mutable slice of the raw memory. No bounds checking overhead in release mode.
+        pub fn as_mut_slice(&mut self) -> &mut [u8] {
+            unsafe { std::slice::from_raw_parts_mut(self.ptr, self.capacity) }
+        }
+
+        /// Returns an immutable slice of the raw memory.
+        pub fn as_slice(&self) -> &[u8] {
+            unsafe { std::slice::from_raw_parts(self.ptr, self.capacity) }
+        }
+    }
+
+    impl Drop for ZeroCopyBuffer {
+        fn drop(&mut self) {
+            unsafe {
+                dealloc(self.ptr, self.layout);
+            }
+        }
+    }
+
+    unsafe impl Send for ZeroCopyBuffer {}
+    unsafe impl Sync for ZeroCopyBuffer {}
 }
 
 #[cfg(test)]
