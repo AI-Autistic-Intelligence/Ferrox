@@ -28,3 +28,7 @@ test_report.html
 ferrox_pentest_report.md
 *.md.tmp
 *.html.tmp
+
+# Additional protections
+[Dd]esktop.ini
+*.pdb
