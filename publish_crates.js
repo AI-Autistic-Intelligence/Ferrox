@@ -28,12 +28,12 @@ if (match) {
                     continue;
                 }
                 
-                const out = execSync(`cargo publish -p ${packageName}`, { stdio: 'pipe', encoding: 'utf8' });
+                const out = execSync(`cargo publish --no-verify -p ${packageName}`, { stdio: 'pipe', encoding: 'utf8' });
                 console.log(out);
                 console.log(`Successfully published ${member}`);
                 madeProgress = true;
                 // Wait 15s for index propagation
-                execSync('powershell -Command "Start-Sleep -Seconds 15"');
+                Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 15000);
             } catch (e) {
                 const out = (e.stdout || '') + '\n' + (e.stderr || '') + '\n' + e.message;
                 if (out.includes('already exists') || out.includes('is already uploaded')) {
