@@ -28,19 +28,24 @@ if (match) {
                     continue;
                 }
                 
-                const out = execSync(`cargo publish --no-verify -p ${packageName}`, { stdio: 'pipe', encoding: 'utf8' });
+                const out = execSync(`cargo publish -p ${packageName} --no-verify`, { stdio: 'pipe', encoding: 'utf8' });
                 console.log(out);
                 console.log(`Successfully published ${member}`);
                 madeProgress = true;
                 // Wait 15s for index propagation
-                Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 15000);
+                execSync('powershell -Command "Start-Sleep -Seconds 15"');
             } catch (e) {
                 const out = (e.stdout || '') + '\n' + (e.stderr || '') + '\n' + e.message;
                 if (out.includes('already exists') || out.includes('is already uploaded')) {
                     console.log(`Already published: ${member}`);
                     madeProgress = true; // Still counts as progressing since it's done
+                } else if (out.includes('429') || out.includes('Too Many Requests')) {
+                    console.log(`Rate limited on ${member}, waiting 60s before retry...`);
+                    execSync('powershell -Command "Start-Sleep -Seconds 60"');
+                    nextMembers.push(member);
+                    madeProgress = true;
                 } else {
-                    console.log(`Failed to publish (maybe dependency missing?): ${member}`);
+                    console.log(`Failed to publish: ${member}\n${out}`);
                     nextMembers.push(member);
                 }
             }

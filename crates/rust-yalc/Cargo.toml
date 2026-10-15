@@ -1,6 +1,6 @@
 [package]
 name = "rust-yalc"
-version = "0.1.0"
+version.workspace = true
 edition = "2021"
 description = "Rust YALC module for Ferrox ecosystem"
 authors.workspace = true
