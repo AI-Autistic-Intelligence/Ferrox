@@ -28,13 +28,15 @@ if (match) {
                     continue;
                 }
                 
-                execSync(`cargo publish --allow-dirty -p ${packageName}`, { stdio: 'inherit' });
+                const out = execSync(`cargo publish -p ${packageName}`, { stdio: 'pipe', encoding: 'utf8' });
+                console.log(out);
                 console.log(`Successfully published ${member}`);
                 madeProgress = true;
+                // Wait 15s for index propagation
+                execSync('powershell -Command "Start-Sleep -Seconds 15"');
             } catch (e) {
-                const out = e.stdout ? e.stdout.toString() : '';
-                const err = e.stderr ? e.stderr.toString() : '';
-                if (err.includes('already exists') || err.includes('is already uploaded')) {
+                const out = (e.stdout || '') + '\n' + (e.stderr || '') + '\n' + e.message;
+                if (out.includes('already exists') || out.includes('is already uploaded')) {
                     console.log(`Already published: ${member}`);
                     madeProgress = true; // Still counts as progressing since it's done
                 } else {
