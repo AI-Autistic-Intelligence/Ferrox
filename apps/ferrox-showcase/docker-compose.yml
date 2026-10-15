@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  showcase:
+    build:
+      context: ../..
+      dockerfile: apps/ferrox-showcase/Dockerfile
+    container_name: ferrox-showcase
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - FERROX_SERVER_PORT=3000
+      - FERROX_JWT_SECRET=super_secret_key_that_is_32_bytes_long_12345678901234567890
+      - RUST_LOG=info
+    networks:
+      - ferrox-showcase-net
+
+networks:
+  ferrox-showcase-net:
+    driver: bridge

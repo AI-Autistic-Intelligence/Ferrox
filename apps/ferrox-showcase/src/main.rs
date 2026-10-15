@@ -8,15 +8,14 @@ use tracing::info;
 
 use ferrox_app::FerroxApp;
 use ferrox_transports::http::HttpTransport;
-use ferrox_logger::{setup_logger, LoggerConfig};
+use ferrox_logger::setup_logger;
 use ferrox_security::PasetoAuth;
 
 use crate::config::AppConfig;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // 1. Load Configuration (from .env or default.toml)
-    // We mock it for the showcase if not present
+    // 1. Load Configuration
     std::env::set_var("FERROX_SERVER_PORT", "3000");
     std::env::set_var("FERROX_JWT_SECRET", "super_secret_key_that_is_32_bytes_long_12345678901234567890");
     std::env::set_var("FERROX_LOGGER.SERVICE_NAME", "ferrox-showcase");
@@ -33,21 +32,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let secret = Secret::new(config.jwt_secret);
     let paseto_auth = Arc::new(PasetoAuth::new(secret).unwrap());
 
-    // 4. Assemble Router
+    // 4. Assemble Router with Health Probes & OpenAPI Swagger Docs
     let app_router = Router::new()
         .merge(modules::health::router())
+        .merge(modules::docs::router())
         .nest("/api/v1/auth", modules::auth::router(paseto_auth));
 
     // 5. Setup HTTP Transport with Zero Trust CORS
     let http_transport = HttpTransport::new(app_router, config.server_port)
         .with_strict_cors(vec!["http://localhost:8080", "https://myfrontend.com"]);
 
-    // 6. Bootstrap Ferrox App Lifecycle Manager
+    info!("⚡ Ferrox HTTP Transport listening on port {}", config.server_port);
+    info!("📖 OpenAPI Swagger UI available at http://localhost:{}/docs", config.server_port);
+    info!("🩺 Health probes available at /health/live and /health/ready");
+
+    // 6. Bootstrap Ferrox App Lifecycle Manager (handles SIGINT/SIGTERM gracefully)
     info!("Starting Ferrox lifecycle manager...");
     let app = FerroxApp::new()
         .add_transport(http_transport);
 
-    // This will block and wait for SIGINT/SIGTERM for graceful shutdown
     app.start().await?;
 
     Ok(())

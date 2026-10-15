@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  saas-backend:
+    build:
+      context: ../..
+      dockerfile: apps/ferrox-saas-backend/Dockerfile
+    container_name: ferrox-saas-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - FERROX_PORT=8080
+      - FERROX_ENV=production
+      - FERROX_JWT_SECRET=super_secret_ferrox_paseto_key_32_bytes!!
+      - FERROX_DB_ENGINE=sql
+      - DATABASE_URL=postgres://postgres:ferrox_secret@postgres:5432/ferrox_saas
+      - REDIS_URL=redis://redis:6379
+      - RUST_LOG=info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ferrox-saas-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ferrox-saas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ferrox_saas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ferrox_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ferrox_saas"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - ferrox-saas-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: ferrox-saas-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - ferrox-saas-net
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: ferrox-saas-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    networks:
+      - ferrox-saas-net
+
+volumes:
+  pgdata:
+
+networks:
+  ferrox-saas-net:
+    driver: bridge

@@ -1,10 +1,9 @@
 use ferrox_saas_backend::{config, modules, persistence};
 
-use axum::{middleware, routing::get, Json, Router};
+use axum::{middleware, Router};
 use ferrox_app::FerroxApp;
 use ferrox_logger::{setup_logger, LoggerConfig};
 use ferrox_transports::http::HttpTransport;
-use serde_json::json;
 use std::sync::Arc;
 use tracing::info;
 
@@ -34,7 +33,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Assemble API Routes
     #[allow(unused_mut)]
     let mut api_routes = Router::new()
-        .route("/health", get(|| async { Json(json!({ "status": "UP", "framework": "Ferrox Framework v0.1.2" })) }))
+        .merge(modules::docs::router())
+        .nest("/health", modules::health::router(config.clone()))
         .nest("/api/v1/auth", modules::auth::router(paseto_auth, user_repo.clone()))
         .nest("/api/v1/users", modules::users::router(user_repo.clone()))
         .nest("/api/v1/admin", modules::admin::router(user_repo.clone()))
@@ -55,8 +55,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_strict_cors(config.cors_origins.iter().map(|s| s.as_str()).collect());
 
     info!("⚡ Ferrox HTTP Server listening on port {}", config.server_port);
+    info!("📖 OpenAPI Swagger UI available at http://localhost:{}/docs", config.server_port);
+    info!("🩺 Health Probes available at /health/live and /health/ready");
 
-    // Start Ferrox Application Lifecycle Orchestrator
+    // Start Ferrox Application Lifecycle Orchestrator (handles SIGINT/SIGTERM gracefully)
     FerroxApp::new()
         .add_transport(http_transport)
         .start()
