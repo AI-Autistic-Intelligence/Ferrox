@@ -60,10 +60,14 @@ pub fn execute(cmd: TestCommand) -> io::Result<()> {
 
     // Phase 2: Cargo Test Runner
     println!("\n🚀 Phase 2: Executing Rust Test Suite with strict zero-failure policy...");
-    let mut cargo_args = vec!["test", "--all"];
+    let mut cargo_args = vec!["test"];
     if let Some(ref f) = cmd.filter {
-        cargo_args.push("--");
-        cargo_args.push(f.as_str());
+        if f.starts_with('-') {
+            cargo_args.push(f.as_str());
+        } else {
+            cargo_args.push("--");
+            cargo_args.push(f.as_str());
+        }
     }
 
     let status = Command::new("cargo")

@@ -52,6 +52,7 @@ members = [
     "apps/ferrox-saas-backend",
     "crates/rust-yalc",
     "crates/ferrox-sentinel",
+    "apps/ferrox-settlement-hub",
 ]
 
 [workspace.package]

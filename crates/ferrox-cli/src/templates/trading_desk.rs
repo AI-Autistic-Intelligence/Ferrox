@@ -253,8 +253,9 @@ mod tests {
 "#;
     write_file(&target_dir.join("src/lib.rs"), lib_rs)?;
 
+    let crate_ident = name.replace('-', "_");
     let main_rs = format!(r#"//! {name} Trading Desk Server
-use {name}::orderbook::{{OrderBook, Side}};
+use {crate_ident}::orderbook::{{OrderBook, Side}};
 
 #[tokio::main]
 async fn main() {{

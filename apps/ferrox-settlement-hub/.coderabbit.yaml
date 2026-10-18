@@ -1,0 +1,13 @@
+# CodeRabbit configuration for Ferrox Ecosystem
+language: en-US
+tone_instructions: "Rigorous senior staff architect review enforcing Ferrox DDD and zero debug debris."
+reviews:
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+chat:
+  auto_reply: true

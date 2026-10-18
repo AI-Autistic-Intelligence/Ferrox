@@ -1,0 +1,19 @@
+[package]
+name = "ferrox-settlement-hub"
+version = "0.1.0"
+template = "clean-service"
+runtime = "rust"
+description = "Ferrox Hexagonal Domain-Driven Microservice"
+
+[architecture]
+pattern = "hexagonal-ddd"
+pure_domain = true
+enforce_purity = true
+
+[security]
+paseto_v4 = true
+sentinel_entropy_threshold = 4.8
+
+[quality]
+min_coverage = 100
+forbid_debug = true

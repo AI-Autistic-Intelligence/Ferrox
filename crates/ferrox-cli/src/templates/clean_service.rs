@@ -234,8 +234,9 @@ pub mod application;
 "#;
     write_file(&target_dir.join("src/lib.rs"), lib_rs)?;
 
+    let crate_ident = name.replace('-', "_");
     let main_rs = format!(r#"//! {name} Entry Point
-use {name}::application::{{CreateOrderCommand, OrderApplicationService}};
+use {crate_ident}::application::{{CreateOrderCommand, OrderApplicationService}};
 
 #[tokio::main]
 async fn main() {{
