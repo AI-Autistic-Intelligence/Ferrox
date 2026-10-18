@@ -8,7 +8,7 @@ use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use cargo_ferrox::commands::{check, codex, dev, new, test};
+use cargo_ferrox::commands::{check, codex, dev, mesh, new, test};
 use cargo_ferrox::templates::ProjectTemplate;
 
 #[derive(Parser, Debug)]
@@ -35,8 +35,11 @@ enum Commands {
     /// Run test suite with strict 100% coverage and zero-debug-debris checks
     Test(TestArgs),
 
-    /// Audit architectural DDD domain purity (forbids ORM/HTTP framework coupling)
+    /// Audit architectural DDD domain purity and Sentinel security compliance
     Check(CheckArgs),
+
+    /// Living Mesh Orchestrator & Chaos Engine (local Redpanda, Redis, zero cloud cost)
+    Mesh(MeshArgs),
 
     /// Preview project documentation on local Ferrox-Codex
     Codex(CodexArgs),
@@ -110,13 +113,63 @@ struct TestArgs {
 
 #[derive(Args, Debug)]
 struct CheckArgs {
-    /// Fail with exit code 1 if any DDD architecture violations are found
+    /// Fail with exit code 1 if any DDD architecture or security violations are found
     #[arg(short, long)]
     strict: bool,
+
+    /// Execute Ferrox Sentinel Security Audit (Shannon entropy, PASETO v4, OWASP WSTG v5.0)
+    #[arg(long)]
+    security: bool,
 
     /// Target directory to inspect (defaults to current dir)
     #[arg(short, long)]
     path: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+struct MeshArgs {
+    #[command(subcommand)]
+    command: MeshSubcommands,
+}
+
+#[derive(Subcommand, Debug)]
+enum MeshSubcommands {
+    /// Start local mesh infrastructure (docker-compose Redpanda/Redis) & print ASCII health check
+    Up {
+        /// Target docker-compose file (defaults to auto-discovering in workspace)
+        #[arg(short, long)]
+        compose_file: Option<PathBuf>,
+        /// Dry run: display topology without executing containers
+        #[arg(long)]
+        dry_run: bool,
+    },
+    /// Stop and safely clean up local mesh infrastructure
+    Down {
+        /// Target docker-compose file
+        #[arg(short, long)]
+        compose_file: Option<PathBuf>,
+        /// Dry run: display cleanup steps without executing docker
+        #[arg(long)]
+        dry_run: bool,
+    },
+    /// Query Kafka/Redpanda consumer lag, topic offsets, and memory of services
+    Status {
+        /// Filter by runtime: match, py, java, php, node, redpanda, redis
+        #[arg(short, long)]
+        runtime: Option<String>,
+    },
+    /// Inject anomaly scenario for automated resilience tests: double-spend, timeout, worker-kill
+    Chaos {
+        /// Scenario: double-spend, timeout, worker-kill
+        #[arg(short, long, default_value = "double-spend")]
+        scenario: String,
+        /// Target service: match, java, php, node
+        #[arg(short, long, default_value = "php")]
+        target: String,
+        /// Duration in ms for timeout scenarios
+        #[arg(long, default_value = "2500")]
+        duration_ms: u64,
+    },
 }
 
 #[derive(Args, Debug)]
@@ -181,8 +234,26 @@ fn main() -> ExitCode {
         }),
         Commands::Check(args) => check::execute(check::CheckCommand {
             strict: args.strict,
+            security: args.security,
             path: args.path,
         }),
+        Commands::Mesh(args) => {
+            let subcommand = match args.command {
+                MeshSubcommands::Up { compose_file, dry_run } => {
+                    mesh::MeshSubcommand::Up(mesh::MeshUpOptions { compose_file, dry_run })
+                }
+                MeshSubcommands::Down { compose_file, dry_run } => {
+                    mesh::MeshSubcommand::Down(mesh::MeshDownOptions { compose_file, dry_run })
+                }
+                MeshSubcommands::Status { runtime } => {
+                    mesh::MeshSubcommand::Status(mesh::MeshStatusOptions { runtime })
+                }
+                MeshSubcommands::Chaos { scenario, target, duration_ms } => {
+                    mesh::MeshSubcommand::Chaos(mesh::MeshChaosOptions { scenario, target, duration_ms })
+                }
+            };
+            mesh::execute(mesh::MeshCommand { subcommand })
+        }
         Commands::Codex(args) => codex::execute(codex::CodexCommand {
             port: args.port,
             open: args.open,

@@ -1,4 +1,4 @@
-use cargo_ferrox::commands::{check, codex, new, test};
+use cargo_ferrox::commands::{check, codex, mesh, new, test};
 use cargo_ferrox::templates::ProjectTemplate;
 use std::fs;
 
@@ -45,6 +45,7 @@ fn test_scaffold_clean_service() {
     // Check DDD purity check on scaffolded clean service
     let check_res = check::execute(check::CheckCommand {
         strict: true,
+        security: false,
         path: Some(tmp.clone()),
     });
     assert!(check_res.is_ok());
@@ -145,4 +146,94 @@ fn test_codex_command() {
         open: false,
     });
     assert!(res.is_ok());
+}
+
+#[test]
+fn test_security_sentinel_audit() {
+    let tmp = std::env::temp_dir().join("ferrox_test_security");
+    let _ = fs::remove_dir_all(&tmp);
+    fs::create_dir_all(tmp.join("src")).unwrap();
+
+    let clean_code = r#"
+        pub fn authenticate_user(token: &str) -> bool {
+            token.starts_with("v4.local.")
+        }
+    "#;
+    fs::write(tmp.join("src/auth.rs"), clean_code).unwrap();
+
+    // Verify clean pass with security flag
+    let res = check::execute(check::CheckCommand {
+        strict: true,
+        security: true,
+        path: Some(tmp.clone()),
+    });
+    assert!(res.is_ok());
+
+    // Verify Shannon entropy calculation
+    let low_entropy = check::calculate_shannon_entropy("aaaaaaaaaaaaaaaa");
+    assert!(low_entropy < 1.0);
+
+    let high_entropy = check::calculate_shannon_entropy("4k7j9xL2pQ8mZ0wR5vY1bC3nF6tH");
+    assert!(high_entropy > 4.0);
+
+    let _ = fs::remove_dir_all(&tmp);
+}
+
+#[test]
+fn test_mesh_commands_lifecycle() {
+    // 1. Mesh Up (dry-run)
+    let up_res = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Up(mesh::MeshUpOptions {
+            compose_file: None,
+            dry_run: true,
+        }),
+    });
+    assert!(up_res.is_ok());
+
+    // 2. Mesh Status
+    let status_res = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Status(mesh::MeshStatusOptions {
+            runtime: Some("match".to_string()),
+        }),
+    });
+    assert!(status_res.is_ok());
+
+    // 3. Mesh Chaos (Double Spend)
+    let chaos_double_spend = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Chaos(mesh::MeshChaosOptions {
+            scenario: "double-spend".to_string(),
+            target: "php".to_string(),
+            duration_ms: 2500,
+        }),
+    });
+    assert!(chaos_double_spend.is_ok());
+
+    // 4. Mesh Chaos (Timeout)
+    let chaos_timeout = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Chaos(mesh::MeshChaosOptions {
+            scenario: "timeout".to_string(),
+            target: "java".to_string(),
+            duration_ms: 1500,
+        }),
+    });
+    assert!(chaos_timeout.is_ok());
+
+    // 5. Mesh Chaos (Worker Kill)
+    let chaos_worker = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Chaos(mesh::MeshChaosOptions {
+            scenario: "worker-kill".to_string(),
+            target: "php".to_string(),
+            duration_ms: 500,
+        }),
+    });
+    assert!(chaos_worker.is_ok());
+
+    // 6. Mesh Down (dry-run)
+    let down_res = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Down(mesh::MeshDownOptions {
+            compose_file: None,
+            dry_run: true,
+        }),
+    });
+    assert!(down_res.is_ok());
 }
