@@ -6,8 +6,15 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
-documentation.workspace = true
-description = "Command Line Interface (cargo ferrox) for project scaffolding, code generation, and TypeScript export."
+description = "Official Command Line Interface (cargo ferrox) for project scaffolding, local dev-server, DDD compliance checks, and TDD quality gates."
+
+[lib]
+name = "cargo_ferrox"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cargo-ferrox"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }

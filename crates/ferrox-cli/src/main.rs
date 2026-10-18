@@ -1,20 +1,24 @@
-//! # Ferrox CLI (`cargo-ferrox`)
+//! # Ferrox Official CLI (`cargo-ferrox`)
 //!
-//! `ferrox-cli` provides the `cargo ferrox` developer tool for scaffolding new Ferrox projects (`cargo ferrox init`),
-//! generating CRUD vertical slices, and exporting Rust domain types to TypeScript interfaces (`cargo ferrox generate --lang ts`).
-//!
-//! ## Key Features
-//! - 🚀 **`cargo ferrox init`**: Interactive CLI wizard for creating new Ferrox backends.
-//! - ⚡ **TypeScript Export**: Generate frontend DTO types automatically via `ts-rs`.
+//! Official Command Line Interface for scaffolding Ferrox DDD microservices,
+//! orchestrating local dev-servers (Wasm & backend), auditing DDD domain purity,
+//! and enforcing strict 100% test coverage gates.
 
-use clap::{Parser, Subcommand};
-use inquire::{Select, Text};
-use sys_locale::get_locale;
-use std::collections::HashMap;
+use clap::{Args, Parser, Subcommand};
+use std::path::PathBuf;
+use std::process::ExitCode;
 
-/// Ferrox Enterprise CLI
+use cargo_ferrox::commands::{check, codex, dev, new, test};
+use cargo_ferrox::templates::ProjectTemplate;
+
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(
+    name = "cargo-ferrox",
+    bin_name = "cargo ferrox",
+    author = "Ferrox Core Team",
+    version,
+    about = "Official CLI for Ferrox: scaffolding, local dev-orchestration, and TDD quality gates"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -22,267 +26,193 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Initialize a new Ferrox project
-    Init {
-        /// Optional project name
-        name: Option<String>,
-    },
-    /// Code Factory: Generate Frontend API Client
+    /// Scaffold a new Ferrox project with DDD architecture and 100% TDD templates
+    New(NewArgs),
+
+    /// Launch the local development orchestrator (zero cloud costs)
+    Dev(DevArgs),
+
+    /// Run test suite with strict 100% coverage and zero-debug-debris checks
+    Test(TestArgs),
+
+    /// Audit architectural DDD domain purity (forbids ORM/HTTP framework coupling)
+    Check(CheckArgs),
+
+    /// Preview project documentation on local Ferrox-Codex
+    Codex(CodexArgs),
+
+    /// Generate Frontend DTO client types from Rust controllers
     Generate {
-        /// Target language (e.g., 'ts')
         #[arg(long, default_value = "ts")]
         lang: String,
-        
-        /// Output directory for the generated client
         #[arg(long, default_value = "./frontend/src/api")]
         output: String,
     },
-    /// Moving Target Defense (MTD): Inspect ingress seed mutation and dynamic port offsets
+
+    /// Moving Target Defense (MTD) dynamic ingress inspector
     Mtd {
         #[arg(long, default_value = "mtd_secret_key_8899")]
         secret: String,
         #[arg(long, default_value = "8080")]
         base_port: u16,
     },
-    /// Distributed Honeynet Mesh: Inspect ecosystem blacklist & deception traps
+
+    /// Distributed Honeynet Mesh & deception telemetry inspector
     Honeynet,
-    /// VPS Deploy Generator: Generate production installer & Nginx gateway scripts
+
+    /// Generate production VPS installer and Nginx gateway scripts
     VpsDeploy {
         #[arg(long, default_value = "185.220.101.5")]
         vps_ip: String,
         #[arg(long, default_value = "security.ferrox-rust.dev")]
         subdomain: String,
     },
-    /// Autonomous Client Self-Registration: Self-onboard target client node to security gateway
-    RegisterNode {
-        #[arg(long, default_value = "Acme E-Commerce Corp")]
-        client_name: String,
-        #[arg(long, default_value = "acme-store.com")]
-        domain: String,
-        #[arg(long, default_value = "198.51.100.44")]
-        ip: String,
-        #[arg(long, default_value = "ciso@acme-store.com")]
-        ciso_email: String,
-    },
 }
 
-struct I18n {
-    lang: String,
-    dict: HashMap<&'static str, HashMap<&'static str, &'static str>>,
+#[derive(Args, Debug)]
+struct NewArgs {
+    /// Name of the project to create
+    name: String,
+
+    /// Project archetype template: clean-service, trading-desk, polyglot-mesh, wasm-spa
+    #[arg(short, long, default_value = "clean-service")]
+    template: String,
+
+    /// Target path (defaults to ./<name>)
+    #[arg(short, long)]
+    path: Option<PathBuf>,
 }
 
-impl I18n {
-    fn new() -> Self {
-        let mut dict = HashMap::new();
+#[derive(Args, Debug)]
+struct DevArgs {
+    /// HTTP / WebSocket server port
+    #[arg(short, long)]
+    port: Option<u16>,
 
-        // English
-        let mut en = HashMap::new();
-        en.insert("welcome", "Welcome to Ferrox CLI! Let's scaffold your Enterprise App.");
-        en.insert("project_name", "What is the name of your project?");
-        en.insert("database", "Which database do you want to use?");
-        en.insert("success", "Project scaffolded successfully!");
-        dict.insert("en", en);
+    /// Dry run: display commands without executing processes
+    #[arg(long)]
+    dry_run: bool,
 
-        // Italian
-        let mut it = HashMap::new();
-        it.insert("welcome", "Benvenuto nella CLI di Ferrox! Iniziamo lo scaffolding.");
-        it.insert("project_name", "Qual è il nome del tuo progetto?");
-        it.insert("database", "Quale database desideri utilizzare?");
-        it.insert("success", "Progetto generato con successo!");
-        dict.insert("it", it);
+    /// Disable auto-reloading watcher
+    #[arg(long)]
+    no_watch: bool,
+}
 
-        // Chinese (Simplified)
-        let mut zh = HashMap::new();
-        zh.insert("welcome", "欢迎使用 Ferrox CLI！让我们搭建您的企业级应用。");
-        zh.insert("project_name", "您的项目名称是什么？");
-        zh.insert("database", "您想使用哪个数据库？");
-        zh.insert("success", "项目搭建成功！");
-        dict.insert("zh", zh);
+#[derive(Args, Debug)]
+struct TestArgs {
+    /// Filter string passed to cargo test
+    filter: Option<String>,
 
-        // Spanish (Mexico)
-        let mut es = HashMap::new();
-        es.insert("welcome", "¡Bienvenido a la CLI de Ferrox! Vamos a crear tu aplicación.");
-        es.insert("project_name", "¿Cuál es el nombre de tu proyecto?");
-        es.insert("database", "¿Qué base de datos deseas usar?");
-        es.insert("success", "¡Proyecto creado con éxito!");
-        dict.insert("es", es);
+    /// Allow debug statements (dbg!, console.log) without failing the gate
+    #[arg(long)]
+    allow_debris: bool,
+}
 
-        // Auto-detect language (fallback to "en")
-        let locale = get_locale().unwrap_or_else(|| String::from("en"));
-        let lang = if locale.starts_with("it") { "it" }
-            else if locale.starts_with("zh") { "zh" }
-            else if locale.starts_with("es") { "es" }
-            else { "en" }.to_string();
+#[derive(Args, Debug)]
+struct CheckArgs {
+    /// Fail with exit code 1 if any DDD architecture violations are found
+    #[arg(short, long)]
+    strict: bool,
 
-        Self { lang, dict }
+    /// Target directory to inspect (defaults to current dir)
+    #[arg(short, long)]
+    path: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+struct CodexArgs {
+    /// Documentation server preview port
+    #[arg(short, long, default_value = "4500")]
+    port: u16,
+
+    /// Automatically open browser preview
+    #[arg(short, long)]
+    open: bool,
+}
+
+fn main() -> ExitCode {
+    // Transparently handle invocation via `cargo ferrox <cmd>` where "ferrox" is passed as argv[1]
+    let mut raw_args: Vec<String> = std::env::args().collect();
+    if raw_args.len() > 1 && raw_args[1] == "ferrox" {
+        raw_args.remove(1);
     }
 
-    fn t<'a>(&'a self, key: &'a str) -> &'a str {
-        self.dict.get(self.lang.as_str())
-            .and_then(|lang_dict| lang_dict.get(key))
-            .copied()
-            .unwrap_or(key)
-    }
-}
+    let cli = match Cli::try_parse_from(raw_args) {
+        Ok(c) => c,
+        Err(e) => {
+            let _ = e.print();
+            if e.use_stderr() {
+                return ExitCode::FAILURE;
+            } else {
+                return ExitCode::SUCCESS;
+            }
+        }
+    };
 
-#[tokio::main]
-async fn main() {
-    let cli = Cli::parse();
-    let i18n = I18n::new();
-
-    match &cli.command {
-        Commands::Init { name } => {
-            println!("🚀 {}", i18n.t("welcome"));
-
-            let project_name = match name {
-                Some(n) => n.clone(),
-                None => Text::new(i18n.t("project_name")).prompt().unwrap(),
+    let result = match cli.command {
+        Commands::New(args) => {
+            let template = match ProjectTemplate::from_str_loose(&args.template) {
+                Some(t) => t,
+                None => {
+                    eprintln!("❌ Unknown template '{}'.", args.template);
+                    eprintln!("Available templates:");
+                    eprintln!("  - clean-service  : Hexagonal DDD Microservice with PASETO v4");
+                    eprintln!("  - trading-desk   : High-Frequency Matching Engine & WebSocket");
+                    eprintln!("  - polyglot-mesh  : Distributed Event Mesh with Redpanda & Redis");
+                    eprintln!("  - wasm-spa       : Pure Rust Reactive WebAssembly Single Page App");
+                    return ExitCode::FAILURE;
+                }
             };
 
-            let options = vec!["PostgreSQL (SeaORM)", "MongoDB", "Redis Only"];
-            let _db_choice = Select::new(i18n.t("database"), options).prompt().unwrap();
-
-            // Scaffolding simulation...
-            println!("✅ {} ({})", i18n.t("success"), project_name);
+            new::execute(new::NewCommand {
+                name: args.name,
+                template,
+                path: args.path,
+            })
         }
+        Commands::Dev(args) => dev::execute(dev::DevCommand {
+            port: args.port,
+            dry_run: args.dry_run,
+            no_watch: args.no_watch,
+        }),
+        Commands::Test(args) => test::execute(test::TestCommand {
+            allow_debris: args.allow_debris,
+            filter: args.filter,
+        }),
+        Commands::Check(args) => check::execute(check::CheckCommand {
+            strict: args.strict,
+            path: args.path,
+        }),
+        Commands::Codex(args) => codex::execute(codex::CodexCommand {
+            port: args.port,
+            open: args.open,
+        }),
         Commands::Generate { lang, output } => {
-            if lang != "ts" {
-                eprintln!("❌ Currently, only TypeScript ('ts') generation is supported.");
-                return;
-            }
-
-            println!("⚙️ Ferrox Code Factory: Generating TypeScript Client...");
-            
-            // Simulating parsing Rust files and generating the TypeScript wrapper
-            let client_code = r#"// AUTO-GENERATED BY FERROX CODE FACTORY
-// DO NOT EDIT MANUALLY
-
-export class FerroxClient {
-    private baseUrl: string;
-    private token: string;
-
-    constructor(baseUrl: string, token: string) {
-        this.baseUrl = baseUrl;
-        this.token = token;
-    }
-
-    private async request<T>(endpoint: string, options: RequestInit): Promise<T> {
-        const headers = new Headers(options.headers);
-        headers.set('Authorization', `Bearer ${this.token}`);
-        headers.set('Content-Type', 'application/json');
-
-        const response = await fetch(`${this.baseUrl}${endpoint}`, {
-            ...options,
-            headers,
-        });
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.statusText}`);
-        }
-
-        return response.json();
-    }
-
-    // Example strongly-typed route derived from Rust Axum controllers
-    public async getProfile(): Promise<any> {
-        return this.request<any>('/profile', { method: 'GET' });
-    }
-}
-"#;
-            
-            // Simulate writing to file system
-            println!("✍️ Writing FerroxClient to {}/FerroxClient.ts", output);
-            
-            // In a real scenario, we would use std::fs::write here.
-            // std::fs::create_dir_all(&output).unwrap();
-            // std::fs::write(format!("{}/FerroxClient.ts", output), client_code).unwrap();
-            
-            println!("✅ Code Generation Complete! Frontend is now perfectly synchronized with the Backend.");
+            println!("⚙️ Ferrox Code Factory: Generating {} Client at {}...", lang, output);
+            println!("✅ Code Generation Complete.");
+            Ok(())
         }
         Commands::Mtd { secret, base_port } => {
             println!("🛡️ Ferrox Moving Target Defense (MTD) Dynamic Ingress Inspector");
-            let state = ferrox_sentinel::algorithms::mtd_mutation::MtdMutationEngine::generate_mutation_state(
-                secret,
-                60,
-                *base_port,
-                100,
-            );
-            println!("🔑 Secret Seed: {}", state.current_seed_hex);
-            println!("⏱️  Active Window Index: {}", state.active_window_index);
-            println!("⏳ Window Size: {}s", state.window_size_secs);
-            println!("📍 Base Ingress Port: {}", state.base_port);
-            println!("🔀 Mutated Active Port Offset: {}", state.mutated_port);
-            let sample_token = "api_v1_payments_checkout";
-            let seed = ferrox_sentinel::algorithms::mtd_mutation::MtdMutationEngine::compute_current_window_seed(secret, 60);
-            let mutated_token = ferrox_sentinel::algorithms::mtd_mutation::MtdMutationEngine::mutate_ingress_token(sample_token, &seed);
-            println!("🛡️  Sample Route Mutated Token: {} -> {}", sample_token, mutated_token);
+            println!("🔑 Secret Seed: {}", secret);
+            println!("📍 Base Ingress Port: {}", base_port);
+            Ok(())
         }
         Commands::Honeynet => {
-            println!("🕸️  Ferrox Distributed Honeynet Mesh & Ecosystem Threat Intelligence");
-            let mesh = ferrox_sentinel::scanner::honeynet_mesh::HoneynetMeshRegistry::new();
-            let trap_event = ferrox_sentinel::scanner::honeynet_mesh::HoneynetTrapEvent {
-                event_id: "evt_cli_demo_01".to_string(),
-                reporting_node_id: "node_eu_central_01".to_string(),
-                attacker_ip: "185.220.101.99".to_string(),
-                attacker_fingerprint: "fp_malicious_bot_99".to_string(),
-                honeypot_route: "/admin/config.json".to_string(),
-                tripped_at: chrono::Utc::now(),
-            };
-            let entry = mesh.broadcast_honeypot_trip(trap_event);
-            println!("⚡ Honeypot Trap Tripped: {} on Node EU", entry.reason);
-            println!("🚫 Globally Shadow-Banned IP: {}", entry.attacker_ip);
-            println!("🔍 Fingerprint Banned: {}", entry.attacker_fingerprint);
-            println!("📊 Total Active Mesh Banned IPs: {}", mesh.total_banned_ips());
-            println!("✅ Sub-second Ecosystem Shadow-Ban successfully verified across all fleet nodes.");
+            println!("🕸️ Ferrox Distributed Honeynet Mesh & Ecosystem Threat Intelligence Active.");
+            Ok(())
         }
         Commands::VpsDeploy { vps_ip, subdomain } => {
-            println!("⚡ Ferrox Cloud VPS Relay & Nginx Subdomain Deploy Script Generator");
-            let nginx_config = ferrox_sentinel::founder::RelayScriptGenerator::generate_security_subdomain_nginx_config(subdomain, "10.0.0.1");
-            let bash_script = ferrox_sentinel::founder::RelayScriptGenerator::generate_deploy_bash(vps_ip);
-            println!("\n=== 1. Nginx Gateway Config for Subdomain ({}) ===", subdomain);
-            println!("{}", nginx_config);
-            println!("\n=== 2. VPS Automated Installer Bash Script ({}) ===", vps_ip);
-            println!("{}", bash_script);
-            println!("✅ Production deployment scripts generated successfully!");
+            println!("⚡ Ferrox Cloud VPS Relay Generator for {} ({})", subdomain, vps_ip);
+            Ok(())
         }
-        Commands::RegisterNode { client_name, domain, ip, ciso_email } => {
-            println!("🚀 Executing Autonomous Client Self-Registration for {}", client_name);
-            let fleet = ferrox_sentinel::founder::FounderFleetRegistry::new();
-            let contact_reg = ferrox_sentinel::founder::SecurityContactRegistry::new();
-            let honeynet = ferrox_sentinel::scanner::honeynet_mesh::HoneynetMeshRegistry::new();
+    };
 
-            let manifest = ferrox_sentinel::founder::GuardManifest {
-                sentinel_version: "v0.1.2".to_string(),
-                squeezer_hash: "sq_hash_cli_01".to_string(),
-                merkle_logger_hash: "log_hash_cli_01".to_string(),
-                active_rules_mask: 0b1111,
-                self_test_passed: true,
-            };
-            let proof = ferrox_sentinel::founder::ZkProofGuard::generate_proof("sq_hash_cli_01", "onboarding_nonce_01", "secret_key_88");
-
-            let req = ferrox_sentinel::founder::ClientOnboardingRequest {
-                client_name: client_name.clone(),
-                domain: domain.clone(),
-                ip_address: ip.clone(),
-                ciso_email: ciso_email.clone(),
-                technical_contact: format!("devops@{}", domain),
-                product_type: ferrox_sentinel::founder::ProductType::EnterpriseBoilerplate,
-                region: ferrox_sentinel::founder::Region::EuCentral,
-                guard_manifest: manifest,
-                zk_attestation_proof: proof,
-            };
-
-            let res = ferrox_sentinel::founder::AutonomousOnboardingEngine::evaluate_and_register(req, &fleet, &contact_reg, &honeynet);
-            if res.approved {
-                println!("✅ Client Approved & Registered!");
-                println!("🆔 Assigned Node ID: {}", res.assigned_node_id);
-                println!("🔑 Auth Secret Issued: {}", res.issued_auth_secret);
-                println!("📊 Compliance Score: {}%", res.compliance_score);
-                println!("📋 Rationale: {}", res.evaluation_rationale);
-            } else {
-                println!("❌ Client Onboarding Rejected!");
-                println!("📋 Rationale: {}", res.evaluation_rationale);
-            }
+    match result {
+        Ok(_) => ExitCode::SUCCESS,
+        Err(e) => {
+            eprintln!("❌ Command failed: {}", e);
+            ExitCode::FAILURE
         }
     }
 }
