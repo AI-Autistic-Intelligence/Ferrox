@@ -39,6 +39,9 @@ use thiserror::Error;
 /// A standard global error type for the application.
 #[derive(Debug, Error)]
 pub enum AppError {
+    #[error("Bad Request: {0}")]
+    BadRequest(String),
+
     #[error("Not Found: {0}")]
     NotFound(String),
 
@@ -68,6 +71,7 @@ pub struct ErrorResponse {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, message) = match &self {
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
             AppError::NotFound(msg) => (StatusCode::NOT_FOUND, msg.clone()),
             AppError::ValidationError(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
             AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg.clone()),

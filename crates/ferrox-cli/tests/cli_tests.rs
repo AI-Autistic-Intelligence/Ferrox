@@ -186,9 +186,20 @@ fn test_mesh_commands_lifecycle() {
         subcommand: mesh::MeshSubcommand::Up(mesh::MeshUpOptions {
             compose_file: None,
             dry_run: true,
+            standalone: false,
         }),
     });
     assert!(up_res.is_ok());
+
+    // 1b. Mesh Up Standalone (dry-run)
+    let up_standalone = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Up(mesh::MeshUpOptions {
+            compose_file: None,
+            dry_run: true,
+            standalone: true,
+        }),
+    });
+    assert!(up_standalone.is_ok());
 
     // 2. Mesh Status
     let status_res = mesh::execute(mesh::MeshCommand {
@@ -228,12 +239,40 @@ fn test_mesh_commands_lifecycle() {
     });
     assert!(chaos_worker.is_ok());
 
-    // 6. Mesh Down (dry-run)
+    // 6. Mesh Publish (dry-run all)
+    let publish_res = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Publish(mesh::MeshPublishOptions {
+            registry: "ghcr.io/ai-autistic-intelligence".to_string(),
+            tag: "latest".to_string(),
+            push: true,
+            dry_run: true,
+            no_cache: false,
+            service: None,
+        }),
+    });
+    assert!(publish_res.is_ok());
+
+    // 6b. Mesh Publish (dry-run filtered service)
+    let publish_front = mesh::execute(mesh::MeshCommand {
+        subcommand: mesh::MeshSubcommand::Publish(mesh::MeshPublishOptions {
+            registry: "ghcr.io/ai-autistic-intelligence".to_string(),
+            tag: "v1.0.0".to_string(),
+            push: false,
+            dry_run: true,
+            no_cache: true,
+            service: Some("front".to_string()),
+        }),
+    });
+    assert!(publish_front.is_ok());
+
+    // 7. Mesh Down (dry-run)
     let down_res = mesh::execute(mesh::MeshCommand {
         subcommand: mesh::MeshSubcommand::Down(mesh::MeshDownOptions {
             compose_file: None,
             dry_run: true,
+            standalone: true,
         }),
     });
     assert!(down_res.is_ok());
 }
+

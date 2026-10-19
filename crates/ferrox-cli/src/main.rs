@@ -142,6 +142,9 @@ enum MeshSubcommands {
         /// Dry run: display topology without executing containers
         #[arg(long)]
         dry_run: bool,
+        /// Use zero-cloning standalone manifest (docker-compose.standalone.yml)
+        #[arg(long)]
+        standalone: bool,
     },
     /// Stop and safely clean up local mesh infrastructure
     Down {
@@ -151,6 +154,9 @@ enum MeshSubcommands {
         /// Dry run: display cleanup steps without executing docker
         #[arg(long)]
         dry_run: bool,
+        /// Use zero-cloning standalone manifest (docker-compose.standalone.yml)
+        #[arg(long)]
+        standalone: bool,
     },
     /// Query Kafka/Redpanda consumer lag, topic offsets, and memory of services
     Status {
@@ -169,6 +175,27 @@ enum MeshSubcommands {
         /// Duration in ms for timeout scenarios
         #[arg(long, default_value = "2500")]
         duration_ms: u64,
+    },
+    /// Build, tag, and publish Docker images to GHCR or container registry directly from host
+    Publish {
+        /// Target registry prefix (default: ghcr.io/ai-autistic-intelligence)
+        #[arg(short, long, default_value = "ghcr.io/ai-autistic-intelligence")]
+        registry: String,
+        /// Target image tag (default: latest)
+        #[arg(short, long, default_value = "latest")]
+        tag: String,
+        /// Push images to registry after building
+        #[arg(long)]
+        push: bool,
+        /// Dry run: display build and push commands without executing
+        #[arg(long)]
+        dry_run: bool,
+        /// Force rebuild without using Docker layer cache
+        #[arg(long)]
+        no_cache: bool,
+        /// Build and publish only a specific service: front, match, saas, java, php, node, py
+        #[arg(short, long)]
+        service: Option<String>,
     },
 }
 
@@ -239,17 +266,27 @@ fn main() -> ExitCode {
         }),
         Commands::Mesh(args) => {
             let subcommand = match args.command {
-                MeshSubcommands::Up { compose_file, dry_run } => {
-                    mesh::MeshSubcommand::Up(mesh::MeshUpOptions { compose_file, dry_run })
+                MeshSubcommands::Up { compose_file, dry_run, standalone } => {
+                    mesh::MeshSubcommand::Up(mesh::MeshUpOptions { compose_file, dry_run, standalone })
                 }
-                MeshSubcommands::Down { compose_file, dry_run } => {
-                    mesh::MeshSubcommand::Down(mesh::MeshDownOptions { compose_file, dry_run })
+                MeshSubcommands::Down { compose_file, dry_run, standalone } => {
+                    mesh::MeshSubcommand::Down(mesh::MeshDownOptions { compose_file, dry_run, standalone })
                 }
                 MeshSubcommands::Status { runtime } => {
                     mesh::MeshSubcommand::Status(mesh::MeshStatusOptions { runtime })
                 }
                 MeshSubcommands::Chaos { scenario, target, duration_ms } => {
                     mesh::MeshSubcommand::Chaos(mesh::MeshChaosOptions { scenario, target, duration_ms })
+                }
+                MeshSubcommands::Publish { registry, tag, push, dry_run, no_cache, service } => {
+                    mesh::MeshSubcommand::Publish(mesh::MeshPublishOptions {
+                        registry,
+                        tag,
+                        push,
+                        dry_run,
+                        no_cache,
+                        service,
+                    })
                 }
             };
             mesh::execute(mesh::MeshCommand { subcommand })

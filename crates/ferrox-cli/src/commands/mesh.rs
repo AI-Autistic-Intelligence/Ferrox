@@ -8,18 +8,21 @@ pub enum MeshSubcommand {
     Down(MeshDownOptions),
     Status(MeshStatusOptions),
     Chaos(MeshChaosOptions),
+    Publish(MeshPublishOptions),
 }
 
 #[derive(Debug, Clone)]
 pub struct MeshUpOptions {
     pub compose_file: Option<PathBuf>,
     pub dry_run: bool,
+    pub standalone: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct MeshDownOptions {
     pub compose_file: Option<PathBuf>,
     pub dry_run: bool,
+    pub standalone: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -34,6 +37,16 @@ pub struct MeshChaosOptions {
     pub duration_ms: u64,
 }
 
+#[derive(Debug, Clone)]
+pub struct MeshPublishOptions {
+    pub registry: String,
+    pub tag: String,
+    pub push: bool,
+    pub dry_run: bool,
+    pub no_cache: bool,
+    pub service: Option<String>,
+}
+
 pub struct MeshCommand {
     pub subcommand: MeshSubcommand,
 }
@@ -44,6 +57,7 @@ pub fn execute(cmd: MeshCommand) -> io::Result<()> {
         MeshSubcommand::Down(opts) => execute_mesh_down(opts),
         MeshSubcommand::Status(opts) => execute_mesh_status(opts),
         MeshSubcommand::Chaos(opts) => execute_mesh_chaos(opts),
+        MeshSubcommand::Publish(opts) => execute_mesh_publish(opts),
     }
 }
 
@@ -73,11 +87,132 @@ fn find_compose_file(specified: Option<PathBuf>) -> Option<PathBuf> {
     None
 }
 
+fn find_standalone_compose_file(specified: Option<PathBuf>) -> Option<PathBuf> {
+    if let Some(p) = specified {
+        if p.exists() {
+            return Some(p);
+        }
+    }
+
+    let candidates = [
+        PathBuf::from("docker-compose.standalone.yml"),
+        PathBuf::from("ferrox-infrastructure/docker-compose.standalone.yml"),
+        PathBuf::from("../ferrox-infrastructure/docker-compose.standalone.yml"),
+        PathBuf::from("../../ferrox-infrastructure/docker-compose.standalone.yml"),
+    ];
+
+    for candidate in &candidates {
+        if candidate.exists() {
+            return Some(candidate.clone());
+        }
+    }
+
+    None
+}
+
+#[derive(Debug)]
+struct MeshTargetInfo {
+    id: &'static str,
+    name: &'static str,
+    image_name: &'static str,
+    relative_context: &'static str,
+    dockerfile_candidates: &'static [&'static str],
+    estimated_size: &'static str,
+}
+
+const MESH_TARGETS: &[MeshTargetInfo] = &[
+    MeshTargetInfo {
+        id: "front",
+        name: "ferrox-front (Reactive Wasm)",
+        image_name: "ferrox-front",
+        relative_context: "ferrox-front",
+        dockerfile_candidates: &["Dockerfile.frontend", "Dockerfile"],
+        estimated_size: "24.5 MB",
+    },
+    MeshTargetInfo {
+        id: "match",
+        name: "ferrox-match (Zero-Alloc Engine)",
+        image_name: "ferrox-match",
+        relative_context: "ferrox-match",
+        dockerfile_candidates: &["Dockerfile"],
+        estimated_size: "18.2 MB",
+    },
+    MeshTargetInfo {
+        id: "saas",
+        name: "ferrox-saas-backend (Rust CQRS)",
+        image_name: "ferrox-saas-backend",
+        relative_context: "ferrox",
+        dockerfile_candidates: &["Dockerfile"],
+        estimated_size: "21.8 MB",
+    },
+    MeshTargetInfo {
+        id: "java",
+        name: "ferrox-java (Project Loom)",
+        image_name: "ferrox-java",
+        relative_context: "ferrox-java",
+        dockerfile_candidates: &["ferrox-java-showcase/Dockerfile", "Dockerfile"],
+        estimated_size: "168.0 MB",
+    },
+    MeshTargetInfo {
+        id: "php",
+        name: "ferrox-php (FrankenPHP Saga)",
+        image_name: "ferrox-php",
+        relative_context: "ferrox-php",
+        dockerfile_candidates: &["examples/eshop/Dockerfile", "Dockerfile"],
+        estimated_size: "95.4 MB",
+    },
+    MeshTargetInfo {
+        id: "node",
+        name: "ferrox-node (NestJS/Fastify CQRS)",
+        image_name: "ferrox-node",
+        relative_context: "ferrox-node",
+        dockerfile_candidates: &["examples/enterprise-showcase/Dockerfile", "Dockerfile"],
+        estimated_size: "82.1 MB",
+    },
+    MeshTargetInfo {
+        id: "py",
+        name: "ferrox-py (Polars Analytics)",
+        image_name: "ferrox-py",
+        relative_context: "ferrox-py",
+        dockerfile_candidates: &["examples/data_platform/Dockerfile", "Dockerfile"],
+        estimated_size: "114.5 MB",
+    },
+];
+
+fn resolve_service_paths(target: &MeshTargetInfo) -> Option<(PathBuf, PathBuf)> {
+    let context_candidates = [
+        PathBuf::from(target.relative_context),
+        PathBuf::from("..").join(target.relative_context),
+        PathBuf::from("../..").join(target.relative_context),
+        PathBuf::from("."),
+    ];
+
+    for ctx in &context_candidates {
+        if ctx.exists() && ctx.is_dir() {
+            for df_rel in target.dockerfile_candidates {
+                let df_path = ctx.join(df_rel);
+                if df_path.exists() {
+                    if ctx == &PathBuf::from(".") && target.id == "saas" && !PathBuf::from("crates/ferrox-cli").exists() && !PathBuf::from("Cargo.toml").exists() {
+                        continue;
+                    }
+                    return Some((ctx.clone(), df_path));
+                }
+            }
+        }
+    }
+    None
+}
+
 fn execute_mesh_up(opts: MeshUpOptions) -> io::Result<()> {
     println!("🌐 Ferrox Polyglot Mesh Orchestrator: STARTING LOCAL MESH");
     println!("================================================================================");
 
-    let compose_file = find_compose_file(opts.compose_file);
+    let compose_file = if opts.standalone {
+        println!("🚀 Mode: STANDALONE ZERO-CLONING (Registry Distributed Images)");
+        find_standalone_compose_file(opts.compose_file)
+    } else {
+        find_compose_file(opts.compose_file)
+    };
 
     if let Some(ref cf) = compose_file {
         println!("📦 Target Docker Compose Manifest: {}", cf.display());
@@ -115,7 +250,11 @@ fn execute_mesh_down(opts: MeshDownOptions) -> io::Result<()> {
     println!("🛑 Ferrox Polyglot Mesh Orchestrator: STOPPING LOCAL MESH");
     println!("================================================================================");
 
-    let compose_file = find_compose_file(opts.compose_file);
+    let compose_file = if opts.standalone {
+        find_standalone_compose_file(opts.compose_file)
+    } else {
+        find_compose_file(opts.compose_file)
+    };
 
     if let Some(ref cf) = compose_file {
         println!("📦 Target Docker Compose Manifest: {}", cf.display());
@@ -133,6 +272,171 @@ fn execute_mesh_down(opts: MeshDownOptions) -> io::Result<()> {
     }
 
     println!("✅ Ferrox Polyglot Living Mesh has been safely stopped.");
+    Ok(())
+}
+
+fn execute_mesh_publish(opts: MeshPublishOptions) -> io::Result<()> {
+    println!("📦 Ferrox Mesh Container Engine: DIRECT HOST PUBLISHING ($0.00 Cloud Cost)");
+    println!("================================================================================");
+    println!("🏷️ Target Registry : {}", opts.registry);
+    println!("🏷️ Image Tag       : {}", opts.tag);
+    println!("🚀 Action Mode     : {}", if opts.push { "BUILD & PUSH TO REGISTRY" } else { "BUILD & TAG LOCALLY" });
+    if opts.dry_run {
+        println!("🔍 Execution Mode  : DRY-RUN (Commands will be displayed without execution)");
+    }
+    if opts.no_cache {
+        println!("⚡ Cache Mode      : --no-cache forced");
+    }
+    if let Some(ref svc) = opts.service {
+        println!("🎯 Service Filter  : {}", svc);
+    }
+    println!("--------------------------------------------------------------------------------");
+
+    struct PublishSummary {
+        id: &'static str,
+        image_tag: String,
+        status: String,
+        action: String,
+        size: &'static str,
+    }
+
+    let mut summaries = Vec::new();
+
+    for target in MESH_TARGETS {
+        if let Some(ref svc_filter) = opts.service {
+            let filter_lower = svc_filter.to_lowercase();
+            if !target.id.eq_ignore_ascii_case(&filter_lower)
+                && !target.image_name.to_lowercase().contains(&filter_lower)
+            {
+                continue;
+            }
+        }
+
+        let full_tag = format!("{}/{}:{}", opts.registry.trim_end_matches('/'), target.image_name, opts.tag);
+        println!("\n🔨 Processing service: {}...", target.name);
+        println!("   Image Tag: {}", full_tag);
+
+        let resolved = resolve_service_paths(target);
+        match resolved {
+            Some((ctx, df)) => {
+                println!("   Context  : {}", ctx.display());
+                println!("   Dockerfl : {}", df.display());
+
+                if opts.dry_run {
+                    let mut cmd_str = format!("docker build -t {} -f {}", full_tag, df.display());
+                    if opts.no_cache {
+                        cmd_str.push_str(" --no-cache");
+                    }
+                    cmd_str.push_str(&format!(" {}", ctx.display()));
+                    println!("   [DRY-RUN] Would run: {}", cmd_str);
+
+                    if opts.push {
+                        println!("   [DRY-RUN] Would run: docker push {}", full_tag);
+                    }
+
+                    summaries.push(PublishSummary {
+                        id: target.id,
+                        image_tag: full_tag,
+                        status: "Dry-Run OK".to_string(),
+                        action: if opts.push { "Would Push".to_string() } else { "Would Build".to_string() },
+                        size: target.estimated_size,
+                    });
+                } else {
+                    println!("   Executing docker build...");
+                    let mut build_cmd = Command::new("docker");
+                    build_cmd.args(["build", "-t", &full_tag, "-f"]);
+                    build_cmd.arg(&df);
+                    if opts.no_cache {
+                        build_cmd.arg("--no-cache");
+                    }
+                    build_cmd.arg(&ctx);
+
+                    let status = build_cmd.status();
+                    match status {
+                        Ok(s) if s.success() => {
+                            println!("   ✔ Build completed successfully.");
+                            let mut action_taken = "Built Locally".to_string();
+
+                            if opts.push {
+                                println!("   🚀 Pushing image to {}...", opts.registry);
+                                let push_status = Command::new("docker")
+                                    .args(["push", &full_tag])
+                                    .status();
+
+                                match push_status {
+                                    Ok(ps) if ps.success() => {
+                                        println!("   ✔ Push completed successfully.");
+                                        action_taken = "Pushed to GHCR".to_string();
+                                    }
+                                    Ok(ps) => {
+                                        println!("   ⚠️ Docker push exited with status {}. Ensure 'docker login ghcr.io' was executed.", ps);
+                                        action_taken = "Push Error (Unauthenticated)".to_string();
+                                    }
+                                    Err(e) => {
+                                        println!("   ⚠️ Docker push failed: {}.", e);
+                                        action_taken = "Push Failed".to_string();
+                                    }
+                                }
+                            }
+
+                            summaries.push(PublishSummary {
+                                id: target.id,
+                                image_tag: full_tag,
+                                status: "SUCCESS".to_string(),
+                                action: action_taken,
+                                size: target.estimated_size,
+                            });
+                        }
+                        Ok(s) => {
+                            println!("   ⚠️ Docker build exited with status {}.", s);
+                            summaries.push(PublishSummary {
+                                id: target.id,
+                                image_tag: full_tag,
+                                status: format!("Exit Code {}", s),
+                                action: "Build Failed".to_string(),
+                                size: target.estimated_size,
+                            });
+                        }
+                        Err(e) => {
+                            println!("   ℹ️ Docker daemon not accessible or skipped ({})", e);
+                            summaries.push(PublishSummary {
+                                id: target.id,
+                                image_tag: full_tag,
+                                status: "Daemon Offline".to_string(),
+                                action: "Skipped".to_string(),
+                                size: target.estimated_size,
+                            });
+                        }
+                    }
+                }
+            }
+            None => {
+                println!("   ⚠️ Could not locate local repository source or Dockerfile for '{}'.", target.name);
+                summaries.push(PublishSummary {
+                    id: target.id,
+                    image_tag: full_tag,
+                    status: "Source Not Found".to_string(),
+                    action: "Skipped".to_string(),
+                    size: target.estimated_size,
+                });
+            }
+        }
+    }
+
+    println!("\n================================================================================");
+    println!("📋 FERROX MESH CONTAINER PUBLISH SUMMARY ($0.00 Host Build):");
+    println!("┌───────────┬────────────────────────────────────────────────────────┬──────────────┬────────────────────────┬──────────┐");
+    println!("│ Target ID │ Image Repository & Tag                                 │ Build Status │ Action                 │ Est Size │");
+    println!("├───────────┼────────────────────────────────────────────────────────┼──────────────┼────────────────────────┼──────────┤");
+    for s in &summaries {
+        println!("│ {:<9} │ {:<54} │ {:<12} │ {:<22} │ {:<8} │", s.id, s.image_tag, s.status, s.action, s.size);
+    }
+    println!("└───────────┴────────────────────────────────────────────────────────┴──────────────┴────────────────────────┴──────────┘");
+
+    println!("\n🌐 GLOBAL ZERO-CLONING QUICKSTART ONE-LINER:");
+    println!("   Anyone in the world can run this full stack with ZERO repo cloning:");
+    println!("   curl -fsSL https://raw.githubusercontent.com/AI-Autistic-Intelligence/ferrox-infrastructure/master/docker-compose.standalone.yml | docker compose -f - up -d\n");
+
     Ok(())
 }
 
